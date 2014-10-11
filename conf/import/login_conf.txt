@@ -1,0 +1,12 @@
+// Login Server Port
+login_port: 7900
+// Ipban features (SQL only)
+ipban.enable: yes
+ipban.sql.db_hostname: 127.0.0.1
+ipban.sql.db_port: 3306
+ipban.sql.db_username: ragnarok
+ipban.sql.db_password: ragnarok
+ipban.sql.db_database: hercuser_rodb
+ipban.sql.codepage:
+ipban.sql.ipban_table: ipbanlist
+// Dynamic password failure ipban system
