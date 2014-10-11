@@ -49,6 +49,8 @@ struct s_subnet {
 	uint32 mask;
 	uint32 char_ip;
 	uint32 map_ip;
+	uint32 char_ip_for_client;
+	uint32 map_ip_for_client;
 } subnet[16];
 
 int subnet_count = 0;
@@ -283,7 +285,7 @@ int lan_subnetcheck(uint32 ip)
 {
 	int i;
 	ARR_FIND( 0, subnet_count, i, (subnet[i].char_ip & subnet[i].mask) == (ip & subnet[i].mask) );
-	return ( i < subnet_count ) ? subnet[i].char_ip : 0;
+	return ( i < subnet_count ) ? subnet[i].char_ip_for_client : 0;
 }
 
 //----------------------------------
@@ -293,8 +295,8 @@ int login_lan_config_read(const char *lancfgName)
 {
 	FILE *fp;
 	int line_num = 0;
-	char line[1024], w1[64], w2[64], w3[64], w4[64];
-
+	char line[1024], w1[64], w2[64], w3[64], w4[64],w5[64],w6[64];
+	int wcount = 0;
 	if((fp = fopen(lancfgName, "r")) == NULL) {
 		ShowWarning("LAN Support configuration file is not found: %s\n", lancfgName);
 		return 1;
@@ -306,7 +308,7 @@ int login_lan_config_read(const char *lancfgName)
 		if ((line[0] == '/' && line[1] == '/') || line[0] == '\n' || line[1] == '\n')
 			continue;
 
-		if (sscanf(line, "%63[^:]: %63[^:]:%63[^:]:%63[^\r\n]", w1, w2, w3, w4) != 4) {
+		if ((wcount=sscanf(line, "%63[^:]: %63[^:]:%63[^:]:%63[^:]%63[^:]%63[^\r\n]", w1, w2, w3, w4,w5,w6)) < 4) {
 			ShowWarning("Error syntax of configuration file %s in line %d.\n", lancfgName, line_num);
 			continue;
 		}
@@ -316,7 +318,18 @@ int login_lan_config_read(const char *lancfgName)
 			subnet[subnet_count].mask = str2ip(w2);
 			subnet[subnet_count].char_ip = str2ip(w3);
 			subnet[subnet_count].map_ip = str2ip(w4);
-
+			switch(wcount)
+				{
+				case 4:
+					subnet[subnet_count].char_ip_for_client = str2ip(w3);
+		                        subnet[subnet_count].map_ip_for_client = str2ip(w4);
+					break;
+				case 6:
+                                        subnet[subnet_count].char_ip_for_client = str2ip(w5);
+                                        subnet[subnet_count].map_ip_for_client = str2ip(w6);
+					break;
+				}
+			
 			if( (subnet[subnet_count].char_ip & subnet[subnet_count].mask) != (subnet[subnet_count].map_ip & subnet[subnet_count].mask) )
 			{
 				ShowError("%s: Configuration Error: The char server (%s) and map server (%s) belong to different subnetworks!\n", lancfgName, w3, w4);
@@ -1084,7 +1097,8 @@ int mmo_auth(struct login_session_data* sd, bool isServer) {
 void login_auth_ok(struct login_session_data* sd)
 {
 	int fd = sd->fd;
-	uint32 ip = session[fd]->client_addr;
+	//uint32 ip = session[fd]->client_addr;
+	uint32 ip = session[fd]->local_addr;
 
 	uint8 server_num, n;
 	uint32 subnet_char_ip;

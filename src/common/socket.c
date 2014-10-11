@@ -488,6 +488,12 @@ int connect_client(int listen_fd) {
 
 	create_session(fd, recv_to_fifo, send_from_fifo, default_func_parse);
 	session[fd]->client_addr = ntohl(client_address.sin_addr.s_addr);
+	{
+		struct sockaddr_in local_address;
+        	socklen_t local_len;
+		getsockname(fd,&local_address,&local_len);
+		session[fd]->local_addr = ntohl(local_address.sin_addr.s_addr);
+	}
 
 	return fd;
 }

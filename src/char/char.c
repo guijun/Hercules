@@ -136,6 +136,8 @@ struct s_subnet {
 	uint32 mask;
 	uint32 char_ip;
 	uint32 map_ip;
+	uint32 char_ip_for_client;
+	uint32 map_ip_for_client;
 } subnet[16];
 int subnet_count = 0;
 
@@ -3871,7 +3873,7 @@ int lan_subnetcheck(uint32 ip)
 	ARR_FIND( 0, subnet_count, i, (subnet[i].char_ip & subnet[i].mask) == (ip & subnet[i].mask) );
 	if( i < subnet_count ) {
 		ShowInfo("Subnet check [%u.%u.%u.%u]: Matches "CL_CYAN"%u.%u.%u.%u/%u.%u.%u.%u"CL_RESET"\n", CONVIP(ip), CONVIP(subnet[i].char_ip & subnet[i].mask), CONVIP(subnet[i].mask));
-		return subnet[i].map_ip;
+		return subnet[i].map_ip_for_client;
 	} else {
 		ShowInfo("Subnet check [%u.%u.%u.%u]: "CL_CYAN"WAN"CL_RESET"\n", CONVIP(ip));
 		return 0;
@@ -4120,7 +4122,8 @@ int parse_char(int fd)
 	unsigned short cmd;
 	int map_fd;
 	struct char_session_data* sd;
-	uint32 ipl = session[fd]->client_addr;
+//	uint32 ipl = session[fd]->client_addr;
+	uint32 ipl = session[fd]->local_addr;
 
 	sd = (struct char_session_data*)session[fd]->session_data;
 
@@ -5011,8 +5014,8 @@ int char_lan_config_read(const char *lancfgName)
 {
 	FILE *fp;
 	int line_num = 0;
-	char line[1024], w1[64], w2[64], w3[64], w4[64];
-
+	char line[1024], w1[64], w2[64], w3[64], w4[64], w5[64],w6[64];
+	int wcount = 0;
 	if((fp = fopen(lancfgName, "r")) == NULL) {
 		ShowWarning("LAN Support configuration file is not found: %s\n", lancfgName);
 		return 1;
@@ -5023,23 +5026,35 @@ int char_lan_config_read(const char *lancfgName)
 		if ((line[0] == '/' && line[1] == '/') || line[0] == '\n' || line[1] == '\n')
 			continue;
 
-		if (sscanf(line,"%63[^:]: %63[^:]:%63[^:]:%63[^\r\n]", w1, w2, w3, w4) != 4) {
-
-			ShowWarning("Error syntax of configuration file %s in line %d.\n", lancfgName, line_num);
-			continue;
-		}
+		if ((wcount=sscanf(line, "%63[^:]: %63[^:]:%63[^:]:%63[^:]%63[^:]%63[^\r\n]", w1, w2, w3, w4,w5,w6)) < 4) {
+                        ShowWarning("Error syntax of configuration file %s in line %d.\n", lancfgName, line_num);
+                        continue;
+                }
 
 		remove_control_chars(w1);
 		remove_control_chars(w2);
 		remove_control_chars(w3);
 		remove_control_chars(w4);
+		remove_control_chars(w5);
+		remove_control_chars(w6);
+
 
 		if( strcmpi(w1, "subnet") == 0 )
 		{
 			subnet[subnet_count].mask = str2ip(w2);
 			subnet[subnet_count].char_ip = str2ip(w3);
 			subnet[subnet_count].map_ip = str2ip(w4);
-
+			switch(wcount)
+                                {
+                                case 4:
+                                        subnet[subnet_count].char_ip_for_client = str2ip(w3);
+                                        subnet[subnet_count].map_ip_for_client = str2ip(w4);
+                                        break;
+                                case 6:
+                                        subnet[subnet_count].char_ip_for_client = str2ip(w5);
+                                        subnet[subnet_count].map_ip_for_client = str2ip(w6);
+                                        break;
+                                }
 			if( (subnet[subnet_count].char_ip & subnet[subnet_count].mask) != (subnet[subnet_count].map_ip & subnet[subnet_count].mask) )
 			{
 				ShowError("%s: Configuration Error: The char server (%s) and map server (%s) belong to different subnetworks!\n", lancfgName, w3, w4);
