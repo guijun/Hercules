@@ -286,7 +286,12 @@ int lan_subnetcheck(uint32 ip)
 	int i;
 	ARR_FIND( 0, subnet_count, i, (subnet[i].char_ip & subnet[i].mask) == (ip & subnet[i].mask) );
         if( i < subnet_count ) {
-                ShowInfo("Subnet check [%u.%u.%u.%u]: Matches "CL_CYAN"%u.%u.%u.%u/%u.%u.%u.%u"CL_RESET"\n", CONVIP(ip), CONVIP(subnet[i].char_ip & subnet[i].mask), CONVIP(subnet[i].mask));
+                ShowInfo("Subnet check [%u.%u.%u.%u]: Matches "CL_CYAN"%u.%u.%u.%u/%u.%u.%u.%u"CL_RESET"=>%u.%u.%u.%u\n", 
+			CONVIP(ip), 
+			CONVIP(subnet[i].char_ip & subnet[i].mask), 
+			CONVIP(subnet[i].mask),
+			CONVIP(subnet[i].char_ip_for_client)
+		);
                 return subnet[i].char_ip_for_client;
         } else {
                 ShowInfo("Subnet check [%u.%u.%u.%u]: "CL_CYAN"WAN"CL_RESET"\n", CONVIP(ip));
@@ -314,7 +319,7 @@ int login_lan_config_read(const char *lancfgName)
 		if ((line[0] == '/' && line[1] == '/') || line[0] == '\n' || line[1] == '\n')
 			continue;
 
-		if ((wcount=sscanf(line, "%63[^:]: %63[^:]:%63[^:]:%63[^:]%63[^:]%63[^\r\n]", w1, w2, w3, w4,w5,w6)) < 4) {
+		if ((wcount=sscanf(line, "%63[^:]: %63[^:]:%63[^:]:%63[^:]:%63[^:]:%63[^\r\n]", w1, w2, w3, w4,w5,w6)) < 4) {
 			ShowWarning("Error syntax of configuration file %s in line %d.\n", lancfgName, line_num);
 			continue;
 		}

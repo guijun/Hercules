@@ -490,7 +490,7 @@ int connect_client(int listen_fd) {
 	session[fd]->client_addr = ntohl(client_address.sin_addr.s_addr);
 	{
 		struct sockaddr_in local_address;
-        	socklen_t local_len;
+        	socklen_t local_len=sizeof(local_address);
 		getsockname(fd,&local_address,&local_len);
 		session[fd]->local_addr = ntohl(local_address.sin_addr.s_addr);
 	}
