@@ -37,12 +37,19 @@ struct pet_data;
  * Max Refine available to your server
  * Changing this limit requires edits to refine_db.txt
  **/
+#if(XA_EXPAND_UPPER_LIMIT)
+#ifdef RENEWAL
+        #define MAX_REFINE 20
+#else
+        #define MAX_REFINE 10
+#endif
+#else
 #ifdef RENEWAL
 	#define MAX_REFINE 20
 #else
 	#define MAX_REFINE 10
 #endif
-
+#endif
 enum refine_type {
 	REFINE_TYPE_ARMOR   = 0,
 	REFINE_TYPE_WEAPON1 = 1,

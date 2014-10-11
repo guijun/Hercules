@@ -104,7 +104,30 @@
 
 //Official Limit: 2.1b ( the var that stores the money doesn't go much higher than this by default )
 #define MAX_BANK_ZENY 2100000000
-
+#if(XA_EXPAND_UPPER_LIMIT)
+#define MAX_LEVEL 1000
+#define MAX_FAME 1000000000
+#define MAX_CART 100
+#define MAX_SKILL 1478
+#define MAX_SKILL_ID 10015   // [Ind/Hercules] max used skill ID
+// Update this max as necessary. 86 is the value needed for Expanded Super Novice.
+#define MAX_SKILL_TREE 86
+#define DEFAULT_WALK_SPEED 150
+#define MIN_WALK_SPEED 20 /* below 20 clips animation */
+#define MAX_WALK_SPEED 1000
+#define MAX_STORAGE 600
+#define MAX_GUILD_STORAGE 1000
+#define MAX_PARTY 24
+#define MAX_GUILD (16+10*10)     // Increased max guild members +6 per 1 extension levels [Lupus]
+#define MAX_GUILDPOSITION 20    // Increased max guild positions to accommodate for all members [Valaris] (removed) [PoW]
+#define MAX_GUILDEXPULSION 32
+#define MAX_GUILDALLIANCE 16
+#define MAX_GUILDSKILL 15       // Increased max guild skills because of new skills [Sara-chan]
+#define MAX_GUILDLEVEL 50
+#define MAX_GUARDIANS 8         // Local max per castle. [Skotlex]
+#define MAX_QUEST_OBJECTIVES 3  // Max quest objectives for a quest
+#define MAX_START_ITEMS 32      // Max number of items allowed to be given to a char whenever it's created. [mkbu95]
+#else
 #define MAX_LEVEL 175
 #define MAX_FAME 1000000000
 #define MAX_CART 100
@@ -127,7 +150,7 @@
 #define MAX_GUARDIANS 8         // Local max per castle. [Skotlex]
 #define MAX_QUEST_OBJECTIVES 3  // Max quest objectives for a quest
 #define MAX_START_ITEMS 32      // Max number of items allowed to be given to a char whenever it's created. [mkbu95]
-
+#endif
 // for produce
 #define MIN_ATTRIBUTE 0
 #define MAX_ATTRIBUTE 4

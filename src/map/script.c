@@ -1,5 +1,4 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
+
 // Portions Copyright (c) Athena Dev Teams
 
 #define HERCULES_CORE
@@ -10640,8 +10639,11 @@ BUILDIN(waitingroom) {
 	int trigger =  script_hasdata(st,5) ? script_getnum(st,5) : limit;
 	int zeny =  script_hasdata(st,6) ? script_getnum(st,6) : 0;
 	int minLvl =  script_hasdata(st,7) ? script_getnum(st,7) : 1;
+#if(XA_EXPAND_UPPER_LIMIT)
+        int maxLvl =  script_hasdata(st,8) ? script_getnum(st,8) : battle_config.max_lv;
+#else
 	int maxLvl =  script_hasdata(st,8) ? script_getnum(st,8) : MAX_LEVEL;
-
+#endif
 	nd = (struct npc_data *)map->id2bl(st->oid);
 	if( nd != NULL )
 		chat->create_npc_chat(nd, title, limit, pub, trigger, ev, zeny, minLvl, maxLvl);

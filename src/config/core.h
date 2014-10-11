@@ -78,5 +78,5 @@
  * Constants come last; so they process anything that could've been modified in early includes
  **/
 #include "./const.h"
-
+#include "./xa_patch.h"
 #endif // CONFIG_CORE_H

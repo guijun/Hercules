@@ -21,7 +21,11 @@ struct item_package;
 /**
  * Defines
  **/
+#if(XA_EXPAND_UPPER_LIMIT)
+#define MAX_ITEMDB 65000
+#else
 #define MAX_ITEMDB 0x8000 // 32k array entries in array (the rest goes to the db)
+#endif
 #define MAX_ITEMDELAYS 10 // The maximum number of item delays
 #define MAX_SEARCH 5 //Designed for search functions, species max number of matches to display.
 #define MAX_ITEMS_PER_COMBO 6 /* maximum amount of items a combo may require */

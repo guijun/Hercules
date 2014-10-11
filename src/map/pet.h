@@ -10,8 +10,11 @@
 #include "unit.h" // struct unit_data
 #include "../common/cbasetypes.h"
 #include "../common/mmo.h" // NAME_LENGTH, struct s_pet
-
+#if(XA_EXPAND_UPPER_LIMIT)
+#define MAX_PET_DB 	1000
+#else
 #define MAX_PET_DB       300
+#endif
 #define MAX_PETLOOT_SIZE 30
 
 struct s_pet_db {
