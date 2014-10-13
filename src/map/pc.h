@@ -4,7 +4,7 @@
 
 #ifndef MAP_PC_H
 #define MAP_PC_H
-
+#include "../config/xa_patch.h"
 #include "../config/core.h" // AUTOLOOTITEM_SIZE, RENEWAL, SECURE_NPCTIMEOUT
 
 #include "battle.h" // battle
