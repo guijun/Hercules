@@ -37,9 +37,6 @@
 #include "../common/utils.h"
 
 struct pet_interface pet_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct pet_interface *pet;
-#endif
 
 #define MIN_PETTHINKTIME 100
 

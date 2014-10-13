@@ -56,7 +56,7 @@ struct chat_interface {
 	struct chat_data* (*create) (struct block_list* bl, const char* title, const char* pass, int limit, bool pub, int trigger, const char* ev, int zeny, int minLvl, int maxLvl);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct chat_interface *chat;
 

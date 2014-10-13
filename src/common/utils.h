@@ -61,7 +61,7 @@ struct HCache_interface {
 	bool enabled;
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern  
+static  
 #endif
 struct HCache_interface *HCache;
 

@@ -32,9 +32,6 @@
 #endif
 
 struct HCache_interface HCache_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct HCache_interface *HCache; 
-#endif
 
 /// Dumps given buffer into file pointed to by a handle.
 void WriteDump(FILE* fp, const void* buffer, size_t length)

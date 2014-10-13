@@ -120,7 +120,7 @@ struct unit_interface {
 	int (*free) (struct block_list *bl, clr_type clrtype);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct unit_interface *unit;
 

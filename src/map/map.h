@@ -749,7 +749,7 @@ struct mapit_interface {
 	bool                    (*exists) (struct s_mapiterator* iter);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct mapit_interface *mapit;
 
@@ -1069,7 +1069,7 @@ struct map_interface {
 	struct map_zone_data *(*merge_zone) (struct map_zone_data *main, struct map_zone_data *other);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct map_interface *map;
 

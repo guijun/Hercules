@@ -47,9 +47,6 @@
 #include "../common/utils.h"
 
 struct mob_interface mob_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct mob_interface *mob;
-#endif
 
 #define ACTIVE_AI_RANGE 2	//Distance added on top of 'AREA_SIZE' at which mobs enter active AI mode.
 

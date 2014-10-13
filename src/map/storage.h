@@ -30,7 +30,7 @@ struct storage_interface {
 	int (*reconnect_sub) (DBKey key, DBData *data, va_list ap);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct storage_interface *storage;
 
@@ -57,7 +57,7 @@ struct guild_storage_interface {
 	DBData (*create) (DBKey key, va_list args);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct guild_storage_interface *gstorage;
 

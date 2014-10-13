@@ -45,7 +45,7 @@ struct sysinfo_interface {
 	void (*final) (void);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct sysinfo_interface *sysinfo;
 

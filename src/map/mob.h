@@ -366,7 +366,7 @@ struct mob_interface {
 	void (*clear_spawninfo) ();
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct mob_interface *mob;
 

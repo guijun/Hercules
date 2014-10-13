@@ -42,9 +42,6 @@
 #include "../common/utils.h"
 
 struct npc_interface npc_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct npc_interface *npc;
-#endif
 
 static int npc_id=START_NPC_NUM;
 static int npc_warp=0;

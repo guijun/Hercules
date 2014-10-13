@@ -23,7 +23,7 @@ struct trade_interface {
 	void (*commit) (struct map_session_data *sd);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct trade_interface *trade;
 

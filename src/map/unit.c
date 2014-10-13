@@ -49,10 +49,6 @@ const short dirx[8]={0,-1,-1,-1,0,1,1,1};
 const short diry[8]={1,1,0,-1,-1,-1,0,1};
 
 struct unit_interface unit_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct unit_interface *unit;
-#endif
-
 
 /**
  * Returns the unit_data for the given block_list. If the object is using

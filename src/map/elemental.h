@@ -117,7 +117,7 @@ struct elemental_interface {
 	int (*read_db) (void);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct elemental_interface *elemental;
 

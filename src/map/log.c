@@ -22,9 +22,6 @@
 #include "../common/strlib.h"
 
 struct log_interface log_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct log_interface *logs;
-#endif
 
 /// obtain log type character for item/zeny logs
 char log_picktype2char(e_log_pick_type type) {
