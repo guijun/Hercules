@@ -35,9 +35,6 @@
 #include "../common/utils.h"
 
 struct guild_interface guild_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct guild_interface *guild;
-#endif
 
 /*==========================================
  * Retrieves and validates the sd pointer for this guild member [Skotlex]

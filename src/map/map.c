@@ -67,14 +67,8 @@
 #endif
 
 struct map_interface map_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct map_interface *map;
-#endif
 
 struct mapit_interface mapit_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct mapit_interface *mapit;
-#endif
 
 /*==========================================
  * server player count (of all mapservers)

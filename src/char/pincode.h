@@ -15,6 +15,9 @@
 #define	PINCODE_WRONG 8
 
 /* Pincode Interface */
+#if(XA_EXTERN_DEF_PATCH)
+static  
+#endif
 struct pincode_interface {
 	/* vars */
 	int *enabled;
@@ -34,14 +37,10 @@ struct pincode_interface {
 	int  (*compare) (int fd, struct char_session_data* sd, char* pin);
 	void (*check) (int fd, struct char_session_data* sd);
 	bool (*config_read) (char *w1, char *w2);
-#if(XA_EXTERN_DEF_PATCH)
-};
-#else
 } pincode_s;
-#endif
 
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static  
 #endif
 struct pincode_interface *pincode;
 

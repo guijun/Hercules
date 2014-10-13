@@ -18,9 +18,6 @@
 #include "../common/showmsg.h"
 
 struct mail_interface mail_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct mail_interface *mail;
-#endif
 
 void mail_clear(struct map_session_data *sd)
 {

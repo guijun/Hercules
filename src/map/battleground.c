@@ -30,9 +30,7 @@
 #include "../common/timer.h"
 
 struct battleground_interface bg_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct battleground_interface *bg;
-#endif
+
 /// Search a BG Team using bg_id
 struct battleground_data* bg_team_search(int bg_id) {
 	if( !bg_id ) return NULL;

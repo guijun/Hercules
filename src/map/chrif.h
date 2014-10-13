@@ -148,7 +148,7 @@ struct chrif_interface {
 	void (*del_scdata_single) (int account_id, int char_id, short type);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct chrif_interface *chrif;
 

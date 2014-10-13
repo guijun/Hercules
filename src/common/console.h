@@ -89,7 +89,7 @@ struct console_interface {
 	struct console_input_interface *input;
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct console_interface *console;
 

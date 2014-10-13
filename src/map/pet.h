@@ -157,7 +157,7 @@ struct pet_interface {
 	int (*read_db) ();
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct pet_interface *pet;
 

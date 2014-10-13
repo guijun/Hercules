@@ -18,9 +18,6 @@
 
 /* mapindex.c interface source */
 struct mapindex_interface mapindex_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct mapindex_interface *mapindex;
-#endif
 
 /// Retrieves the map name from 'string' (removing .gat extension if present).
 /// Result gets placed either into 'buf' or in a static local buffer.

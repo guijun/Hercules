@@ -38,9 +38,6 @@
 #endif
 
 struct console_interface console_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct console_interface* console;
-#endif
 #ifdef CONSOLE_INPUT
 struct console_input_interface console_input_s;
 #endif

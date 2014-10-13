@@ -276,7 +276,7 @@ struct npc_interface {
 	int (*secure_timeout_timer) (int tid, int64 tick, int id, intptr_t data);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct npc_interface *npc;
 
@@ -323,7 +323,7 @@ struct npc_chat_interface {
 	void (*finalize_pcrematch_entry) (struct pcrematch_entry* e);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct npc_chat_interface *npc_chat;
 
@@ -343,7 +343,7 @@ struct pcre_interface {
 	int (*get_substring) (const char *subject, int *ovector, int stringcount, int stringnumber, const char **stringptr);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct pcre_interface *libpcre;
 

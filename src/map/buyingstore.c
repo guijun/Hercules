@@ -19,9 +19,6 @@
 #include "../common/strlib.h"  // safestrncpy
 
 struct buyingstore_interface buyingstore_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct buyingstore_interface *buyingstore;
-#endif
 
 /// Returns unique buying store id
 unsigned int buyingstore_getuid(void) {

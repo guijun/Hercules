@@ -96,7 +96,7 @@ struct searchstore_interface {
 };
 
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct searchstore_interface *searchstore;
 

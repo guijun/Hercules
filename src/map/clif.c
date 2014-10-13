@@ -58,9 +58,6 @@
 #include "../common/utils.h"
 
 struct clif_interface clif_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct clif_interface *clif;
-#endif
 
 /* re-usable */
 static struct packet_itemlist_normal itemlist_normal;

@@ -35,9 +35,6 @@
 #include "../common/utils.h"
 
 struct quest_interface quest_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct quest_interface *quest;
-#endif
 
 /**
  * Searches a quest by ID.

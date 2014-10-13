@@ -613,7 +613,7 @@ struct itemdb_interface {
 	struct item_combo * (*id2combo) (unsigned short id);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct itemdb_interface *itemdb;
 

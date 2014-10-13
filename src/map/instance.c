@@ -29,9 +29,6 @@
 #include "../common/utils.h"
 
 struct instance_interface instance_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct instance_interface *instance; 
-#endif
 
 /// Checks whether given instance id is valid or not.
 bool instance_is_valid(int instance_id) {

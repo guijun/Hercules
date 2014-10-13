@@ -139,7 +139,7 @@ struct party_interface {
 	int (*db_final) (DBKey key, DBData *data, va_list ap);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct party_interface *party;
 

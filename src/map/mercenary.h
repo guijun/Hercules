@@ -95,7 +95,7 @@ struct mercenary_interface {
 	bool (*read_skill_db_sub) (char* str[], int columns, int current);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct mercenary_interface *mercenary;
 

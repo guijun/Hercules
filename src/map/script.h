@@ -711,7 +711,7 @@ struct script_interface {
 	unsigned short (*mapindexname2id) (struct script_state *st, const char* name);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct script_interface *script;
 

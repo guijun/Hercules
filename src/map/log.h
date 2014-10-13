@@ -129,7 +129,7 @@ struct log_interface {
 	bool (*should_log_item) (int nameid, int amount, int refine, struct item_data *id);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct log_interface *logs;
 

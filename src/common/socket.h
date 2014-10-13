@@ -169,7 +169,7 @@ struct socket_interface {
 	void (*set_eof) (int fd);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct socket_interface *sockt;
 

@@ -26,15 +26,8 @@
 #include "../common/nullpo.h"
 
 struct storage_interface storage_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct storage_interface *storage;
-#endif
 
 struct guild_storage_interface gstorage_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct guild_storage_interface *gstorage;
-#endif
-
 
 /*==========================================
  * Sort items in the warehouse

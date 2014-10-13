@@ -28,9 +28,6 @@
 #define DIR_EAST 8
 
 struct path_interface path_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct path_interface *path;
-#endif
 
 /// @name Structures and defines for A* pathfinding
 /// @{

@@ -57,9 +57,6 @@
 #include "../common/utils.h"
 
 struct atcommand_interface atcommand_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct atcommand_interface *atcommand;
-#endif
 
 static char atcmd_output[CHAT_SIZE_MAX];
 static char atcmd_player_name[NAME_LENGTH];

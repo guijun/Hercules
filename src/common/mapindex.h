@@ -86,7 +86,7 @@ struct mapindex_interface {
 	const char* (*id2name) (unsigned short,const char *file, int line, const char *func);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct mapindex_interface *mapindex;
 

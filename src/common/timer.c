@@ -25,9 +25,6 @@
 #endif
 
 struct timer_interface timer_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct timer_interface *timer;
-#endif
 
 // If the server can't handle processing thousands of monsters
 // or many connected clients, please increase TIMER_MIN_INTERVAL.

@@ -16,12 +16,6 @@
 #include "pc.h"
 #include "../common/cbasetypes.h"
 
-#if(XA_EXTERN_DEF_PATCH)
-struct duel_interface duel_s;
-struct duel_interface *duel;
-#endif
-
-
 /*==========================================
  * Duel organizing functions [LuzZza]
  *------------------------------------------*/

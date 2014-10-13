@@ -42,9 +42,6 @@
 #include "../common/utils.h"
 
 struct mercenary_interface mercenary_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct mercenary_interface *mercenary;
-#endif
 
 int merc_search_index(int class_)
 {
