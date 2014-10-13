@@ -2,7 +2,7 @@
 #Hi my naem is Kirt and I liek anime
 
 ulimit -Sc unlimited
-
+ulimit -c unlimited
 while [ 1 ] ; do
 if [ -f .stopserver ] ; then
 echo server marked down >> server-log.txt
