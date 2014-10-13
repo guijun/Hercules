@@ -71,7 +71,7 @@ struct buyingstore_interface {
 	unsigned int (*getuid) (void);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct buyingstore_interface *buyingstore;
 
