@@ -1026,6 +1026,9 @@ struct pc_interface {
 	void (*autotrade_populate) (struct map_session_data *sd);
 };
 
+#if(XA_PC_PCG_FIX)
+extern 
+#endif
 struct pc_interface *pc;
 
 void pc_defaults(void);

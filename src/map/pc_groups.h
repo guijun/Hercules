@@ -91,7 +91,9 @@ struct pc_groups_interface {
 	int (*get_level) (GroupSettings *group);
 	int (*get_idx) (GroupSettings *group);
 };
-
+#if(XA_PC_PCG_FIX)
+extern 
+#endif
 struct pc_groups_interface *pcg;
 
 void pc_groups_defaults(void);

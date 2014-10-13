@@ -270,6 +270,7 @@ void log_atcommand_sub_txt(struct map_session_data* sd, const char* message) {
 void log_atcommand(struct map_session_data* sd, const char* message)
 {
 	nullpo_retv(sd);
+	//nullpo_retv(pc->should_log_commands);
 
 	if( !logs->config.commands ||
 	    !pc->should_log_commands(sd) )
