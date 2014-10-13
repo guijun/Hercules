@@ -1026,8 +1026,8 @@ struct pc_interface {
 	void (*autotrade_populate) (struct map_session_data *sd);
 };
 
-#if(XA_PC_PCG_FIX)
-extern 
+#if(XA_EXTERN_DEF_PATCH)
+static 
 #endif
 struct pc_interface *pc;
 

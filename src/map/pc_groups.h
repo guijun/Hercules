@@ -91,8 +91,8 @@ struct pc_groups_interface {
 	int (*get_level) (GroupSettings *group);
 	int (*get_idx) (GroupSettings *group);
 };
-#if(XA_PC_PCG_FIX)
-extern 
+#if(XA_EXTERN_DEF_PATCH)
+static 
 #endif
 struct pc_groups_interface *pcg;
 

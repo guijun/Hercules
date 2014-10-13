@@ -21,9 +21,6 @@
 static GroupSettings dummy_group; ///< dummy group used in dummy map sessions @see pc_get_dummy_sd()
 
 struct pc_groups_interface pcg_s;
-#if(XA_PC_PCG_FIX)
-struct pc_groups_interface *pcg;
-#endif
 /**
  * Returns dummy group.
  * Used in dummy map sessions.
