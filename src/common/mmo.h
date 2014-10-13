@@ -4,7 +4,7 @@
 
 #ifndef COMMON_MMO_H
 #define COMMON_MMO_H
-
+#include "../config/xa_patch.h"
 #include <time.h>
 
 #include "../common/cbasetypes.h"

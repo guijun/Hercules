@@ -4,7 +4,7 @@
 
 #ifndef COMMON_CONF_H
 #define COMMON_CONF_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 #include "../../3rdparty/libconfig/libconfig.h"
@@ -90,7 +90,9 @@ struct libconfig_interface {
 	void (*setting_copy_aggregate) (config_setting_t *parent, const config_setting_t *src);
 	int (*setting_copy) (config_setting_t *parent, const config_setting_t *src);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct libconfig_interface *libconfig;
 
 void libconfig_defaults(void);

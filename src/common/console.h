@@ -3,7 +3,7 @@
 
 #ifndef COMMON_CONSOLE_H
 #define COMMON_CONSOLE_H
-
+#include "../config/xa_patch.h"
 #include "../config/core.h" // MAX_CONSOLE_INPUT
 
 #include "../common/cbasetypes.h"
@@ -88,7 +88,9 @@ struct console_interface {
 
 	struct console_input_interface *input;
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct console_interface *console;
 
 void console_defaults(void);

@@ -41,7 +41,7 @@
 \*****************************************************************************/
 #ifndef COMMON_DB_H
 #define COMMON_DB_H
-
+#include "../config/xa_patch.h"
 #include <stdarg.h>
 
 #include "../common/cbasetypes.h"

@@ -3,7 +3,7 @@
 
 #ifndef COMMON_HPMI_H
 #define COMMON_HPMI_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 #include "../common/console.h"
 #include "../common/core.h"
@@ -155,6 +155,9 @@ enum HPluginConfType {
 #define addGroupPermission(pcgname,maskptr) HPMi->addPCGPermission(HPMi->pid,pcgname,&maskptr)
 
 /* Hercules Plugin Mananger Include Interface */
+#if(XA_EXTERN_DEF_PATCH)
+static 
+#endif
 HPExport struct HPMi_interface {
 	/* */
 	unsigned int pid;
@@ -180,7 +183,11 @@ HPExport struct HPMi_interface {
 	/* pc group permission */
 	void (*addPCGPermission) (unsigned int pluginID, char *name, unsigned int *mask);
 } HPMi_s;
+
 #ifndef HERCULES_CORE
+#if(XA_EXTERN_DEF_PATCH)
+static 
+#endif
 HPExport struct HPMi_interface *HPMi;
 #endif
 

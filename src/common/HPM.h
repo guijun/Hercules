@@ -3,7 +3,7 @@
 
 #ifndef COMMON_HPM_H
 #define COMMON_HPM_H
-
+#include "../config/xa_patch.h"
 #ifndef HERCULES_CORE
 #error You should never include HPM.h from a plugin.
 #endif
@@ -152,8 +152,15 @@ struct HPM_interface {
 	bool (*parseConf) (const char *w1, const char *w2, enum HPluginConfType point);
 	/* validates plugin data */
 	bool (*DataCheck) (struct s_HPMDataCheck *src, unsigned int size, char *name);
+#if(XA_EXTERN_DEF_PATCH)
+};
+#else
 } HPM_s;
+#endif
 
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct HPM_interface *HPM;
 
 void hpm_defaults(void);

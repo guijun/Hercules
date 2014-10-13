@@ -2,7 +2,7 @@
 // For more information, see LICENCE in the main folder
 #ifndef COMMON_DES_H
 #define COMMON_DES_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 /// One 64-bit block.

@@ -4,7 +4,7 @@
 
 #ifndef COMMON_MAPINDEX_H
 #define COMMON_MAPINDEX_H
-
+#include "../config/xa_patch.h"
 #include "../common/db.h"
 #include "../common/mmo.h"
 
@@ -85,7 +85,9 @@ struct mapindex_interface {
 	unsigned short (*name2id) (const char*);
 	const char* (*id2name) (unsigned short,const char *file, int line, const char *func);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct mapindex_interface *mapindex;
 
 void mapindex_defaults(void);

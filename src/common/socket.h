@@ -4,7 +4,7 @@
 
 #ifndef COMMON_SOCKET_H
 #define COMMON_SOCKET_H
-
+#include "../config/xa_patch.h"
 #include <time.h>
 
 #include "../common/cbasetypes.h"
@@ -168,7 +168,9 @@ struct socket_interface {
 	/* */
 	void (*set_eof) (int fd);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct socket_interface *sockt;
 
 void socket_defaults(void);

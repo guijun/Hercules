@@ -3,7 +3,7 @@
 
 #ifndef COMMON_GRFIO_H
 #define COMMON_GRFIO_H
-
+#include "../config/xa_patch.h"
 void grfio_init(const char* fname);
 void grfio_final(void);
 void* grfio_reads(const char* fname, int* size);

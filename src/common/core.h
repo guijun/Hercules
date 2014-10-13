@@ -4,7 +4,7 @@
 
 #ifndef COMMON_CORE_H
 #define COMMON_CORE_H
-
+#include "../config/xa_patch.h"
 #include "../common/db.h"
 #include "../common/mmo.h"
 

@@ -5,7 +5,7 @@
 //       as it will get overwritten.
 #ifndef HPM_DATA_CHECK_H
 #define HPM_DATA_CHECK_H
-
+#include "../config/xa_patch.h"
 
 HPExport const struct s_HPMDataCheck HPMDataCheck[] = {
 	#ifdef COMMON_CONF_H

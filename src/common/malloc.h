@@ -3,7 +3,7 @@
 
 #ifndef COMMON_MALLOC_H
 #define COMMON_MALLOC_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 #define ALC_MARK __FILE__, __LINE__, __func__
@@ -86,6 +86,8 @@ struct malloc_interface {
 };
 
 void memmgr_report (int extra);
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct malloc_interface *iMalloc;
 #endif /* COMMON_MALLOC_H */

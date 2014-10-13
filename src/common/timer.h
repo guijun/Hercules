@@ -4,7 +4,7 @@
 
 #ifndef COMMON_TIMER_H
 #define COMMON_TIMER_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 #define DIFF_TICK(a,b) ((a)-(b))
@@ -62,7 +62,9 @@ struct timer_interface {
 	void (*init) (void);
 	void (*final) (void);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern  
+#endif
 struct timer_interface *timer;
 
 void timer_defaults(void);

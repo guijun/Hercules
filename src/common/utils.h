@@ -4,7 +4,7 @@
 
 #ifndef COMMON_UTILS_H
 #define COMMON_UTILS_H
-
+#include "../config/xa_patch.h"
 #include <stdio.h> // FILE*
 #include <time.h>
 
@@ -60,7 +60,9 @@ struct HCache_interface {
 	time_t recompile_time;
 	bool enabled;
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern  
+#endif
 struct HCache_interface *HCache;
 
 void HCache_defaults(void);

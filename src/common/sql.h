@@ -4,7 +4,7 @@
 
 #ifndef COMMON_SQL_H
 #define COMMON_SQL_H
-
+#include "../config/xa_patch.h"
 #include <stdarg.h>// va_list
 
 #include "../common/cbasetypes.h"
@@ -268,7 +268,9 @@ struct sql_interface {
 	void (*StmtShowDebug_)(SqlStmt* self, const char* debug_file, const unsigned long debug_line);
 
 } sql_s;
-
+#if(XA_EXTERN_DEF_PATCH)
+static 
+#endif
 struct sql_interface *SQL;
 
 void sql_defaults(void);

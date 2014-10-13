@@ -4,7 +4,7 @@
 
 #ifndef COMMON_SYSINFO_H
 #define COMMON_SYSINFO_H
-
+#include "../config/xa_patch.h"
 /**
  * Provides various bits of information about the system Hercules is running on
  * (note: on unix systems, to avoid runtime detection, most of the data is
@@ -43,7 +43,9 @@ struct sysinfo_interface {
 	void (*init) (void);
 	void (*final) (void);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+static 
+#endif
 struct sysinfo_interface *sysinfo;
 
 void sysinfo_defaults(void);

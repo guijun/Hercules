@@ -52,6 +52,9 @@
  * Socket Interface Source
  **/
 struct socket_interface sockt_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct socket_interface *sockt;
+#endif
 
 #ifdef SEND_SHORTLIST
 	// Add a fd to the shortlist so that it'll be recognized as a fd that needs
