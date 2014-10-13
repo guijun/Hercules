@@ -16,7 +16,7 @@
 
 /* Pincode Interface */
 #if(XA_EXTERN_DEF_PATCH)
-static  
+extern  
 #endif
 struct pincode_interface {
 	/* vars */
@@ -40,10 +40,9 @@ struct pincode_interface {
 } pincode_s;
 
 #if(XA_EXTERN_DEF_PATCH)
-static  
+extern  
 #endif
 struct pincode_interface *pincode;
-
 void pincode_defaults(void);
 
 #endif /* CHAR_PINCODE_H */

@@ -19,6 +19,9 @@
 #	include "../common/winapi.h" // Needed before mysql.h
 #endif
 #include <mysql.h>
+#if(XA_EXTERN_DEF_PATCH)
+struct sql_interface *SQL;
+#endif
 
 void hercules_mysql_error_handler(unsigned int ecode);
 

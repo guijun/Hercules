@@ -118,7 +118,7 @@ struct battleground_interface {
 	void (*config_read) (void);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct battleground_interface *bg;
 

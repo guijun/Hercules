@@ -1027,7 +1027,7 @@ struct pc_interface {
 };
 
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct pc_interface *pc;
 

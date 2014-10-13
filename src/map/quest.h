@@ -48,7 +48,7 @@ struct quest_interface {
 	int (*read_db) (void);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct quest_interface *quest;
 

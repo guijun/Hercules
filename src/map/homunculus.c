@@ -43,6 +43,9 @@
 #include "../common/utils.h"
 
 struct homunculus_interface homunculus_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct homunculus_interface *homun;
+#endif
 
 //Returns the viewdata for homunculus
 struct view_data* homunculus_get_viewdata(int class_) {

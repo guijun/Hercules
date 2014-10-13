@@ -16,6 +16,9 @@
 #include "../common/sysinfo.h"
 
 struct malloc_interface iMalloc_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct malloc_interface *iMalloc;
+#endif
 
 ////////////// Memory Libraries //////////////////
 

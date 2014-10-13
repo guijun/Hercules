@@ -39,6 +39,9 @@
 #include "../common/timer.h"
 
 struct chrif_interface chrif_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct chrif_interface *chrif;
+#endif
 
 //Used Packets:
 //2af8: Outgoing, chrif_connect -> 'connect to charserver / auth @ charserver'

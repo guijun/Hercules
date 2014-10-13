@@ -2115,7 +2115,7 @@ struct status_interface {
 	bool (*readdb_scconfig) (char *fields[], int columns, int current);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct status_interface *status;
 

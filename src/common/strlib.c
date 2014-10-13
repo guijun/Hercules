@@ -17,6 +17,15 @@
 #include "../common/showmsg.h"
 
 #define J_MAX_MALLOC_SIZE 65535
+#if(XA_EXTERN_DEF_PATCH)
+struct strlib_interface *strlib;
+#endif
+#if(XA_EXTERN_DEF_PATCH)
+struct stringbuf_interface *StrBuf;
+#endif
+#if(XA_EXTERN_DEF_PATCH)
+struct sv_interface *sv;
+#endif
 
 // escapes a string in-place (' -> \' , \ -> \\ , % -> _)
 char* jstrescape (char* pt) {

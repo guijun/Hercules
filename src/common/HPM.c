@@ -27,6 +27,15 @@
 #ifndef WIN32
 #	include <unistd.h>
 #endif
+#if(XA_EXTERN_DEF_PATCH)
+struct HPM_interface *HPM;
+#endif
+#ifndef HERCULES_CORE
+	#if(XA_EXTERN_DEF_PATCH)
+	extern 
+	#endif
+	HPExport struct HPMi_interface *HPMi;
+#endif
 
 struct malloc_interface iMalloc_HPM;
 

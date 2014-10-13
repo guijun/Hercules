@@ -28,8 +28,14 @@
  * interface sources
  **/
 struct npc_chat_interface npc_chat_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct npc_chat_interface *npc_chat;
+#endif
 
 struct pcre_interface libpcre_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct pcre_interface *libpcre;
+#endif
 
 
 /**

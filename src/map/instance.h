@@ -84,7 +84,7 @@ struct instance_interface {
 	int (*destroy_timer) (int tid, int64 tick, int id, intptr_t data);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct instance_interface *instance;
 

@@ -100,9 +100,6 @@ struct HPConfListenStorage {
 };
 
 /* Hercules Plugin Manager Interface */
-#if(XA_EXTERN_DEF_PATCH)
-static 
-#endif
 struct HPM_interface {
 	/* vars */
 	unsigned int version[2];
@@ -158,7 +155,7 @@ struct HPM_interface {
 } HPM_s;
 
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct HPM_interface *HPM;
 

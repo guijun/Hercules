@@ -69,6 +69,9 @@ static inline void SETVALUE(unsigned char* buf, int i, int n) {
 }
 
 struct script_interface script_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct script_interface *script;
+#endif
 
 const char* script_op2name(int op) {
 #define RETURN_OP_NAME(type) case type: return #type

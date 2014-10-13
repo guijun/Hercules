@@ -56,6 +56,10 @@
 #include "../common/utils.h"
 
 struct pc_interface pc_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct pc_interface *pc;
+#endif
+
 //Converts a class to its array index for CLASS_COUNT defined arrays.
 //Note that it does not do a validity check for speed purposes, where parsing
 //player input make sure to use a pcdb_checkid first!

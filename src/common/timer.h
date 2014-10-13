@@ -63,7 +63,7 @@ struct timer_interface {
 	void (*final) (void);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static  
+extern  
 #endif
 struct timer_interface *timer;
 

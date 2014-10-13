@@ -182,7 +182,7 @@ struct intif_interface {
 	void (*pDeleteHomunculusOk) (int fd);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct intif_interface *intif;
 

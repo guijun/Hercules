@@ -42,6 +42,9 @@
 #include "../common/utils.h"
 
 struct elemental_interface elemental_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct elemental_interface *elemental;
+#endif
 
 int elemental_search_index(int class_) {
 	int i;

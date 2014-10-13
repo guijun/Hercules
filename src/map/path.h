@@ -43,7 +43,7 @@ struct path_interface {
 	unsigned int (*distance) (int dx, int dy);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct path_interface *path;
 

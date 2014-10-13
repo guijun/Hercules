@@ -59,7 +59,7 @@ struct irc_bot_interface {
 	void (*usernick) (int fd, char *cmd, char *source, char *target, char *msg);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct irc_bot_interface *ircbot;
 

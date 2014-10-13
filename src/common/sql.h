@@ -61,9 +61,6 @@ struct SqlStmt;// Sql statement (private access)
 typedef enum SqlDataType SqlDataType;
 typedef struct Sql Sql;
 typedef struct SqlStmt SqlStmt;
-#if(XA_EXTERN_DEF_PATCH)
-static 
-#endif
 struct sql_interface {
 	/// Establishes a connection.
 	///
@@ -271,7 +268,7 @@ struct sql_interface {
 
 } sql_s;
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct sql_interface *SQL;
 

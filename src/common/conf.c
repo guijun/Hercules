@@ -12,6 +12,9 @@
 
 /* interface source */
 struct libconfig_interface libconfig_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct libconfig_interface *libconfig;
+#endif
 
 int conf_read_file(config_t *config, const char *config_filename) {
 	libconfig->init(config);

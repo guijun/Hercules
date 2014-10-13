@@ -46,7 +46,7 @@ struct mapreg_interface {
 	bool (*config_read) (const char *w1, const char *w2);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct mapreg_interface *mapreg;
 

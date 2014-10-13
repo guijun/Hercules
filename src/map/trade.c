@@ -25,6 +25,9 @@
 #include "../common/socket.h"
 
 struct trade_interface trade_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct trade_interface *trade;
+#endif
 
 /*==========================================
  * Initiates a trade request.

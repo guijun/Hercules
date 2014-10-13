@@ -15,6 +15,9 @@
 #include "../common/strlib.h"  // safestrncpy
 
 struct searchstore_interface searchstore_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct searchstore_interface *searchstore;
+#endif
 
 /// retrieves search function by type
 static inline searchstore_search_t searchstore_getsearchfunc(unsigned char type) {

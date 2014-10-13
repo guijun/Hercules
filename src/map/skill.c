@@ -62,6 +62,9 @@
 #endif
 
 struct skill_interface skill_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct skill_interface *skill;
+#endif
 
 //Since only mob-casted splash skills can hit ice-walls
 static inline int splash_target(struct block_list* bl) {

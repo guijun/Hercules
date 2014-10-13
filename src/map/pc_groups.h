@@ -92,7 +92,7 @@ struct pc_groups_interface {
 	int (*get_idx) (GroupSettings *group);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct pc_groups_interface *pcg;
 

@@ -607,7 +607,7 @@ struct battle_interface {
 	int (*damage_area) (struct block_list *bl, va_list ap);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct battle_interface *battle;
 

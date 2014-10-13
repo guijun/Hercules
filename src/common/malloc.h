@@ -87,7 +87,7 @@ struct malloc_interface {
 
 void memmgr_report (int extra);
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern  
 #endif
 struct malloc_interface *iMalloc;
 #endif /* COMMON_MALLOC_H */

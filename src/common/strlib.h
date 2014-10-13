@@ -54,9 +54,6 @@ struct StringBuf {
 	unsigned int max_;
 };
 typedef struct StringBuf StringBuf;
-#if(XA_EXTERN_DEF_PATCH)
-static 
-#endif
 struct strlib_interface {
 	char *(*jstrescape) (char* pt);
 	char *(*jstrescapecpy) (char* pt, const char* spt);
@@ -96,12 +93,10 @@ struct strlib_interface {
 	bool (*bin2hex) (char* output, unsigned char* input, size_t count);
 } strlib_s;
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct strlib_interface *strlib;
-#if(XA_EXTERN_DEF_PATCH)
-static 
-#endif
+
 struct stringbuf_interface {
 	StringBuf* (*Malloc) (void);
 	void (*Init) (StringBuf* self);
@@ -116,12 +111,9 @@ struct stringbuf_interface {
 	void (*Free) (StringBuf* self);
 } stringbuf_s;
 #if(XA_EXTERN_DEF_PATCH)
-static 
-#endif
 struct stringbuf_interface *StrBuf;
-#if(XA_EXTERN_DEF_PATCH)
-static 
 #endif
+
 struct sv_interface {
 	/// Parses a single field in a delim-separated string.
 	/// The delimiter after the field is skipped.
@@ -164,7 +156,7 @@ struct sv_interface {
 	bool (*readdb) (const char* directory, const char* filename, char delim, int mincols, int maxcols, int maxrows, bool (*parseproc)(char* fields[], int columns, int current));
 } sv_s;
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct sv_interface *sv;
 

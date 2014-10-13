@@ -114,7 +114,7 @@ struct atcommand_interface {
 	const char* (*msg) (int msg_number);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct atcommand_interface *atcommand;
 

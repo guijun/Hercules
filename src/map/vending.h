@@ -32,7 +32,7 @@ struct vending_interface {
 	bool (*searchall) (struct map_session_data* sd, const struct s_search_store_search* s);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct vending_interface *vending;
 

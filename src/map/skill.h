@@ -2047,7 +2047,7 @@ struct skill_interface {
 	bool (*check_shadowform) (struct block_list *bl, int64 damage, int hit);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct skill_interface *skill;
 

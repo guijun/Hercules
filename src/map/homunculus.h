@@ -144,7 +144,7 @@ struct homunculus_interface {
 	int8 (*get_intimacy_grade) (struct homun_data *hd);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct homunculus_interface *homun;
 

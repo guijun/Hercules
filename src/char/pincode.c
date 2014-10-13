@@ -15,6 +15,12 @@
 #include "../common/showmsg.h"
 #include "../common/socket.h"
 #include "../common/strlib.h"
+
+#if(XA_EXTERN_DEF_PATCH)
+struct pincode_interface pincode_s;
+struct pincode_interface *pincode;
+#endif
+
 int enabled = PINCODE_OK;
 int changetime = 0;
 int maxtry = 3;
