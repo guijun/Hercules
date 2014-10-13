@@ -1,0 +1,22 @@
+//===== RoSF.us Script ======================================
+//= Mapflag: Player versus Player mode.
+//===== By: ==================================================
+//= RoSF.us Dev Team
+//===== Current Version: =====================================
+//= 1.0
+//===== Description: =========================================
+//= Enables PvP on a map.
+//===== Additional Comments: =================================
+//= 1.0 - Initial script.
+//============================================================
+
+// BossiniaMapFlag …Ë÷√ ========================
+bossnia_01	mapflag	pvp	off
+bossnia_02	mapflag	pvp	off
+bossnia_03	mapflag	pvp	off
+bossnia_04	mapflag	pvp	off
+
+bossnia_01	mapflag	zone	Bossnia 01
+bossnia_02	mapflag	zone	Bossnia 02
+bossnia_03	mapflag	zone	Bossnia 03
+bossnia_04	mapflag	zone	Bossnia 04

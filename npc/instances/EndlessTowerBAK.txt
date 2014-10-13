@@ -1,0 +1,2247 @@
+//===== Hercules Script ======================================
+//= Endless Tower
+//===== By: ======Translation:================================ 
+//= L0ne_W0lf     安赫尔|20130701[ROSF.US]
+//===== Current Version: ===================================== 
+//= 2.4
+//===== Description: ========================================= 
+//= [Official Conversion]
+//= Endless Tower Memorial Dungeon.
+//= Consists of 101 floors.
+//===== Additional Comments: ================================= 
+//= 1.0 First version.
+//= 1.1 Removed a disablenpc from #102FShadowDust1. (bugreport:4415)
+//= 1.2 Added ends to several NPCs which would allow you to restart timers.
+//=     Added some missing stopnpctimers to npcs. (bugreport:4418)
+//= 1.3 Fixed a couple copy/paste errors :D I fail. [L0ne_W0lf]
+//      Timer no longer resets when re-entering.
+//= 1.4 Added quest log entries based on iRO. [L0ne_W0lf]
+//=     You may need to update your questid2display.
+//=     Changed White lady spawn to MVP White Lady. (bugreport:4601)
+//= 1.5 Corrected some grammar and typos.
+//= 1.6 Corrected the tower re-entry blocked condition. (bugreport:4677) [L0ne_W0lf]
+//=     Corrected floor 75 warp disabling the wrong NPC. (bugreport:4711)
+//= 1.7 Added missing end's to prevent accidental disabling of
+//=     warps between floors. (bugreport:4623)
+//=     Added missing end's to prevent infinite mobspawn (bugreport:4540)
+//=     Commented out remaining GM-only NPCs. [Gepard]
+//= 1.8 Adjusted Instance Attach Map to Validate ALL Maps, instead of 
+//=     only 1@tower -> 5@tower (bugreport:4983)
+//= 1.9 Added 'instance_check_party' command to the script for proper checking if
+//=     the invoking party meets the requirements to join the Memorial Dungeon.
+//= 2.0 Fixed broken else/if chaining. [Joseph]
+//= 2.1 Updated to match latest official script. [Euphy]
+//= 2.2 Instance system rewrite. [Euphy]
+//= 2.3 Added some missing announcements. [Euphy]
+//= 2.4 Added GM management function. [Euphy]
+//============================================================ 
+
+1@tower	mapflag	src4instance
+2@tower	mapflag	src4instance
+3@tower	mapflag	src4instance
+4@tower	mapflag	src4instance
+5@tower	mapflag	src4instance
+6@tower	mapflag	src4instance
+//============================================================
+alberta,214,77,6	script	扬森船长	4_M_SEAMAN,{
+	if (checkweight(1201,1) == 0) {
+		mes "^008800等等!!";
+		mes "你携带了太多的物品, 请整理后再来.^000000";
+		close;
+	}
+	if (BaseLevel < 50) {
+		mes "[扬森船长]";
+		mes "哎... 我不知道我还能不能驾着我的帆船再次驰骋大海...";
+		close;
+	}
+	set .@name$,strcharinfo(0);
+	if (in_102tower == 1) {
+		mes "^0000ff老人冲进海洋店赶紧订货, 看起来非常兴奋. 你没有其他事情做, 所以你决定问他为什么这么着急.^000000";
+		next;
+		mes "^0000ff老人, 整理他的货物后, 向你走来.^000000";
+		next;
+		mes "[扬森船长]";
+		mes "作为萍水相逢的陌生人, 你却能接受我的请求, 这让我很感动. 我必须为那些真正具备英勇冒险精神的冒险家们做些什么?";
+		next;
+		mes "["+.@name$+"]";
+		mes "I我出海过几次… 但现在我想想, 我却从穿越海洋到达过彼岸.";
+		next;
+		mes "[扬森船长]";
+		mes "不,那就够了. 我需要的只是一个小渔船, 但我是船长, 我指挥过舰队.";
+		next;
+		mes "[扬森船长]";
+		mes "你可能了解一些在海上航行的常识, 不过很多人已经尝试去穿越这个大陆外的那片海洋, 却都无功而返. 即使连我这样的老水手也无法征服这片大海.";
+		next;
+		mes "^0000ff扬森船长开始谈他那些危险的海洋旅行. 你正好有闲暇时间, 所以你坐下来, 静静地听他的的故事.^000000";
+		next;
+		mes "^0000ff至少有一半的他的故事听起来很夸张：他坚持强调, 在海洋中有一个巨大的塔, 非常非常的高, 它漂浮在空中, 等等等等...^000000";
+		set in_102tower,2;
+		close;
+	} else if (in_102tower == 2) {
+		mes "[扬森船长]";
+		mes "...我的船触礁了, 那是我们所能做的就是尽可能的靠近陆地, 在我们的努力下我们把船靠近了那个巨大的塔并在边上抛了锚. 起先, 我们只想待在那里直到暴风雨过去, 但恶劣的天气并没有我们期望的那么快结束.";
+		next;
+		mes "[扬森船长]";
+		mes "我的船员等的都快饿死了, 然后他们组织在了一起, 走进那个未知的塔... 但是他们再也也没有回来.";
+		next;
+		mes "["+.@name$+"]";
+		mes "你为什么不一起去呢?";
+		next;
+		mes "[扬森船长]";
+		mes "我的直觉告诉我, 那里是危险的. 虽然我很好奇, 但我不想冒生命危险. 在他们临走之前, 我要求他们无论如何在7天内必须回来. 但是直到暴雨结束, 却没有一个人回来.";
+		next;
+		mes "[扬森船长]";
+		mes "在我们绝望之际, 放弃了我们所有的货物, 离开塔的时候只有一点点的水和食物. 当我们的船终于抵达了陆地, 却只剩我一个人活着...";
+		next;
+		mes "^0000ff你能想象到那令人心碎的场景, 垂死的船员们, 舰队的最后一次航行. 老船长的脸上充满着忧郁与懊悔, 他沉默了一会儿, 继续说:^000000";
+		next;
+		mes "[扬森船长]";
+		mes "我有生之日, 有一件事必须做. 就是找回死在塔中的船员遗体, 并将他们埋葬. 让他们的灵魂能够得以安息.";
+		next;
+		mes "[扬森船长]";
+		mes "我觉得很幸运, 遇到一个热心的冒险家. 有了你的资助, 终于可以去那里了.";
+		next;
+		mes "["+.@name$+"]";
+		mes "让我作为你的第一个队友吧?";
+		next;
+		mes "[扬森船长]";
+		mes "谢谢你, 但那是一个非常危险的地方. 我有我必须去履行的职责, 但是你却没有任何义务去冒这个险. 我不希望牺牲像你这样的年轻冒险家.";
+		next;
+		mes "["+.@name$+"]";
+		mes "不...";
+		mes ".";
+		mes ".";
+		mes "作为一名冒险者, 我有义务帮助有需要的人. 而且我自己也对那个地方很好奇...";
+		next;
+		mes "[扬森船长]";
+		mes "好吧, 那我也不多说了. 我要马上出发了, 既然你想加入我们, 我会给你些准备的时间. 我会在这里等你准备好.";
+		next;
+		mes "[扬森船长]";
+		mes "...呢么...";
+		mes "欢迎上船, 伙计.";
+		set in_102tower,3;
+		close;
+	} else if (in_102tower == 3) {
+		mes "[扬森船长]";
+		mes "我们现在走吗?";
+		next;
+		switch(select("- 是, 出发!:- 不, 我还没准备好.")) {
+		case 1:
+			mes "[扬森船长]";
+			mes "起锚了, 伙计!!";
+			close2;
+			set in_102tower,4;
+			warp "e_tower",70,114;
+			end;
+		case 2:
+			mes "[扬森船长]";
+			mes "当然, 没问题. 等你已经准备好了就过来吧.";
+			close;
+		}
+	} else if (in_102tower > 3) {
+		mes "[扬森船长]";
+		mes "嗯, 想出海探险? 我们需要准备各类补给品. 不过有个前提是你能先给我 10,000 Zeny.";
+		next;
+		switch(select("- 我去准备一下.:- 现在就干吧!")) {
+		case 1:
+			mes "["+.@name$+"]";
+			mes "我很抱歉, 但是我没有那么多钱. 我存够了再来.";
+			next;
+			mes "[扬森船长]";
+			mes "当然, 没问题. 我会等你回来.";
+			close;
+		case 2:
+			if (Zeny < 10000) {
+				mes "[扬森船长]";
+				mes "……我很抱歉, 但我不认为你有 10,000 Zeny. 谢谢你的好意, 但是这远远不够.";
+				close;
+			}
+			else {
+				mes "[扬森船长]";
+				mes "很棒! 现在, 我们出发!";
+				Zeny -= 10000;
+				close2;
+				warp "e_tower",70,114;
+				end;
+			}
+		}
+	} else {
+		mes "[扬森船长]";
+		mes "不好意思请问, 你是一个冒险家吗?";
+		next;
+		mes "[扬森船长]";
+		mes "对不起问你这个问题, 尤其是当这是我们第一次见, 但你可以帮我一个忙吗.";
+		next;
+		mes "[扬森船长]";
+		mes "能赞助我 ^0000FF10,000 Zeny^000000 吗...";
+		next;
+		switch(select("- 不行!","- 可以.")) {
+		case 1:
+			mes "["+.@name$+"]";
+			mes "对不起啦, 我想你是找错对象了.";
+			next;
+			mes "[扬森船长]";
+			mes "我们不... 抱歉如此唐突. 我也知道初次见面就提出这样的要求是有点过份.";
+			close;
+		case 2:
+			mes "[扬森船长]";
+			mes "咦? 你确定你不介意给我那么多钱吗!";
+			next;
+			if (Zeny < 10000) {
+				mes "[扬森船长]";
+				mes "...对不起, 但我不认为你有10000 Zeny. 谢谢你的好意, 这远远不够.";
+				close;
+			} else {
+				mes "["+.@name$+"]";
+				mes "我不知道你为什么会需要这么多钱. 不过, 收下这些钱吧.";
+				next;
+				mes "^0000ff你给了扬森船长 10,000 Zeny^000000.";
+				next;
+				mes "[扬森船长]";
+				mes "太谢谢你了! 现在, 我可以为我的船准备补给品了.!";
+				set Zeny, Zeny - 10000;
+				set in_102tower,1;
+				close;
+			}
+		}
+	}
+}
+
+e_tower,81,105,0	script	无限塔守护石	2_MONEMUS,{
+
+	set .@party_id,getcharid(1);
+	set .@p_name$,getpartyname(.@party_id);
+	set .@md_name$,"无限塔";
+
+	set .@etower_timer,checkquest(60200,PLAYTIME); // 1 week
+	set .@etower_timer2,checkquest(60201,PLAYTIME); // 4 hours
+
+	if (!instance_check_party(.@party_id,2)) {
+		mes "请建立或加入组队, 并且至少有1名队友的情况下, 才能够进入副本.";
+		close;
+	}
+	if (.@etower_timer == -1) {
+		if (getcharid(0) == getpartyleader(.@party_id,2)) {
+			mes "已完成组队检查, 确认您在组队中, 您是否现在就要进入无限塔副本?";
+			next;
+			switch(select("- 生成副本 "+.@md_name$+":- 进入副本:- 返回阿尔贝塔:- 结束对话")) {
+			case 1:
+				set .@instance, instance_create(.@md_name$,.@party_id);
+				if (.@instance < 0) {
+					mes "队伍名称 : "+.@p_name$;
+					mes "队    长 : "+strcharinfo(0);
+					mes "^0000ff"+.@md_name$+" ^000000- 副本生成失败!";
+					close;
+				}
+				mes "^0000ff"+.@md_name$+"^000000 - 尝试注册副本";
+				mes "生成副本后, 您必须再次与NPC对话, 并选择菜单'进入副本'.";
+				for( set .@i, 1; .@i <= 6; set .@i, .@i + 1 ) {
+					if( instance_attachmap(.@i + "@tower", .@instance) == "" ) {
+						mes "^0000ff"+.@md_name$+" ^000000- 副本生成失败!";
+						instance_destroy(.@instance);
+						close;
+					}
+				}
+				instance_set_timeout 14400,300,.@instance;
+				instance_init(.@instance);
+				close;
+			case 2:
+				callsub L_Enter,0,1,.@md_name$,.@p_name$;
+			case 3:
+				mes "现在将您传送至阿尔贝塔.";
+				close2;
+				warp "alberta",223,36;
+				end;
+			case 4:
+				close;
+			}
+		}
+		switch(select("- 进入"+.@md_name$+":- 返回阿尔贝塔:- 取消")) {
+		case 1:
+			callsub L_Enter,1,1,.@md_name$,.@p_name$;
+		case 2:
+			mes "现在将您传送至阿尔贝塔.";
+			close2;
+			warp "alberta",223,36;
+			end;
+		case 3:
+			end;
+		}
+	} else if ((.@etower_timer >= 0) && (.@etower_timer2 < 2)) {
+		mes "如果您已经建立了副本, 则无需再次注册, 可以马上进入. ";
+		next;
+		switch(select("- 进入"+.@md_name$+":- 返回阿尔贝塔:- 取消")) {
+		case 1:
+			callsub L_Enter,0,0,.@md_name$,.@p_name$;
+		case 2:
+			mes "现在将您传送至阿尔贝塔.";
+			close2;
+			warp "alberta",223,36;
+			end;
+		case 3:
+			break;
+		}
+		close;
+	} else if ((.@etower_timer >= 0) && (.@etower_timer < 2) && (.@etower_timer2 == 2)) {
+
+		set .@dun_lim_time,etower_timer+604800; // 1 week
+		set .@dun_lim_time2,etower_timer+14400; // 4 hours
+		set .@dun_cur_time,gettimetick(2);
+		set .@dun_ent_t,(.@dun_lim_time - .@dun_cur_time);
+		set .@dun_h,(.@dun_ent_t / 3600);
+		set .@dun_m,(.@dun_ent_t - (.@dun_h * 3600)) / 60;
+		set .@dun_s,.@dun_ent_t - ((.@dun_h * 3600) + (.@dun_m * 60));
+
+		mes "您的无限塔副本的冷却时间尚未结束, 您现在无法进入该副本, 副本的CD时间还剩" + .@dun_h + "hours " + .@dun_m + "minutes " + .@dun_s + ".";
+		next;
+		mes "这里非常危险. 现在将您传送至阿尔贝塔.";
+		close2;
+		warp "alberta",223,36;
+		end;
+	} else {
+		set etower_timer,0;
+		erasequest 60200;
+		erasequest 60201;
+		mes "^0000ff无限塔的副本CD已过. 您可以重新预订无限塔副本, 并开始冒险.^000000";
+		close;
+	}
+
+L_Enter:
+	if (has_instance("1@tower") == "") {
+		mes "副本进度 " +getarg(2)+ " 尚未注册.";
+		mes "队长并没有注册副本进度.";
+		close;
+	} else {
+		mapannounce "e_tower", strcharinfo(0)+" 率领小队, " +getarg(3)+", 进入了副本, 无限塔.",bc_map,"0x00ff99",FW_NORMAL,12;
+		if (getarg(1)) {
+			set etower_timer,gettimetick(2);
+			setquest 60200;
+			setquest 60201;
+		}
+		warp "1@tower",52,354;
+		if (getarg(0) == 0)
+			close;
+		else
+			end;
+	}
+}
+
+e_tower,30,30,2	script	巨大的漩涡	CLEAR_NPC,2,2,{
+	end;
+OnTouch:
+	mapannounce "e_tower","[ " + strcharinfo(0) + " ], 似乎被一个巨大的漩涡给吞噬了.",bc_map,"0x00ff99",FW_NORMAL,12;
+	warp "alberta",223,36;
+	end;
+}
+
+// Original name: "#102Administrator Mode104"
+e_tower,1,1,2	script	#102Administrator Mode	CLEAR_NPC,{
+	callfunc "F_GM_NPC";
+	mes "请输入管理密码";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		switch(select("- 创建CD净化石:- 删除CD净化石:- 取消")) {
+		case 1:
+			mes "创建净化石并维持30分钟.";
+			donpcevent "CD净化石#et1::OnEnable";
+			break;
+		case 2:
+			mes "立即删除净化石";
+			donpcevent "CD净化石#et1::OnDisable";
+			break;
+		case 3:
+			mes "您已取消了相关操作.";
+			break;
+		}
+		close;
+	} else {
+		mes "请正确输入密码.";
+		close;
+	}
+}
+
+e_tower,69,117,4	script	CD净化石#et1	2_MONEMUS,{
+	set etower_timer,0;
+	mes "^0000ff您的无限塔副本的冷却时间已被刷新, 您现在无法进入该副本.^000000";
+	close;
+
+OnInit:
+	disablenpc "CD净化石#et1";
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnDisable:
+	stopnpctimer;
+	disablenpc "CD净化石#et1";
+	end;
+
+OnTimer1000:
+	enablenpc "CD净化石#et1";
+	end;
+
+OnTimer1740000:
+	mapannounce "e_tower", "CD净化石将在1分钟内消失.",bc_map,"0x00ff99";
+	end;
+
+OnTimer1800000:
+	disablenpc "CD净化石#et1";
+	end;
+}
+
+e_tower,151,185,4	script	CD净化石#et2	CLEAR_NPC,{
+	callfunc "F_GM_NPC";
+	set etower_timer,0;
+	mes "^0000ff您的无限塔副本的冷却时间已被刷新, 您现在无法进入该副本.^000000";
+	close2;
+	warp "e_tower",75,108;
+	end;
+}
+
+// Core Functions
+//============================================================
+function	script	F_Tower_Monster	{
+
+	set .@level, getarg(0);
+	set .@map$, getarg(1);
+	set .@label$, getarg(2);
+
+	switch(.@level) {
+	case 1:
+		areamonster .@map$,7,351,17,387,"金属波利",1613,15,.@label$;
+		areamonster .@map$,7,351,17,387,"冰波利",1242,5,.@label$;
+		areamonster .@map$,7,351,17,387,"波波利",1031,5,.@label$;
+		areamonster .@map$,7,351,17,387,"土波利",1113,5,.@label$;
+		areamonster .@map$,7,351,17,387,"波利之王",1090,1,.@label$;
+		areamonster .@map$,7,351,17,387,"圣诞波利",1002,5,.@label$;
+		break;
+	case 2:
+		areamonster .@map$,93,351,103,387,"沙漠之狼",1106,20,.@label$;
+		areamonster .@map$,93,351,103,387,"流浪之狼",1092,1,.@label$;
+		areamonster .@map$,93,351,103,387,"沙漠幼狼",1107,10,.@label$;
+		break;
+	case 3:
+		areamonster .@map$,181,351,191,387,"邪骸弓箭手",1016,5,.@label$;
+		areamonster .@map$,181,351,191,387,"邪骸矿工",1169,5,.@label$;
+		areamonster .@map$,181,351,191,387,"邪骸士兵",1028,5,.@label$;
+		areamonster .@map$,181,351,191,387,"邪骸兽人",1152,5,.@label$;
+		areamonster .@map$,181,351,191,387,"邪骸海盗",1071,5,.@label$;
+		areamonster .@map$,181,351,191,387,"邪骸战士",1076,5,.@label$;
+		break;
+	case 4:
+		areamonster .@map$,267,351,277,387,"艾吉欧蜈蚣",1099,15,.@label$;
+		areamonster .@map$,267,351,277,387,"螳螂",1139,5,.@label$;
+		areamonster .@map$,267,351,277,387,"艾斯蜘蛛",1100,5,.@label$;
+		areamonster .@map$,267,351,277,387,"摇滚蝗虫",1088,1,.@label$;
+		areamonster .@map$,267,351,277,387,"蝗虫",1052,5,.@label$;
+		areamonster .@map$,267,351,277,387,"蜂兵",1004,5,.@label$;
+		break;
+	case 5:
+		areamonster .@map$,352,351,362,387,"黄金小强",1086,1,.@label$;
+		areamonster .@map$,352,351,362,387,"玛勒盗虫",1054,15,.@label$;
+		areamonster .@map$,352,351,362,387,"浮勒盗虫",1053,15,.@label$;
+		areamonster .@map$,352,351,362,387,"盗虫",1051,15,.@label$;
+		areamonster .@map$,352,351,362,387,"盗虫卵",1048,5,.@label$;
+		break;
+	case 6:
+		areamonster .@map$,9,267,19,303,"龙蛋",1721,5,.@label$;
+		areamonster .@map$,9,267,19,303,"盗虫卵",1048,5,.@label$;
+		areamonster .@map$,9,267,19,303,"蚂蚁幼虫",1097,5,.@label$;
+		areamonster .@map$,9,267,19,303,"虫蛹",1008,5,.@label$;
+		break;
+	case 7:
+		areamonster .@map$,93,267,103,303,"爆炎蝙蝠",1383,15,.@label$;
+		areamonster .@map$,93,267,103,303,"红蝙蝠",1111,15,.@label$;
+		areamonster .@map$,93,267,103,303,"蚊子",1627,15,.@label$;
+		areamonster .@map$,93,267,103,303,"吸血蝙蝠",1005,15,.@label$;
+		break;
+	case 8:
+		areamonster .@map$,181,267,191,303,"武士火枪兵",1403,15,.@label$;
+		areamonster .@map$,181,267,191,303,"玩具士兵",1248,15,.@label$;
+		break;
+	case 9:
+		areamonster .@map$,267,267,277,303,"黑曜石",1615,15,.@label$;
+		areamonster .@map$,267,267,277,303,"巨石怪",1040,15,.@label$;
+		areamonster .@map$,267,267,277,303,"石头波利",1784,10,.@label$;
+		break;
+	case 10:
+		areamonster .@map$,352,267,362,303,"蜂后",1059,1,.@label$;
+		areamonster .@map$,352,267,362,303,"狂暴蜂兵",1303,25,.@label$;
+		areamonster .@map$,352,267,362,303,"蜂兵",1004,20,.@label$;
+		break;
+	case 11:
+		areamonster .@map$,9,180,19,216,"森林妖姬",1493,15,.@label$;
+		areamonster .@map$,9,180,19,216,"苗娃佩瑞丝",1500,15,.@label$;
+		areamonster .@map$,9,180,19,216,"人参精",1413,15,.@label$;
+		areamonster .@map$,9,180,19,216,"草精",1162,5,.@label$;
+		break;
+	case 12:
+		areamonster .@map$,93,180,103,216,"天邪鬼",1378,25,.@label$;
+		areamonster .@map$,93,180,103,216,"朽魔",1199,25,.@label$;
+		break;
+	case 13:
+		areamonster .@map$,181,180,191,216,"妖君",1512,15,.@label$;
+		areamonster .@map$,181,180,191,216,"妖道",1188,15,.@label$;
+		areamonster .@map$,181,180,191,216,"僵尸",1026,10,.@label$;
+		break;
+	case 14:
+		areamonster .@map$,267,180,277,216,"兽人战士长",1213,15,.@label$;
+		areamonster .@map$,267,180,277,216,"兽人弓箭手",1189,10,.@label$;
+		areamonster .@map$,267,180,277,216,"兽人妈妈",1273,10,.@label$;
+		areamonster .@map$,267,180,277,216,"兽人爸爸",1023,5,.@label$;
+		areamonster .@map$,267,180,277,216,"兽人婴儿",1686,5,.@label$;
+		break;
+	case 15:
+		areamonster .@map$,352,180,362,216,"蚁后",1147,1,.@label$;
+		areamonster .@map$,352,180,362,216,"皮里恩",1159,1,.@label$;
+		areamonster .@map$,352,180,362,216,"兵蚁",1105,15,.@label$;
+		areamonster .@map$,352,180,362,216,"工蚁",1160,15,.@label$;
+		areamonster .@map$,352,180,362,216,"白蚁",1095,15,.@label$;
+		areamonster .@map$,352,180,362,216,"蚂蚁幼虫",1097,5,.@label$;
+		break;
+	case 16:
+		areamonster .@map$,9,96,19,132,"幽灵弓箭手",1276,10,.@label$;
+		areamonster .@map$,9,96,19,132,"兽人弓箭手",1189,10,.@label$;
+		areamonster .@map$,9,96,19,132,"蝙蝠弓箭手",1253,10,.@label$;
+		areamonster .@map$,9,96,19,132,"邪骸弓箭手",1016,10,.@label$;
+		break;
+	case 17:
+		areamonster .@map$,93,96,103,132,"人鱼士兵",1264,10,.@label$;
+		areamonster .@map$,93,96,103,132,"小巴风特",1101,10,.@label$;
+		areamonster .@map$,93,96,103,132,"邪骸食人鱼",1065,15,.@label$;
+		areamonster .@map$,93,96,103,132,"希尔士兵",1629,5,.@label$;
+		break;
+	case 18:
+		areamonster .@map$,181,96,191,132,"蓝鼠",1209,25,.@label$;
+		areamonster .@map$,181,96,191,132,"白鼠",1175,15,.@label$;
+		break;
+	case 19:
+		areamonster .@map$,267,96,277,132,"狄奥斯",1108,10,.@label$;
+		areamonster .@map$,267,96,277,132,"邪骸食人鱼",1064,10,.@label$;
+		areamonster .@map$,267,96,277,132,"异变鱼",1069,10,.@label$;
+		areamonster .@map$,267,96,277,132,"剑鱼",1158,10,.@label$;
+		break;
+	case 20:
+		areamonster .@map$,352,96,362,132,"海盗之王",1112,1,.@label$;
+		areamonster .@map$,352,96,362,132,"邪骸海盗",1071,50,.@label$;
+		break;
+	case 21:
+		areamonster .@map$,9,9,19,45,"黄色等离子体",1693,10,.@label$;
+		areamonster .@map$,9,9,19,45,"紫色等离子体",1696,10,.@label$;
+		areamonster .@map$,9,9,19,45,"绿色等离子体",1695,5,.@label$;
+		areamonster .@map$,9,9,19,45,"蓝色等离子体",1697,5,.@label$;
+		areamonster .@map$,9,9,19,45,"红色等离子体",1694,5,.@label$;
+		break;
+	case 22:
+		areamonster .@map$,93,9,103,45,"邪恶噬人花",1780,15,.@label$;
+		areamonster .@map$,93,9,103,45,"茅膏菜",1781,15,.@label$;
+		areamonster .@map$,93,9,103,45,"噬人花",1118,15,.@label$;
+		areamonster .@map$,93,9,103,45,"海葵",1068,15,.@label$;
+		areamonster .@map$,93,9,103,45,"曼陀罗魔花",1020,10,.@label$;
+		areamonster .@map$,93,9,103,45,"草精",1162,10,.@label$;
+		break;
+	case 23:
+		areamonster .@map$,181,9,191,45,"梅纳海葵",1216,15,.@label$;
+		areamonster .@map$,181,9,191,45,"人鱼",1044,10,.@label$;
+		areamonster .@map$,181,9,191,45,"乌贼",1144,10,.@label$;
+		areamonster .@map$,181,9,191,45,"异变鱼",1069,10,.@label$;
+		areamonster .@map$,181,9,191,45,"海葵",1068,5,.@label$;
+		break;
+	case 24:
+		areamonster .@map$,267,9,277,45,"裘卡",1131,15,.@label$;
+		areamonster .@map$,267,9,277,45,"卡拉特小丑",1267,15,.@label$;
+		areamonster .@map$,267,9,277,45,"南瓜先生",1130,10,.@label$;
+		break;
+	case 25:
+		areamonster .@map$,352,9,362,45,"狂暴月夜猫",1307,15,.@label$;
+		areamonster .@map$,352,9,362,45,"月夜猫",1150,1,.@label$;
+		areamonster .@map$,352,9,362,45,"九尾狐",1180,15,.@label$;
+		break;
+	case 26:
+		areamonster .@map$,9,351,19,387,"鬼娃树",1503,10,.@label$;
+		areamonster .@map$,9,351,19,387,"猴桃木",1410,10,.@label$;
+		areamonster .@map$,9,351,19,387,"机木人",1497,10,.@label$;
+		areamonster .@map$,9,351,19,387,"石炮火树",1495,10,.@label$;
+		areamonster .@map$,9,351,19,387,"长老树精",1033,5,.@label$;
+		break;
+	case 27:
+		areamonster .@map$,93,351,103,387,"弓箭哥布灵",1258,10,.@label$;
+		areamonster .@map$,93,351,103,387,"刺刀哥布灵",1122,10,.@label$;
+		areamonster .@map$,93,351,103,387,"链锤哥布灵",1123,5,.@label$;
+		areamonster .@map$,93,351,103,387,"大斧哥布灵",1124,5,.@label$;
+		areamonster .@map$,93,351,103,387,"榔头哥布灵",1125,5,.@label$;
+		areamonster .@map$,93,351,103,387,"刺锤哥布灵",1126,5,.@label$;
+		break;
+	case 28:
+		areamonster .@map$,181,351,191,387,"卷甲虫",1194,30,.@label$;
+		areamonster .@map$,181,351,191,387,"奈利虫",1255,15,.@label$;
+		areamonster .@map$,181,351,191,387,"单眼虫",1256,15,.@label$;
+		areamonster .@map$,181,351,191,387,"库克雷",1070,10,.@label$;
+		break;
+	case 29:
+		areamonster .@map$,267,351,277,387,"镜妖",1260,10,.@label$;
+		areamonster .@map$,267,351,277,387,"纸妖",1375,10,.@label$;
+		areamonster .@map$,267,351,277,387,"兔斯拉",1510,10,.@label$;
+		areamonster .@map$,267,351,277,387,"万圣魔",1508,5,.@label$;
+		areamonster .@map$,267,351,277,387,"南瓜魂",1509,5,.@label$;
+		areamonster .@map$,267,351,277,387,"白幽灵",1179,10,.@label$;
+		break;
+	case 30:
+		areamonster .@map$,352,351,362,387,"白素贞",1630,1,.@label$;
+		areamonster .@map$,352,351,362,387,"妖仙女",1416,30,.@label$;
+		break;
+	case 31:
+		areamonster .@map$,9,267,19,303,"沙漠毒蝎",1387,20,.@label$;
+		areamonster .@map$,9,267,19,303,"铁蝎",1212,15,.@label$;
+		areamonster .@map$,9,267,19,303,"艾吉欧蜈蚣",1099,10,.@label$;
+		areamonster .@map$,9,267,19,303,"蝎子",1001,5,.@label$;
+		break;
+	case 32:
+		areamonster .@map$,93,267,103,303,"哥布灵首领",1299,1,.@label$;
+		areamonster .@map$,93,267,103,303,"弓箭哥布灵",1258,10,.@label$;
+		areamonster .@map$,93,267,103,303,"刺刀哥布灵",1122,10,.@label$;
+		areamonster .@map$,93,267,103,303,"链锤哥布灵",1123,5,.@label$;
+		areamonster .@map$,93,267,103,303,"大斧哥布灵",1124,5,.@label$;
+		areamonster .@map$,93,267,103,303,"榔头哥布灵",1125,5,.@label$;
+		areamonster .@map$,93,267,103,303,"刺锤哥布灵",1126,5,.@label$;
+		break;
+	case 33:
+		areamonster .@map$,181,267,191,303,"犬妖首领",1296,1,.@label$;
+		areamonster .@map$,181,267,191,303,"大斧犬妖",1133,15,.@label$;
+		areamonster .@map$,181,267,191,303,"犬妖弓箭手",1282,15,.@label$;
+		areamonster .@map$,181,267,191,303,"榔头犬妖",1134,10,.@label$;
+		areamonster .@map$,181,267,191,303,"刺锤犬妖",1135,5,.@label$;
+		break;
+	case 34:
+		areamonster .@map$,267,267,277,303,"火焰颅骨",1869,20,.@label$;
+		areamonster .@map$,267,267,277,303,"白幽灵",1179,10,.@label$;
+		areamonster .@map$,267,267,277,303,"巨大白幽灵",1186,10,.@label$;
+		break;
+	case 35:
+		areamonster .@map$,352,267,362,303,"乌龟将军",1312,1,.@label$;
+		areamonster .@map$,352,267,362,303,"水灵龟",1319,10,.@label$;
+		areamonster .@map$,352,267,362,303,"岩石龟",1316,10,.@label$;
+		areamonster .@map$,352,267,362,303,"火焰龟",1318,10,.@label$;
+		areamonster .@map$,352,267,362,303,"果树龟",1314,10,.@label$;
+		break;
+	case 36:
+		areamonster .@map$,9,180,19,216,"虎蜥人",1206,30,.@label$;
+		areamonster .@map$,9,180,19,216,"绿变色龙",1687,10,.@label$;
+		areamonster .@map$,9,180,19,216,"鳄鱼人",1271,10,.@label$;
+		break;
+	case 37:
+		areamonster .@map$,93,180,103,216,"钟塔守护者",1270,10,.@label$;
+		areamonster .@map$,93,180,103,216,"古钟魔",1269,10,.@label$;
+		areamonster .@map$,93,180,103,216,"钟怪",1193,30,.@label$;
+		break;
+	case 38:
+		areamonster .@map$,181,180,191,216,"死亡魔书",1698,25,.@label$;
+		areamonster .@map$,181,180,191,216,"飞行魔书",1195,25,.@label$;
+		break;
+	case 39:
+		areamonster .@map$,267,180,277,216,"妖仙女",1416,10,.@label$;
+		areamonster .@map$,267,180,277,216,"狐仙",1513,10,.@label$;
+		areamonster .@map$,267,180,277,216,"恶云仙人",1412,10,.@label$;
+		areamonster .@map$,267,180,277,216,"舞狮",1514,10,.@label$;
+		areamonster .@map$,267,180,277,216,"豹皮怪",1517,5,.@label$;
+		break;
+	case 40:
+		areamonster .@map$,352,180,362,216,"元灵武士",1492,1,.@label$;
+		areamonster .@map$,352,180,362,216,"火忍西怒毕",1401,10,.@label$;
+		areamonster .@map$,352,180,362,216,"天狗",1405,10,.@label$;
+		areamonster .@map$,352,180,362,216,"武士火枪兵",1403,5,.@label$;
+		areamonster .@map$,352,180,362,216,"米雅毕 Doll",1404,10,.@label$;
+		areamonster .@map$,352,180,362,216,"伞妖",1400,5,.@label$;
+		break;
+	case 41:
+		areamonster .@map$,9,96,19,132,"克莱本",1587,50,.@label$;
+		break;
+	case 42:
+		areamonster .@map$,93,96,103,132,"沙妖",1386,20,.@label$;
+		areamonster .@map$,93,96,103,132,"史汀",1207,10,.@label$;
+		areamonster .@map$,93,96,103,132,"米糕",1516,10,.@label$;
+		areamonster .@map$,93,96,103,132,"泥人",1165,5,.@label$;
+		areamonster .@map$,93,96,103,132,"蚯蚓",1127,5,.@label$;
+		break;
+	case 43:
+		areamonster .@map$,181,96,191,132,"米杜沙",1148,10,.@label$;
+		areamonster .@map$,181,96,191,132,"黑蛇",1037,40,.@label$;
+		areamonster .@map$,181,96,191,132,"毒蛇",1030,5,.@label$;
+		areamonster .@map$,181,96,191,132,"青蛇",1025,5,.@label$;
+		break;
+	case 44:
+		areamonster .@map$,267,96,277,132,"卡仑宝宝",1515,20,.@label$;
+		areamonster .@map$,267,96,277,132,"小巴风特",1101,20,.@label$;
+		areamonster .@map$,267,96,277,132,"兽人婴儿",1686,1,.@label$;
+		areamonster .@map$,267,96,277,132,"沙漠幼狼",1107,10,.@label$;
+		areamonster .@map$,267,96,277,132,"小野猪",1167,10,.@label$;
+		break;
+	case 45:
+		areamonster .@map$,352,96,362,132,"俄塞里斯",1038,1,.@label$;
+		areamonster .@map$,352,96,362,132,"狂暴木乃伊",1297,15,.@label$;
+		areamonster .@map$,352,96,362,132,"毕莱特",1032,15,.@label$;
+		areamonster .@map$,352,96,362,132,"木乃伊",1041,20,.@label$;
+		break;
+	case 46:
+		areamonster .@map$,9,9,19,45,"搜索者",1774,20,.@label$;
+		areamonster .@map$,9,9,19,45,"恶魔之眼",1633,20,.@label$;
+		break;
+	case 47:
+		areamonster .@map$,93,9,103,45,"七彩飞龙",1384,20,.@label$;
+		areamonster .@map$,93,9,103,45,"七彩地龙",1385,10,.@label$;
+		areamonster .@map$,93,9,103,45,"毕帝特飞龙",1156,10,.@label$;
+		areamonster .@map$,93,9,103,45,"毕帝特地龙",1155,10,.@label$;
+		break;
+	case 48:
+		areamonster .@map$,181,9,191,45,"狂暴蜈蚣",1305,10,.@label$;
+		areamonster .@map$,181,9,191,45,"狂暴木乃伊",1297,10,.@label$;
+		areamonster .@map$,181,9,191,45,"狂暴邪恶箱",1699,10,.@label$;
+		break;
+	case 49:
+		areamonster .@map$,267,9,277,45,"暴焰野熊",1381,20,.@label$;
+		areamonster .@map$,267,9,277,45,"狂暴大脚熊",1306,7,.@label$;
+		areamonster .@map$,267,9,277,45,"拉链熊",1417,5,.@label$;
+		areamonster .@map$,267,9,277,45,"雪熊",1243,5,.@label$;
+		areamonster .@map$,267,9,277,45,"大脚熊",1060,5,.@label$;
+		break;
+	case 50:
+		areamonster .@map$,352,9,362,45,"法老王",1157,1,.@label$;
+		areamonster .@map$,352,9,362,45,"古埃及王",1511,1,.@label$;
+		areamonster .@map$,352,9,362,45,"安毕斯",1098,10,.@label$;
+		areamonster .@map$,352,9,362,45,"马尔杜克",1140,10,.@label$;
+		areamonster .@map$,352,9,362,45,"黑狐",1146,10,.@label$;
+		break;
+	case 51:
+		areamonster .@map$,9,351,19,387,"狂暴小恶魔",1292,20,.@label$;
+		areamonster .@map$,9,351,19,387,"赤焰小恶魔",1382,20,.@label$;
+		areamonster .@map$,9,351,19,387,"小恶魔",1109,10,.@label$;
+		break;
+	case 52:
+		areamonster .@map$,93,351,103,387,"鸟人哈比",1376,20,.@label$;
+		areamonster .@map$,93,351,103,387,"七彩大嘴鸟",1369,10,.@label$;
+		areamonster .@map$,93,351,103,387,"血蝴蝶",1408,10,.@label$;
+		areamonster .@map$,93,351,103,387,"蝙蝠弓箭手",1253,10,.@label$;
+		areamonster .@map$,93,351,103,387,"希尔队长",1680,5,.@label$;
+		areamonster .@map$,93,351,103,387,"希尔士兵",1629,5,.@label$;
+		break;
+	case 53:
+		areamonster .@map$,181,351,191,387,"风灵龟",1315,25,.@label$;
+		areamonster .@map$,181,351,191,387,"火忍西怒毕",1401,30,.@label$;
+		break;
+	case 54:
+		areamonster .@map$,267,351,277,387,"魔灵娃娃",1250,10,.@label$;
+		areamonster .@map$,267,351,277,387,"傀儡娃娃",1143,10,.@label$;
+		areamonster .@map$,267,351,277,387,"米雅毕",1404,10,.@label$;
+		break;
+	case 55:
+		areamonster .@map$,352,351,362,387,"美杜莎",1148,25,.@label$;
+		areamonster .@map$,352,351,362,387,"墨蛇君",1418,1,.@label$;
+		areamonster .@map$,352,351,362,387,"蛇女伊丝",1029,15,.@label$;
+		areamonster .@map$,352,351,362,387,"黑蛇",1037,15,.@label$;
+		break;
+	case 56:
+		areamonster .@map$,9,267,19,303,"水灵龟",1319,10,.@label$;
+		areamonster .@map$,9,267,19,303,"卡仑宝宝",1515,10,.@label$;
+		areamonster .@map$,9,267,19,303,"寒冰巨人",1777,15,.@label$;
+		areamonster .@map$,9,267,19,303,"雪怪",1775,10,.@label$;
+		areamonster .@map$,9,267,19,303,"寒冰雕像",1778,10,.@label$;
+		break;
+	case 57:
+		areamonster .@map$,93,267,103,303,"圣天使波利",1388,1,.@label$;
+		areamonster .@map$,93,267,103,303,"恶魔波利",1582,1,.@label$;
+		areamonster .@map$,93,267,103,303,"天使波利",1096,1,.@label$;
+		areamonster .@map$,93,267,103,303,"幽灵波利",1120,1,.@label$;
+		areamonster .@map$,93,267,103,303,"波利之王",1090,1,.@label$;
+		areamonster .@map$,93,267,103,303,"金属波利",1613,25,.@label$;
+		areamonster .@map$,93,267,103,303,"冰波利",1242,5,.@label$;
+		areamonster .@map$,93,267,103,303,"波波利",1031,5,.@label$;
+		areamonster .@map$,93,267,103,303,"土波利",1113,5,.@label$;
+		break;
+	case 58:
+		areamonster .@map$,181,267,191,303,"阿修罗狂战士",1202,20,.@label$;
+		areamonster .@map$,181,267,191,303,"瑞比欧",1201,10,.@label$;
+		areamonster .@map$,181,267,191,303,"腐尸战俘",1197,10,.@label$;
+		areamonster .@map$,181,267,191,303,"邪骸战俘",1196,5,.@label$;
+		areamonster .@map$,181,267,191,303,"邪恶使者",1257,5,.@label$;
+		break;
+	case 59:
+		areamonster .@map$,267,267,277,303,"狂暴邪恶箱",1699,30,.@label$;
+		areamonster .@map$,267,267,277,303,"邪恶箱",1191,20,.@label$;
+		areamonster .@map$,267,267,277,303,"邪恶礼盒",1249,10,.@label$;
+		break;
+	case 60:
+		areamonster .@map$,352,267,362,303,"闇●剑士 赛尼亚",1658,1,.@label$;
+		areamonster .@map$,352,267,362,303,"死灵",1046,1,.@label$;
+		areamonster .@map$,352,267,362,303,"闇●商人",1654,10,.@label$;
+		areamonster .@map$,352,267,362,303,"闇●盗贼",1653,10,.@label$;
+		areamonster .@map$,352,267,362,303,"闇●魔法师",1657,10,.@label$;
+		areamonster .@map$,352,267,362,303,"闇●弓箭手",1656,10,.@label$;
+		areamonster .@map$,352,267,362,303,"闇●服侍",1655,10,.@label$;
+		areamonster .@map$,352,267,362,303,"闇●剑士",1652,10,.@label$;
+		break;
+	case 61:
+		areamonster .@map$,9,180,19,216,"阿加波",1769,10,.@label$;
+		areamonster .@map$,9,180,19,216,"艾基奥",1770,10,.@label$;
+		areamonster .@map$,9,180,19,216,"依斯拉",1772,5,.@label$;
+		areamonster .@map$,9,180,19,216,"流氓",1313,10,.@label$;
+		areamonster .@map$,9,180,19,216,"帕莎纳",1154,10,.@label$;
+		areamonster .@map$,9,180,19,216,"凡贝尔克",1771,5,.@label$;
+		break;
+	case 62:
+		areamonster .@map$,93,180,103,216,"邪骸浪人",1208,35,.@label$;
+		break;
+	case 63:
+		areamonster .@map$,181,180,191,216,"变异僵尸",1865,20,.@label$;
+		areamonster .@map$,181,180,191,216,"腐尸首领",1298,10,.@label$;
+		areamonster .@map$,181,180,191,216,"腐尸战俘",1197,5,.@label$;
+		areamonster .@map$,181,180,191,216,"兽人腐尸",1153,5,.@label$;
+		areamonster .@map$,181,180,191,216,"腐尸",1015,5,.@label$;
+		break;
+	case 64:
+		areamonster .@map$,267,180,277,216,"温古力安特",1618,30,.@label$;
+		areamonster .@map$,267,180,277,216,"狂暴蜈蚣",1305,2,.@label$;
+		areamonster .@map$,267,180,277,216,"狂暴绿棉虫",1300,2,.@label$;
+		areamonster .@map$,267,180,277,216,"狂暴克瑞米",1293,2,.@label$;
+		areamonster .@map$,267,180,277,216,"狂暴螳螂",1294,2,.@label$;
+		areamonster .@map$,267,180,277,216,"狂暴蜂兵",1303,2,.@label$;
+		break;
+	case 65:
+		areamonster .@map$,352,180,362,216,"阿特罗斯",1785,1,.@label$;
+		areamonster .@map$,352,180,362,216,"疯狂鬣狗",1783,20,.@label$;
+		break;
+	case 66:
+		areamonster .@map$,9,96,19,132,"恶魔侍者",1374,20,.@label$;
+		areamonster .@map$,9,96,19,132,"爱丽俄",1736,20,.@label$;
+		areamonster .@map$,9,96,19,132,"邪恶使者",1257,10,.@label$;
+		break;
+	case 67:
+		areamonster .@map$,93,96,103,132,"灰俄希托斯",1716,10,.@label$;
+		areamonster .@map$,93,96,103,132,"黄俄希托斯",1713,10,.@label$;
+		areamonster .@map$,93,96,103,132,"七彩飞龙",1384,5,.@label$;
+		areamonster .@map$,93,96,103,132,"半龙人",1262,10,.@label$;
+		areamonster .@map$,93,96,103,132,"毕帝特飞龙",1156,5,.@label$;
+		break;
+	case 68:
+		areamonster .@map$,181,96,191,132,"熔岩巨石",1366,10,.@label$;
+		areamonster .@map$,181,96,191,132,"钟乳巨石怪",1278,10,.@label$;
+		areamonster .@map$,181,96,191,132,"寒冰巨人",1777,10,.@label$;
+		areamonster .@map$,181,96,191,132,"机木人",1497,5,.@label$;
+		areamonster .@map$,181,96,191,132,"巨石怪",1040,5,.@label$;
+		break;
+	case 69:
+		areamonster .@map$,267,96,277,132,"监视者",1700,20,.@label$;
+		areamonster .@map$,267,96,277,132,"安息者",1701,10,.@label$;
+		areamonster .@map$,267,96,277,132,"代行刑者",1702,10,.@label$;
+		areamonster .@map$,267,96,277,132,"慰劳者",1703,10,.@label$;
+		areamonster .@map$,267,96,277,132,"伪天使",1371,10,.@label$;
+		break;
+	case 70:
+		areamonster .@map$,352,96,362,132,"兽人英雄",1087,1,.@label$;
+		areamonster .@map$,352,96,362,132,"兽人酋长",1190,1,.@label$;
+		areamonster .@map$,352,96,362,132,"兽人婴儿",1686,20,.@label$;
+		break;
+	case 71:
+		areamonster .@map$,9,9,19,45,"恶魔女仆",1370,20,.@label$;
+		areamonster .@map$,9,9,19,45,"七彩梦魇",1379,20,.@label$;
+		areamonster .@map$,9,9,19,45,"恶魔侍者",1374,20,.@label$;
+		areamonster .@map$,9,9,19,45,"梦魇",1061,5,.@label$;
+		break;
+	case 72:
+		areamonster .@map$,93,9,103,45,"闇●神官",1637,10,.@label$;
+		areamonster .@map$,93,9,103,45,"果树龟",1314,10,.@label$;
+		areamonster .@map$,93,9,103,45,"闇●服侍",1655,10,.@label$;
+		areamonster .@map$,93,9,103,45,"猴桃木",1410,10,.@label$;
+		break;
+	case 73:
+		areamonster .@map$,181,9,191,45,"恶魔女仆",1370,10,.@label$;
+		areamonster .@map$,181,9,191,45,"银月魔女",1505,20,.@label$;
+		areamonster .@map$,181,9,191,45,"爱丽哲",1737,10,.@label$;
+		areamonster .@map$,181,9,191,45,"艾斯恩魔女",1200,5,.@label$;
+		areamonster .@map$,181,9,191,45,"爱丽丝女仆",1275,5,.@label$;
+		areamonster .@map$,181,9,191,45,"小青",1631,10,.@label$;
+		break;
+	case 74:
+		areamonster .@map$,267,9,277,45,"冰冻迪靡克",1671,6,.@label$;
+		areamonster .@map$,267,9,277,45,"火焰迪靡克",1673,6,.@label$;
+		areamonster .@map$,267,9,277,45,"崩裂迪靡克",1672,6,.@label$;
+		areamonster .@map$,267,9,277,45,"绿凡娜图",1677,6,.@label$;
+		areamonster .@map$,267,9,277,45,"暴风迪靡克",1670,6,.@label$;
+		areamonster .@map$,267,9,277,45,"阿克坦",1668,6,.@label$;
+		areamonster .@map$,267,9,277,45,"橘凡娜图",1678,6,.@label$;
+		areamonster .@map$,267,9,277,45,"蓝凡娜图",1679,6,.@label$;
+		areamonster .@map$,267,9,277,45,"褐凡娜图",1676,6,.@label$;
+		break;
+	case 75:
+		areamonster .@map$,352,9,362,45,"巴风特",1039,1,.@label$;
+		areamonster .@map$,352,9,362,45,"黑暗之王",1272,1,.@label$;
+		areamonster .@map$,352,9,362,45,"小巴风特",1101,20,.@label$;
+		areamonster .@map$,352,9,362,45,"迷幻之王",1302,10,.@label$;
+		break;
+	case 76:
+		areamonster .@map$,9,351,19,387,"深渊骑士",1219,30,.@label$;
+		areamonster .@map$,9,351,19,387,"七彩梦魇",1379,20,.@label$;
+		areamonster .@map$,9,351,19,387,"梦魇",1061,10,.@label$;
+		break;
+	case 77:
+		areamonster .@map$,93,351,103,387,"女妖",1867,30,.@label$;
+		areamonster .@map$,93,351,103,387,"狂暴恶灵",1291,10,.@label$;
+		areamonster .@map$,93,351,103,387,"闇神官",1117,10,.@label$;
+		areamonster .@map$,93,351,103,387,"狂暴小恶魔",1192,10,.@label$;
+		areamonster .@map$,93,351,103,387,"风魔巫师",1263,10,.@label$;
+		break;
+	case 78:
+		areamonster .@map$,181,351,191,387,"机械剑士",1829,5,.@label$;
+		areamonster .@map$,181,351,191,387,"血腥骑士",1268,10,.@label$;
+		areamonster .@map$,181,351,191,387,"深渊骑士",1219,5,.@label$;
+		areamonster .@map$,181,351,191,387,"无颅武士",1504,10,.@label$;
+		areamonster .@map$,181,351,191,387,"幽灵剑士",1163,20,.@label$;
+		break;
+	case 79:
+		areamonster .@map$,267,351,277,387,"三头龙",1720,10,.@label$;
+		areamonster .@map$,267,351,277,387,"红贝勒斯",1714,10,.@label$;
+		areamonster .@map$,267,351,277,387,"绿贝勒斯",1717,10,.@label$;
+		areamonster .@map$,267,351,277,387,"七彩地龙",1385,5,.@label$;
+		areamonster .@map$,267,351,277,387,"毕帝特地龙",1155,5,.@label$;
+		break;
+	case 80:
+		areamonster .@map$,352,351,362,387,"堕落的大神官希巴姆",1871,1,.@label$;
+		areamonster .@map$,352,351,362,387,"亡灵巫师",1870,15,.@label$;
+		break;
+	case 81:
+		areamonster .@map$,9,267,19,303,"弑神者",1203,20,.@label$;
+		areamonster .@map$,9,267,19,303,"兽牙怪",1204,20,.@label$;
+		areamonster .@map$,9,267,19,303,"行刑者",1205,20,.@label$;
+		break;
+	case 82:
+		areamonster .@map$,93,267,103,303,"血腥骑士",1268,10,.@label$;
+		areamonster .@map$,93,267,103,303,"阿加波",1769,10,.@label$;
+		areamonster .@map$,93,267,103,303,"嗜血怪人",1507,10,.@label$;
+		areamonster .@map$,93,267,103,303,"皮影魔",1752,10,.@label$;
+		areamonster .@map$,93,267,103,303,"邪恶使者",1257,10,.@label$;
+		break;
+	case 83:
+		areamonster .@map$,181,267,191,303,"褐方体恶魔",1754,10,.@label$;
+		areamonster .@map$,181,267,191,303,"迷幻之王",1302,10,.@label$;
+		areamonster .@map$,181,267,191,303,"狮鹫兽",1259,10,.@label$;
+		areamonster .@map$,181,267,191,303,"凯美拉",1283,10,.@label$;
+		break;
+	case 84:
+		areamonster .@map$,267,267,277,303,"恶魔女仆",1370,10,.@label$;
+		areamonster .@map$,267,267,277,303,"迷幻之王",1302,20,.@label$;
+		areamonster .@map$,267,267,277,303,"鹗枭首领",1320,10,.@label$;
+		areamonster .@map$,267,267,277,303,"鹗枭男爵",1295,10,.@label$;
+		areamonster .@map$,267,267,277,303,"恶魔侍者",1374,10,.@label$;
+		break;
+	case 85:
+		areamonster .@map$,352,267,362,303,"伊夫利特",1832,1,.@label$;
+		break;
+	case 86:
+		areamonster .@map$,9,180,19,216,"三头龙",1720,10,.@label$;
+		areamonster .@map$,9,180,19,216,"狮鹫兽",1259,10,.@label$;
+		areamonster .@map$,9,180,19,216,"凯美拉",1283,10,.@label$;
+		areamonster .@map$,9,180,19,216,"狂暴米诺斯",1310,10,.@label$;
+		break;
+	case 87:
+		areamonster .@map$,93,180,103,216,"熔岩蜥蜴",1831,15,.@label$;
+		areamonster .@map$,93,180,103,216,"不死鸟",1833,20,.@label$;
+		areamonster .@map$,93,180,103,216,"熔岩巨石",1366,15,.@label$;
+		areamonster .@map$,93,180,103,216,"狂暴鬼火",1309,10,.@label$;
+		break;
+	case 88:
+		areamonster .@map$,181,180,191,216,"亡灵巫师",1870,15,.@label$;
+		areamonster .@map$,181,180,191,216,"安毕斯",1098,15,.@label$;
+		areamonster .@map$,181,180,191,216,"狂暴恶灵",1291,10,.@label$;
+		areamonster .@map$,181,180,191,216,"狂暴木乃伊",1297,10,.@label$;
+		areamonster .@map$,181,180,191,216,"卡利斯格",1132,10,.@label$;
+		break;
+	case 89:
+		areamonster .@map$,267,180,277,216,"达纳托斯的憎恨",1704,6,.@label$;
+		areamonster .@map$,267,180,277,216,"达纳托斯的绝望",1705,6,.@label$;
+		areamonster .@map$,267,180,277,216,"达纳托斯的悲哀",1706,6,.@label$;
+		areamonster .@map$,267,180,277,216,"达纳托斯的苦恼",1707,6,.@label$;
+		break;
+	case 90:
+		areamonster .@map$,352,180,362,216,"兰特克力斯",1751,1,.@label$;
+		areamonster .@map$,352,180,362,216,"代行刑者",1702,10,.@label$;
+		areamonster .@map$,352,180,362,216,"慰劳者",1703,10,.@label$;
+		areamonster .@map$,352,180,362,216,"伪天使",1371,10,.@label$;
+		break;
+	case 91:
+		areamonster .@map$,9,96,19,132,"闇●神射手",1638,10,.@label$;
+		areamonster .@map$,9,96,19,132,"机械狙击手",1830,10,.@label$;
+		areamonster .@map$,9,96,19,132,"闇●弓箭手",1656,30,.@label$;
+		break;
+	case 92:
+		areamonster .@map$,93,96,103,132,"闇●超魔导师",1639,15,.@label$;
+		areamonster .@map$,93,96,103,132,"邪灵魔导士",1377,10,.@label$;
+		areamonster .@map$,93,96,103,132,"闇●魔法师",1657,10,.@label$;
+		areamonster .@map$,93,96,103,132,"风魔巫师",1263,10,.@label$;
+		areamonster .@map$,93,96,103,132,"马尔杜克",1140,10,.@label$;
+		break;
+	case 93:
+		areamonster .@map$,181,96,191,132,"闇●骑士领主",1634,15,.@label$;
+		areamonster .@map$,181,96,191,132,"血腥骑士",1268,10,.@label$;
+		areamonster .@map$,181,96,191,132,"深渊骑士",1219,10,.@label$;
+		areamonster .@map$,181,96,191,132,"邪骸浪人",1208,10,.@label$;
+		break;
+	case 94:
+		areamonster .@map$,267,96,277,132,"机械剑士",1829,15,.@label$;
+		areamonster .@map$,267,96,277,132,"机械狙击手",1830,15,.@label$;
+		break;
+	case 95:
+		areamonster .@map$,352,96,362,132,"贝雷杰",1873,1,.@label$;
+		areamonster .@map$,352,96,362,132,"赤苍蝇",1035,30,.@label$;
+		areamonster .@map$,352,96,362,132,"绿苍蝇",1042,5,.@label$;
+		areamonster .@map$,352,96,362,132,"龙蝇",1091,5,.@label$;
+		areamonster .@map$,352,96,362,132,"苍蝇",1011,5,.@label$;
+		break;
+	case 96:
+		areamonster .@map$,9,9,19,45,"巴基力 兰特克力斯",1765,5,.@label$;
+		areamonster .@map$,9,9,19,45,"黑方体恶魔",1755,10,.@label$;
+		areamonster .@map$,9,9,19,45,"褐方体恶魔",1754,10,.@label$;
+		break;
+	case 97:
+		areamonster .@map$,93,9,103,45,"梦罗克分身",1918,5,.@label$;
+		areamonster .@map$,93,9,103,45,"梦罗克分身",1919,5,.@label$;
+		areamonster .@map$,93,9,103,45,"梦罗克分身",1920,5,.@label$;
+		areamonster .@map$,93,9,103,45,"梦罗克分身",1921,5,.@label$;
+		break;
+	case 98:
+		areamonster .@map$,181,9,191,45,"闇●超魔导师",1639,2,.@label$;
+		areamonster .@map$,181,9,191,45,"闇●骑士领主",1634,2,.@label$;
+		areamonster .@map$,181,9,191,45,"闇●神官",1637,2,.@label$;
+		areamonster .@map$,181,9,191,45,"闇●十字刺客",1635,2,.@label$;
+		areamonster .@map$,181,9,191,45,"闇●神工匠",1636,2,.@label$;
+		areamonster .@map$,181,9,191,45,"闇●神射手",1638,2,.@label$;
+		break;
+	case 99:
+		for(set .@i,1; .@i<=7; set .@i,.@i+1) {
+			set .@mob_ran,rand(1,30);
+			if (.@mob_ran == 1) 
+				areamonster .@map$,267,9,277,45,"闇●超魔导师",1639,2,.@label$;
+			else if (.@mob_ran == 2) 
+				areamonster .@map$,267,9,277,45,"闇●骑士领主",1634,2,.@label$;
+			else if (.@mob_ran == 3) 
+				areamonster .@map$,267,9,277,45,"闇●神官",1637,2,.@label$;
+			else if (.@mob_ran == 4) 
+				areamonster .@map$,267,9,277,45,"闇●十字刺客",1635,2,.@label$;
+			else if (.@mob_ran == 5) 
+				areamonster .@map$,267,9,277,45,"闇●神工匠",1636,2,.@label$;
+			else if (.@mob_ran == 6) 
+				areamonster .@map$,267,9,277,45,"闇●神射手",1638,2,.@label$;
+			else if (.@mob_ran == 7) 
+				areamonster .@map$,267,9,277,45,"梦罗克分身",1918,5,.@label$;
+			else if (.@mob_ran == 8) 
+				areamonster .@map$,267,9,277,45,"梦罗克分身",1919,5,.@label$;
+			else if (.@mob_ran == 9) 
+				areamonster .@map$,267,9,277,45,"梦罗克分身",1920,5,.@label$;
+			else if (.@mob_ran == 10) 
+				areamonster .@map$,267,9,277,45,"梦罗克分身",1921,5,.@label$;
+			else if (.@mob_ran == 11) 
+				areamonster .@map$,267,9,277,45,"巴基力 兰特克力斯",1765,5,.@label$;
+			else if (.@mob_ran == 12) 
+				areamonster .@map$,267,9,277,45,"黑方体恶魔",1755,10,.@label$;
+			else if (.@mob_ran == 13) 
+				areamonster .@map$,267,9,277,45,"褐方体恶魔",1754,10,.@label$;
+			else if (.@mob_ran == 14) 
+				areamonster .@map$,267,9,277,45,"闇●骑士领主",1634,15,.@label$;
+			else if (.@mob_ran == 15) 
+				areamonster .@map$,267,9,277,45,"血腥骑士",1268,10,.@label$;
+			else if (.@mob_ran == 16) 
+				areamonster .@map$,267,9,277,45,"深渊骑士",1219,10,.@label$;
+			else if (.@mob_ran == 17) 
+				areamonster .@map$,267,9,277,45,"邪骸浪人",1208,10,.@label$;
+			else if (.@mob_ran == 18) 
+				areamonster .@map$,267,9,277,45,"机械剑士",1829,15,.@label$;
+			else if (.@mob_ran == 19) 
+				areamonster .@map$,267,9,277,45,"机械狙击手",1830,15,.@label$;
+			else if (.@mob_ran == 20) 
+				areamonster .@map$,267,9,277,45,"闇●超魔导师",1639,15,.@label$;
+			else if (.@mob_ran == 21) 
+				areamonster .@map$,267,9,277,45,"邪灵魔导士",1377,10,.@label$;
+			else if (.@mob_ran == 22) 
+				areamonster .@map$,267,9,277,45,"闇●魔法师",1657,10,.@label$;
+			else if (.@mob_ran == 23) 
+				areamonster .@map$,267,9,277,45,"风魔巫师",1263,10,.@label$;
+			else if (.@mob_ran == 24) 
+				areamonster .@map$,267,9,277,45,"马尔杜克",1140,10,.@label$;
+			else if (.@mob_ran == 25) 
+				areamonster .@map$,267,9,277,45,"闇●神射手",1638,10,.@label$;
+			else if (.@mob_ran == 26) 
+				areamonster .@map$,267,9,277,45,"机械狙击手",1830,10,.@label$;
+			else if (.@mob_ran == 27) 
+				areamonster .@map$,267,9,277,45,"闇●弓箭手",1656,30,.@label$;
+			else if (.@mob_ran == 28) 
+				areamonster .@map$,267,9,277,45,"代行刑者",1702,10,.@label$;
+			else if (.@mob_ran == 29) 
+				areamonster .@map$,267,9,277,45,"慰劳者",1703,10,.@label$;
+			else 
+				areamonster .@map$,267,9,277,45,"伪天使",1371,10,.@label$;
+		}
+		break;
+	}
+	return;
+}
+
+function	script	F_Tower_Warp	{
+
+	set .@level, getarg(0);
+	set .@map$, getarg(1);
+
+	switch(.@level) {
+		case 2: warp .@map$,136,354; break;
+		case 3: warp .@map$,224,354; break;
+		case 4: warp .@map$,310,354; break;
+		case 5: warp .@map$,395,354; break;
+		case 6: warp .@map$,52,270; break;
+		case 7: warp .@map$,136,270; break;
+		case 8: warp .@map$,224,270; break;
+		case 9: warp .@map$,310,270; break;
+		case 10: warp .@map$,395,270; break;
+		case 11: warp .@map$,52,183; break;
+		case 12: warp .@map$,136,183; break;
+		case 13: warp .@map$,224,183; break;
+		case 14: warp .@map$,310,183; break;
+		case 15: warp .@map$,395,183; break;
+		case 16: warp .@map$,52,99; break;
+		case 17: warp .@map$,136,99; break;
+		case 18: warp .@map$,224,99; break;
+		case 19: warp .@map$,310,99; break;
+		case 20: warp .@map$,395,99; break;
+		case 21: warp .@map$,52,12; break;
+		case 22: warp .@map$,136,12; break;
+		case 23: warp .@map$,224,12; break;
+		case 24: warp .@map$,310,12; break;
+		case 25: warp .@map$,395,12; break;
+
+		case 27: warp .@map$,136,354; break;
+		case 28: warp .@map$,224,354; break;
+		case 29: warp .@map$,310,354; break;
+		case 30: warp .@map$,395,354; break;
+		case 31: warp .@map$,52,270; break;
+		case 32: warp .@map$,136,270; break;
+		case 33: warp .@map$,224,270; break;
+		case 34: warp .@map$,310,270; break;
+		case 35: warp .@map$,395,270; break;
+		case 36: warp .@map$,52,183; break;
+		case 37: warp .@map$,136,183; break;
+		case 38: warp .@map$,224,183; break;
+		case 39: warp .@map$,310,183; break;
+		case 40: warp .@map$,395,183; break;
+		case 41: warp .@map$,52,99; break;
+		case 42: warp .@map$,136,99; break;
+		case 43: warp .@map$,224,99; break;
+		case 44: warp .@map$,310,99; break;
+		case 45: warp .@map$,395,99; break;
+		case 46: warp .@map$,52,12; break;
+		case 47: warp .@map$,136,12; break;
+		case 48: warp .@map$,224,12; break;
+		case 49: warp .@map$,310,12; break;
+		case 50: warp .@map$,395,12; break;
+
+		case 52: warp .@map$,136,354; break;
+		case 53: warp .@map$,224,354; break;
+		case 54: warp .@map$,310,354; break;
+		case 55: warp .@map$,395,354; break;
+		case 56: warp .@map$,52,270; break;
+		case 57: warp .@map$,136,270; break;
+		case 58: warp .@map$,224,270; break;
+		case 59: warp .@map$,310,270; break;
+		case 60: warp .@map$,395,270; break;
+		case 61: warp .@map$,52,183; break;
+		case 62: warp .@map$,136,183; break;
+		case 63: warp .@map$,224,183; break;
+		case 64: warp .@map$,310,183; break;
+		case 65: warp .@map$,395,183; break;
+		case 66: warp .@map$,52,99; break;
+		case 67: warp .@map$,136,99; break;
+		case 68: warp .@map$,224,99; break;
+		case 69: warp .@map$,310,99; break;
+		case 70: warp .@map$,395,99; break;
+		case 71: warp .@map$,52,12; break;
+		case 72: warp .@map$,136,12; break;
+		case 73: warp .@map$,224,12; break;
+		case 74: warp .@map$,310,12; break;
+		case 75: warp .@map$,395,12; break;
+
+		case 77: warp .@map$,136,354; break;
+		case 78: warp .@map$,224,354; break;
+		case 79: warp .@map$,310,354; break;
+		case 80: warp .@map$,395,354; break;
+		case 81: warp .@map$,52,270; break;
+		case 82: warp .@map$,136,270; break;
+		case 83: warp .@map$,224,270; break;
+		case 84: warp .@map$,310,270; break;
+		case 85: warp .@map$,395,270; break;
+		case 86: warp .@map$,52,183; break;
+		case 87: warp .@map$,136,183; break;
+		case 88: warp .@map$,224,183; break;
+		case 89: warp .@map$,310,183; break;
+		case 90: warp .@map$,395,183; break;
+		case 91: warp .@map$,52,99; break;
+		case 92: warp .@map$,136,99; break;
+		case 93: warp .@map$,224,99; break;
+		case 94: warp .@map$,310,99; break;
+		case 95: warp .@map$,395,99; break;
+		case 96: warp .@map$,52,12; break;
+		case 97: warp .@map$,136,12; break;
+		case 98: warp .@map$,224,12; break;
+		case 99: warp .@map$,309,12; break;
+	}
+	return;
+}
+
+// Levels 1-25
+//============================================================
+1@tower,50,360,0	script	不朽的火盆#	CLEAR_NPC,{
+	mes "- 火盆上刻着一段文字 -";
+	mes "在这里持有黑暗圣物的人将能够更接近纳户特基格, 那个黑夜中的魔王...";
+	next;
+
+	setarray .@level$[1],"26th","51st","76th";
+	setarray .@map$[1],"2@tower","3@tower","4@tower";
+	set .@i, select("- 26th 层:- 51st 层:- 76th 层");
+
+	if (countitem(6000) < .@i) {
+		mes "- 警告 -";
+		mes "传送到 "+.@level$[.@i]+" 层, 需要 "+.@i+" 黑暗圣物.";
+		close;
+	}
+	delitem 6000,.@i; //Dark_Ashes
+	mapannounce instance_mapname("1@tower"), strcharinfo(0)+". 您将被传送至 "+.@level$[.@i]+" 层.",bc_map,"0x00ff99";
+	warp instance_mapname(.@map$[.@i]),52,354;
+	close;
+
+OnInstanceInit:
+	initnpctimer;
+	end;
+
+OnTimer10000:
+	mapannounce instance_mapname("1@tower"), "警告 : 驯服怪物将不会被计算到要求的击杀数内.",bc_map,"0xff0000";
+	stopnpctimer;
+	end;
+}
+
+1@tower,29,365,1	script	#1F Controller	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	callfunc "F_Tower_Monster",
+		1,
+		instance_mapname("1@tower"),
+		instance_npcname("#1F Controller")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("1@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#1F Controller")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor 1
+	} else
+		mapannounce .@map$, "第1层的剩余魔物 - "+.@mob_dead_num,bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	mapannounce instance_mapname("1@tower"), "第1层的所有怪物都已经被击杀.",bc_map,"0xffff00";
+	donpcevent instance_npcname("1FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+1@tower,12,393,0	script	1FGate102tower	WARPNPC,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname(strnpcinfo(0));
+	end;
+
+OnEnable:
+	enablenpc instance_npcname(strnpcinfo(0));
+	callfunc "F_Tower_Monster",
+		atoi(replacestr(strnpcinfo(0),"FGate102tower","")) + 1,
+		strnpcinfo(4),
+		instance_npcname(strnpcinfo(0))+"::OnMyMobDead";
+	end;
+
+OnTouch_:
+	callfunc "F_Tower_Warp",
+		atoi(replacestr(strnpcinfo(0),"FGate102tower","")) + 1,
+		strnpcinfo(4);
+	end;
+
+OnMyMobDead:
+	set .@map$, strnpcinfo(4);
+	set .@level, atoi(replacestr(strnpcinfo(0),"FGate102tower","")) + 1;
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname(strnpcinfo(0))+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor .@level
+	} else
+		mapannounce .@map$, "第"+callsub(L_Display,.@level)+"层的剩余魔物 - "+.@mob_dead_num,bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	set .@level, atoi(replacestr(strnpcinfo(0),"FGate102tower","")) + 1;
+	mapannounce strnpcinfo(4), "第"+callsub(L_Display,.@level)+"层的所有怪物都已经被击杀.",bc_map,"0xffff00";
+	donpcevent instance_npcname(.@level+"FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+
+L_Display:
+	// Display level properly.
+	set .@mod, getarg(0) % 10;
+	if (.@mod == 1 && getarg(0) != 11) return getarg(0)+"st";
+	else if (.@mod == 2 && getarg(0) != 12) return getarg(0)+"nd";
+	else if (.@mod == 3 && getarg(0) != 13) return getarg(0)+"rd";
+	else return getarg(0)+"th";
+}
+1@tower,96,393,0	duplicate(1FGate102tower)	2FGate102tower	WARPNPC,2,2
+1@tower,184,393,0	duplicate(1FGate102tower)	3FGate102tower	WARPNPC,2,2
+1@tower,270,393,0	duplicate(1FGate102tower)	4FGate102tower	WARPNPC,2,2
+1@tower,355,393,0	duplicate(1FGate102tower)	5FGate102tower	WARPNPC,2,2
+1@tower,12,309,0	duplicate(1FGate102tower)	6FGate102tower	WARPNPC,2,2
+1@tower,96,309,0	duplicate(1FGate102tower)	7FGate102tower	WARPNPC,2,2
+1@tower,184,309,0	duplicate(1FGate102tower)	8FGate102tower	WARPNPC,2,2
+1@tower,270,309,0	duplicate(1FGate102tower)	9FGate102tower	WARPNPC,2,2
+1@tower,355,309,0	duplicate(1FGate102tower)	10FGate102tower	WARPNPC,2,2
+1@tower,12,222,0	duplicate(1FGate102tower)	11FGate102tower	WARPNPC,2,2
+1@tower,96,222,0	duplicate(1FGate102tower)	12FGate102tower	WARPNPC,2,2
+1@tower,184,222,0	duplicate(1FGate102tower)	13FGate102tower	WARPNPC,2,2
+1@tower,270,222,0	duplicate(1FGate102tower)	14FGate102tower	WARPNPC,2,2
+1@tower,355,222,0	duplicate(1FGate102tower)	15FGate102tower	WARPNPC,2,2
+1@tower,12,138,0	duplicate(1FGate102tower)	16FGate102tower	WARPNPC,2,2
+1@tower,96,138,0	duplicate(1FGate102tower)	17FGate102tower	WARPNPC,2,2
+1@tower,184,138,0	duplicate(1FGate102tower)	18FGate102tower	WARPNPC,2,2
+1@tower,270,138,0	duplicate(1FGate102tower)	19FGate102tower	WARPNPC,2,2
+1@tower,355,138,0	duplicate(1FGate102tower)	20FGate102tower	WARPNPC,2,2
+1@tower,12,51,0	duplicate(1FGate102tower)	21FGate102tower	WARPNPC,2,2
+1@tower,96,51,0	duplicate(1FGate102tower)	22FGate102tower	WARPNPC,2,2
+1@tower,184,51,0	duplicate(1FGate102tower)	23FGate102tower	WARPNPC,2,2
+1@tower,270,51,0	duplicate(1FGate102tower)	24FGate102tower	WARPNPC,2,2
+
+1@tower,355,51,0	script	25FGate102tower	WARPNPC,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("25FGate102tower");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("25FGate102tower");
+	initnpctimer;
+	end;
+
+OnTouch_:
+	getitem 6000,1; //Dark_Ashes
+	warp instance_mapname("2@tower"),52,354;
+	end;
+
+OnTimer120000:
+	disablenpc instance_npcname("25FGate102tower");
+	donpcevent instance_npcname("25FGate102tower-2")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+1@tower,355,51,0	script	25FGate102tower-2	WARPNPC,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("25FGate102tower-2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("25FGate102tower-2");
+	end;
+
+OnTouch_:
+	warp instance_mapname("2@tower"),52,354;
+	end;
+}
+
+1@tower,71,4,0	script	#Broadcast Mode1	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	initnpctimer;
+	end;
+
+OnTimer15000:
+OnTimer60000:
+	mapannounce instance_mapname("1@tower"), "警告 : 使用任何非正常手段击杀怪物, 可能会导致您将无法开启下一楼层的传送!",bc_map,"0xff0000";
+	end;
+OnTimer120000:
+	mapannounce instance_mapname("1@tower"), "警告 : 使用任何非正常手段击杀怪物, 可能会导致您将无法开启下一楼层的传送!",bc_map,"0xff0000";
+	stopnpctimer;
+	end;
+}
+
+1@tower,71,1,0	script	#Manager Mode1	CLEAR_NPC,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		mes "This NPC manages the tower from the 1st to the 25th Level.";
+		mes "Please enter the Level number to open.";
+		mes "(i.g.: 1F->1, 25F->25)";
+		input .@input,1,25;
+		next;
+		if (.@input < 1 || .@input > 25)
+			mes "You can only enter a number from 1 to 25.";
+		else {
+			donpcevent instance_npcname(.@input+"FGate102tower")+"::OnEnable";
+			mes "*** 层 "+ .@input + " 现在开启了. ***";
+		}
+	}
+	close;
+}
+
+// Levels 26-50
+//============================================================
+2@tower,29,365,2	script	不朽的火盆#1	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	callfunc "F_Tower_Monster",
+		26,
+		instance_mapname("2@tower"),
+		instance_npcname("不朽的火盆#1")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("2@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("不朽的火盆#1")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor 26
+	}
+	else
+		mapannounce .@map$, "第26层剩余魔物 - " + .@mob_dead_num,bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	mapannounce instance_mapname("2@tower"), "第26层的所有怪物都已经被击杀.",bc_map,"0xffff00";
+	donpcevent instance_npcname("26FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+2@tower,12,393,0	duplicate(1FGate102tower)	26FGate102tower	WARPNPC,2,2
+2@tower,96,393,0	duplicate(1FGate102tower)	27FGate102tower	WARPNPC,2,2
+2@tower,184,393,0	duplicate(1FGate102tower)	28FGate102tower	WARPNPC,2,2
+2@tower,270,393,0	duplicate(1FGate102tower)	29FGate102tower	WARPNPC,2,2
+2@tower,355,393,0	duplicate(1FGate102tower)	30FGate102tower	WARPNPC,2,2
+2@tower,12,309,0	duplicate(1FGate102tower)	31FGate102tower	WARPNPC,2,2
+2@tower,96,309,0	duplicate(1FGate102tower)	32FGate102tower	WARPNPC,2,2
+2@tower,184,309,0	duplicate(1FGate102tower)	33FGate102tower	WARPNPC,2,2
+2@tower,270,309,0	duplicate(1FGate102tower)	34FGate102tower	WARPNPC,2,2
+2@tower,355,309,0	duplicate(1FGate102tower)	35FGate102tower	WARPNPC,2,2
+2@tower,12,222,0	duplicate(1FGate102tower)	36FGate102tower	WARPNPC,2,2
+2@tower,96,222,0	duplicate(1FGate102tower)	37FGate102tower	WARPNPC,2,2
+2@tower,184,222,0	duplicate(1FGate102tower)	38FGate102tower	WARPNPC,2,2
+2@tower,270,222,0	duplicate(1FGate102tower)	39FGate102tower	WARPNPC,2,2
+2@tower,355,222,0	duplicate(1FGate102tower)	40FGate102tower	WARPNPC,2,2
+2@tower,12,138,0	duplicate(1FGate102tower)	41FGate102tower	WARPNPC,2,2
+2@tower,96,138,0	duplicate(1FGate102tower)	42FGate102tower	WARPNPC,2,2
+2@tower,184,138,0	duplicate(1FGate102tower)	43FGate102tower	WARPNPC,2,2
+2@tower,270,138,0	duplicate(1FGate102tower)	44FGate102tower	WARPNPC,2,2
+2@tower,355,138,0	duplicate(1FGate102tower)	45FGate102tower	WARPNPC,2,2
+2@tower,12,51,0	duplicate(1FGate102tower)	46FGate102tower	WARPNPC,2,2
+2@tower,96,51,0	duplicate(1FGate102tower)	47FGate102tower	WARPNPC,2,2
+2@tower,184,51,0	duplicate(1FGate102tower)	48FGate102tower	WARPNPC,2,2
+2@tower,270,51,0	duplicate(1FGate102tower)	49FGate102tower	WARPNPC,2,2
+
+2@tower,355,51,0	script	50FGate102tower	WARPNPC,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("50FGate102tower");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("50FGate102tower");
+	initnpctimer;
+	end;
+
+OnTouch_:
+	getitem 6000,1; //Dark_Ashes
+	warp instance_mapname("3@tower"),52,354;
+	end;
+
+OnTimer120000:
+	disablenpc instance_npcname("50FGate102tower");
+	donpcevent instance_npcname("50FGate102tower-2")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+2@tower,355,51,0	script	50FGate102tower-2	WARPNPC,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("50FGate102tower-2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("50FGate102tower-2");
+	end;
+
+OnTouch_:
+	warp instance_mapname("3@tower"),52,354;
+	end;
+}
+
+2@tower,71,1,0	script	#Manager Mode2	CLEAR_NPC,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		mes "该NPC可管理25至50层.";
+		mes "请输入需要管理的楼层数字.";
+		mes "(i.g.: 26F->26, 50F->50)";
+		input .@input,26,50;
+		next;
+		if (.@onput < 26 || .@input > 50)
+			mes "仅可以输入26-50之间的数字.";
+		else {
+			donpcevent instance_npcname(.@input+"FGate102tower")+"::OnEnable";
+			mes "*** 层 "+ .@input + " 已经开启了. ***";
+		}
+	}
+	close;
+}
+
+// Levels 51-75
+//============================================================
+3@tower,29,365,2	script	不朽的火盆#2	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	callfunc "F_Tower_Monster",
+		51,
+		instance_mapname("3@tower"),
+		instance_npcname("不朽的火盆#2")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("3@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("不朽的火盆#2")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor 51
+	}
+	else
+		mapannounce .@map$, "第51层剩余魔物 - " + .@mob_dead_num,bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	mapannounce instance_mapname("3@tower"), "第51层的所有怪物都已经被击杀.",bc_map,"0xffff00";
+	donpcevent instance_npcname("51FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+3@tower,12,393,0	duplicate(1FGate102tower)	51FGate102tower	WARPNPC,2,2
+3@tower,96,393,0	duplicate(1FGate102tower)	52FGate102tower	WARPNPC,2,2
+3@tower,184,393,0	duplicate(1FGate102tower)	53FGate102tower	WARPNPC,2,2
+3@tower,270,393,0	duplicate(1FGate102tower)	54FGate102tower	WARPNPC,2,2
+3@tower,355,393,0	duplicate(1FGate102tower)	55FGate102tower	WARPNPC,2,2
+3@tower,12,309,0	duplicate(1FGate102tower)	56FGate102tower	WARPNPC,2,2
+3@tower,96,309,0	duplicate(1FGate102tower)	57FGate102tower	WARPNPC,2,2
+3@tower,184,309,0	duplicate(1FGate102tower)	58FGate102tower	WARPNPC,2,2
+3@tower,270,309,0	duplicate(1FGate102tower)	59FGate102tower	WARPNPC,2,2
+3@tower,355,309,0	duplicate(1FGate102tower)	60FGate102tower	WARPNPC,2,2
+3@tower,12,222,0	duplicate(1FGate102tower)	61FGate102tower	WARPNPC,2,2
+3@tower,96,222,0	duplicate(1FGate102tower)	62FGate102tower	WARPNPC,2,2
+3@tower,184,222,0	duplicate(1FGate102tower)	63FGate102tower	WARPNPC,2,2
+3@tower,270,222,0	duplicate(1FGate102tower)	64FGate102tower	WARPNPC,2,2
+3@tower,355,222,0	duplicate(1FGate102tower)	65FGate102tower	WARPNPC,2,2
+3@tower,12,138,0	duplicate(1FGate102tower)	66FGate102tower	WARPNPC,2,2
+3@tower,96,138,0	duplicate(1FGate102tower)	67FGate102tower	WARPNPC,2,2
+3@tower,184,138,0	duplicate(1FGate102tower)	68FGate102tower	WARPNPC,2,2
+3@tower,270,138,0	duplicate(1FGate102tower)	69FGate102tower	WARPNPC,2,2
+3@tower,355,138,0	duplicate(1FGate102tower)	70FGate102tower	WARPNPC,2,2
+3@tower,12,51,0	duplicate(1FGate102tower)	71FGate102tower	WARPNPC,2,2
+3@tower,96,51,0	duplicate(1FGate102tower)	72FGate102tower	WARPNPC,2,2
+3@tower,184,51,0	duplicate(1FGate102tower)	73FGate102tower	WARPNPC,2,2
+3@tower,270,51,0	duplicate(1FGate102tower)	74FGate102tower	WARPNPC,2,2
+
+3@tower,355,51,0	script	75FGate102tower	WARPNPC,1,1,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("75FGate102tower");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("75FGate102tower");
+	initnpctimer;
+	end;
+
+OnTouch_:
+	getitem 6000,1; //Dark_Ashes
+	warp instance_mapname("4@tower"),52,354;
+	end;
+
+OnTimer120000:
+	disablenpc instance_npcname("75FGate102tower");
+	donpcevent instance_npcname("75FGate102tower-2")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+3@tower,355,51,0	script	75FGate102tower-2	WARPNPC,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("75FGate102tower-2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("75FGate102tower-2");
+	end;
+
+OnTouch_:
+	warp instance_mapname("4@tower"),52,354;
+	end;
+}
+
+3@tower,71,1,0	script	#Manager Mode3	CLEAR_NPC,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		mes "该NPC可以管理51至75层.";
+		mes "请输入楼层数字.";
+		mes "(i.g.: 51F->51, 75F->75)";
+		input .@input,51,75;
+		next;
+		if (.@input < 51 || .@input > 75)
+			mes "仅支持 51 - 75.";
+		else {
+			donpcevent instance_npcname(.@input+"FGate102tower")+"::OnEnable";
+			mes "*** 层 "+ .@input + " 已经打开. ***";
+		}
+	}
+	close;
+}
+
+// Levels 76-99
+//============================================================
+4@tower,29,365,2	script	不朽的火盆#3	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	callfunc "F_Tower_Monster",
+		76,
+		instance_mapname("4@tower"),
+		instance_npcname("不朽的火盆#3")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("4@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("不朽的火盆#3")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		initnpctimer;
+		//SetItemPartyInMap in_102floor 76
+	}
+	else
+		mapannounce .@map$,"第76层剩余魔物 - " + .@mob_dead_num,bc_map,"0x00ff99";
+	end;
+
+OnTimer5000:
+	mapannounce instance_mapname("4@tower"),"第76层的所有怪物都已经被击杀.",bc_map,"0xffff00";
+	donpcevent instance_npcname("76FGate102tower")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+4@tower,12,393,0	duplicate(1FGate102tower)	76FGate102tower	WARPNPC,2,2
+4@tower,96,393,0	duplicate(1FGate102tower)	77FGate102tower	WARPNPC,2,2
+4@tower,184,393,0	duplicate(1FGate102tower)	78FGate102tower	WARPNPC,2,2
+4@tower,270,393,0	duplicate(1FGate102tower)	79FGate102tower	WARPNPC,2,2
+4@tower,355,393,0	duplicate(1FGate102tower)	80FGate102tower	WARPNPC,2,2
+4@tower,12,309,0	duplicate(1FGate102tower)	81FGate102tower	WARPNPC,2,2
+4@tower,96,309,0	duplicate(1FGate102tower)	82FGate102tower	WARPNPC,2,2
+4@tower,184,309,0	duplicate(1FGate102tower)	83FGate102tower	WARPNPC,2,2
+4@tower,270,309,0	duplicate(1FGate102tower)	84FGate102tower	WARPNPC,2,2
+4@tower,355,309,0	duplicate(1FGate102tower)	85FGate102tower	WARPNPC,2,2
+4@tower,12,222,0	duplicate(1FGate102tower)	86FGate102tower	WARPNPC,2,2
+4@tower,96,222,0	duplicate(1FGate102tower)	87FGate102tower	WARPNPC,2,2
+4@tower,184,222,0	duplicate(1FGate102tower)	88FGate102tower	WARPNPC,2,2
+4@tower,270,222,0	duplicate(1FGate102tower)	89FGate102tower	WARPNPC,2,2
+4@tower,355,222,0	duplicate(1FGate102tower)	90FGate102tower	WARPNPC,2,2
+4@tower,12,138,0	duplicate(1FGate102tower)	91FGate102tower	WARPNPC,2,2
+4@tower,96,138,0	duplicate(1FGate102tower)	92FGate102tower	WARPNPC,2,2
+4@tower,184,138,0	duplicate(1FGate102tower)	93FGate102tower	WARPNPC,2,2
+4@tower,270,138,0	duplicate(1FGate102tower)	94FGate102tower	WARPNPC,2,2
+4@tower,355,138,0	duplicate(1FGate102tower)	95FGate102tower	WARPNPC,2,2
+4@tower,12,51,0	duplicate(1FGate102tower)	96FGate102tower	WARPNPC,2,2
+4@tower,96,51,0	duplicate(1FGate102tower)	97FGate102tower	WARPNPC,2,2
+4@tower,184,51,0	duplicate(1FGate102tower)	98FGate102tower	WARPNPC,2,2
+
+4@tower,271,51,0	script	99FGate102tower	WARPNPC,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("99FGate102tower");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("99FGate102tower");
+	initnpctimer;
+	end;
+
+OnTouch_:
+	getitem 6000,1; //Dark_Ashes
+	warp instance_mapname("5@tower"),101,72;
+	end;
+
+OnTimer120000:
+	disablenpc instance_npcname("99FGate102tower");
+	donpcevent instance_npcname("99FGate102tower-2")+"::OnEnable";
+	stopnpctimer;
+	end;
+}
+
+4@tower,271,51,0	script	99FGate102tower-2	WARPNPC,2,2,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("99FGate102tower-2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("99FGate102tower-2");
+	end;
+
+OnTouch_:
+	warp instance_mapname("5@tower"),101,72;
+	end;
+}
+
+4@tower,71,1,0	script	#Manager Mode4	CLEAR_NPC,{
+	callfunc "F_GM_NPC";
+	mes "Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		mes "This NPC manages the tower from the 76th to the 99th Level.";
+		mes "Please enter the Level number to open.";
+		mes "(i.g.: 76F->76, 99F->99)";
+		input .@input,76,99;
+		next;
+		if (.@input < 76 || .@input > 99)
+			mes "仅支持 76 - 99.";
+		else {
+			donpcevent instance_npcname(.@input+"FGate102tower")+"::OnEnable";
+			mes "*** 层 "+ .@input + " 已开启. ***";
+		}
+	}
+	close;
+}
+
+// Level 100
+//============================================================
+5@tower,106,109,2	script	清醒水晶#102	CLEAR_NPC,{
+	if (in_102tower < 10) {
+		mes "^0000ff当你触碰发出强光的清醒水晶时, 一个神秘的声音开始向你呼唤.^000000";
+		next;
+		mes "[神秘的声音]";
+		mes "欢迎到我的地方, 入侵者. 能够看着你们在我面前忍受所有的痛苦是我的爱好.";
+		next;
+		mes "[神秘的声音]";
+		mes "不幸的是, 这场演出已经到了落幕的时间了.";
+		next;
+		mes "[神秘的声音]";
+		mes "你们现在就想开始庆祝未免为时过早, 我的得力干将 Knothen 还没被彻底杀死!";
+		next;
+		mes "[神秘的声音]";
+		mes "我会将他复活, 算是作为下一幕演出的主角吧. 如果你们能够再次获胜的话, 那就有资格让我出面了.";
+		next;
+		mes "[神秘的声音]";
+		mes "呢么现在, 先再见了.";
+		mes "还有, 很期待这个激动人心的时刻, 人类. 这希望能再次碰上你们.";
+		next;
+		mes "^0000ff当声音消失后, 一种不可抗拒的力量将你们传送到另一个的地方.";
+		close2;
+		set in_102tower,10;
+		warp "alberta",223,36;
+	}
+	else {
+		mes "^0000ff发出强光的清醒水晶似乎在召唤着你, 就和上次来的时候一样.^000000";
+		next;
+		mes "[神秘的声音]";
+		mes "一定是我低估了你...没想到能够再次见面.";
+		next;
+		mes "[神秘的声音]";
+		mes "我可以闻到你的汗水味, 在战斗中听到你疲惫喘息声. 啊! 人类对于胜利的渴望与追求总是让我无比兴奋.";
+		next;
+		mes "[神秘的声音]";
+		mes "现在让你来成为我的观众. 来我这里, 来伟大的黑暗纳户特基格身边!";
+		close2;
+		warp instance_mapname("6@tower"),32,12;
+	}
+	end;
+
+OnInstanceInit:
+OnDisable:
+	disablenpc instance_npcname("清醒水晶#102");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("清醒水晶#102");
+	donpcevent instance_npcname("#102Effect1")+"::OnEnable";
+	end;
+}
+
+5@tower,106,109,2	script	#102Effect1	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#102Effect1");
+	end;
+
+OnDisable:
+	disablenpc instance_npcname("#102Effect1");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("#102Effect1");
+	initnpctimer;
+	end;
+
+OnTimer500:
+	specialeffect EF_ENHANCE;
+	stopnpctimer;
+	donpcevent instance_npcname("#102Effect2")+"::OnEnable";
+	end;
+}
+
+5@tower,106,109,2	script	#102Effect2	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#102Effect2");
+	end;
+
+OnDisable:
+	disablenpc instance_npcname("#102Effect2");
+	end;
+
+OnEnable:
+	enablenpc instance_npcname("#102Effect2");
+	initnpctimer;
+	end;
+
+OnTimer500:
+	specialeffect EF_ENHANCE;
+	stopnpctimer;
+	donpcevent instance_npcname("#102Effect1")+"::OnEnable";
+	end;
+}
+
+5@tower,82,112,2	script	#102FShadowDust1	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	donpcevent instance_npcname("#102FShadowDust")+"::OnEnable";
+	monster instance_mapname("5@tower"),83,85,"Entweihen Crothen",1957,1,instance_npcname("#102FShadowDust1")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("5@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#102FShadowDust1")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		mapannounce .@map$, "神秘的声音: 你是谁, 竟敢闯入我的圣地?!",bc_map,"0xffff00";
+		donpcevent instance_npcname("#102FShadowDust")+"::OnDisable";
+		donpcevent instance_npcname("清醒水晶#102")+"::OnEnable";
+		//SetItemPartyInMap in_102floor 100
+	}
+	end;
+}
+
+5@tower,82,113,2	script	#102FShadowDust	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#102FShadowDust");
+	end;
+
+OnDisable:
+	killmonsterall instance_mapname("5@tower");
+	end;
+
+OnEnable:
+	set .@map$, instance_mapname("5@tower");
+	monster .@map$,72,93,"棘手的骨架",1958,1;
+	monster .@map$,70,87,"魔法荆棘",1960,1;
+	monster .@map$,68,83,"普尔丽思荆棘",1961,1;
+	monster .@map$,70,80,"棘手的骨架",1958,1;
+	monster .@map$,74,81,"魔法荆棘",1960,1;
+	monster .@map$,78,72,"魔法荆棘",1960,1;
+	monster .@map$,81,70,"棘手的骨架",1958,1;
+	monster .@map$,78,84,"恢复荆棘",1959,1;
+	monster .@map$,85,72,"魔法荆棘",1960,1;
+	monster .@map$,91,74,"棘手的骨架",1958,1;
+	monster .@map$,79,77,"普尔丽思荆棘",1961,1;
+	monster .@map$,82,80,"恢复荆棘",1959,1;
+	monster .@map$,87,83,"恢复荆棘",1959,1;
+	monster .@map$,80,92,"普尔丽思荆棘",1961,1;
+	monster .@map$,81,89,"棘手的骨架",1958,1;
+	monster .@map$,85,93,"魔法荆棘",1960,1;
+	monster .@map$,86,90,"恢复荆棘",1959,1;
+	monster .@map$,88,88,"棘手的骨架",1958,1;
+	monster .@map$,91,87,"魔法荆棘",1960,1;
+	monster .@map$,95,94,"魔法荆棘",1960,1;
+	monster .@map$,91,96,"棘手的骨架",1958,1;
+	monster .@map$,90,82,"普尔丽思荆棘",1961,1;
+	monster .@map$,96,98,"魔法荆棘",1960,1;
+	monster .@map$,83,76,"棘手的骨架",1958,1;
+	monster .@map$,74,85,"棘手的骨架",1958,1;
+	switch(rand(1,3)) {
+		case 1: monster .@map$,82,85,"棘手的骨架",1958,1; break;
+		case 2: monster .@map$,82,85,"魔法荆棘",1960,1; break;
+		case 3: monster .@map$,82,85,"普尔丽思荆棘",1961,1; break;
+	}
+	switch(rand(1,3)) {
+		case 1: monster .@map$,84,85,"棘手的骨架",1958,1; break;
+		case 2: monster .@map$,84,85,"魔法荆棘",1960,1; break;
+		case 3: monster .@map$,84,85,"普尔丽思荆棘",1961,1; break;
+	}
+	end;
+}
+
+5@tower,71,1,0	script	#Manager Mode5	CLEAR_NPC,{
+	callfunc "F_GM_NPC";
+	mes "This NPC manages the crystal on the 100th Level. Please enter the password.";
+	set .@i, callfunc("F_GM_NPC","dmc2008",1);
+	next;
+	if (.@i == 1) {
+		donpcevent instance_npcname("清醒水晶#102")+"::OnEnable";
+		mes "100层已被激活.";
+	} else
+		mes "密码错误, 请重试.";
+	close;
+}
+
+// Level 101
+//============================================================
+6@tower,45,89,2	script	生命之泉#1	CLEAR_NPC,{
+	mes "^0066ff你喝了一口清澈的生命泉水, 立刻觉得恢复了不少体力.^000000";
+	heal (MaxHp-Hp),(MaxSp-Sp);
+	close;
+
+OnInstanceInit:
+	donpcevent instance_npcname("生命之泉#2")+"::OnEnable";
+	end;
+}
+
+6@tower,45,89,2	script	生命之泉#2	CLEAR_NPC,{
+	end;
+
+OnEnable:
+	specialeffect EF_BUBBLE;
+	initnpctimer;
+	end;
+
+OnTimer2000:
+	stopnpctimer;
+	donpcevent instance_npcname("生命之泉#3")+"::OnEnable";
+	end;
+}
+
+6@tower,45,89,2	script	生命之泉#3	CLEAR_NPC,{
+	end;
+
+OnEnable:
+	specialeffect EF_BUBBLE;
+	initnpctimer;
+	end;
+
+OnTimer2000:
+	stopnpctimer;
+	donpcevent instance_npcname("生命之泉#2")+"::OnEnable";
+	end;
+}
+
+6@tower,32,100,0	warp	102FGate102tower	2,2,6@tower,155,64
+
+6@tower,156,151,2	script	暴君的王座#	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	areamonster instance_mapname("6@tower"),154,73,156,75,"Watcher's Son",1627,10,instance_npcname("暴君的王座#")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@mob_dead_num,mobcount(instance_mapname("6@tower"),instance_npcname("暴君的王座#")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		donpcevent instance_npcname("#1st Beeper")+"::OnEnable";
+		disablenpc instance_npcname("暴君的王座#");
+	}
+	end;
+}
+
+6@tower,156,151,2	script	#1st Beeper	CLEAR_NPC,{
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"访客, 唔? 我希望你知道来这里作客的下场. 如果你不知道的话, 那么... 已经太迟了!",bc_map,"0x00ffcc";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"这就是为什么你们这群冒险家总是死于非命.",bc_map,"0x00ffcc";
+	end;
+
+OnTimer10500:
+	mapannounce instance_mapname("6@tower"),"我很欣赏你们的勇气... 当然, 我想在进入正题之前, 我们先来点开胃甜点.",bc_map,"0x00ffcc";
+	end;
+
+OnTimer15500:
+	mapannounce instance_mapname("6@tower"),"我想你应该知道, 我最大的爱好就是看到无助的人类在恐惧和彷徨中挣扎.",bc_map,"0x00ffcc";
+	end;
+
+OnTimer20500:
+	set .@map$, instance_mapname("6@tower");
+	mapannounce .@map$,"让我们看看谁跑的最快吧, 准备好了吗?",bc_map,"0x00ffcc";
+	stopnpctimer;
+	areamonster .@map$,151,66,153,106,"邪骸兽人",1152,50,instance_npcname("#1st Beeper")+"::OnMyMobDead";
+	areamonster .@map$,158,66,160,106,"邪骸兽人",1152,50,instance_npcname("#1st Beeper")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("6@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#1st Beeper")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		donpcevent instance_npcname("#2nd Beeper")+"::OnEnable";
+		//SetItemPartyInMap in_102floor 101
+	}
+	else
+		mapannounce .@map$,"剩余目标 " + .@mob_dead_num + "个",bc_map,"0x00ff99";
+	end;
+}
+
+6@tower,156,151,2	script	#2nd Beeper	CLEAR_NPC,{
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"很好, 我猜这群废物对你应该没有什么挑战性吧.",bc_map,"0x00ffcc";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"让我们加快点步伐, 如何?",bc_map,"0x00ffcc";
+	end;
+
+OnTimer10500:
+	set .@map$, instance_mapname("6@tower");
+	mapannounce .@map$,"我要求再来一次!",bc_map,"0x00ffcc";
+	stopnpctimer;
+	areamonster .@map$,151,66,153,106,"风魔巫师",1263,30,instance_npcname("#2nd Beeper")+"::OnMyMobDead";
+	areamonster .@map$,158,66,160,106,"风魔巫师",1263,30,instance_npcname("#2nd Beeper")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("6@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#2nd Beeper")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		donpcevent instance_npcname("#3rd Beeper")+"::OnEnable";
+		//SetItemPartyInMap in_102floor 102
+	}
+	else
+		mapannounce .@map$,"剩余目标 " + .@mob_dead_num + "个",bc_map,"0x00ff99";
+	end;
+}
+
+6@tower,156,151,2	script	#3rd Beeper	844,{
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"噢, 真是越来越精彩了!",bc_map,"0x00ffcc";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"我会记住你的, 你是唯一几个能够让我如此兴奋的人.",bc_map,"0x00ffcc";
+	end;
+
+OnTimer10500:
+	set .@map$, instance_mapname("6@tower");
+	mapannounce .@map$,"怎么样, 要不要再来一场?",bc_map,"0x00ffcc";
+	stopnpctimer;
+	areamonster .@map$,151,66,153,106,"卡利斯格",1132,20,instance_npcname("#3rd Beeper")+"::OnMyMobDead";
+	areamonster .@map$,158,66,160,106,"卡利斯格",1132,20,instance_npcname("#3rd Beeper")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	set .@map$, instance_mapname("6@tower");
+	set .@mob_dead_num,mobcount(.@map$,instance_npcname("#3rd Beeper")+"::OnMyMobDead");
+	if (.@mob_dead_num < 1) {
+		donpcevent instance_npcname("#4th Beeper")+"::OnEnable";
+		//SetItemPartyInMap in_102floor 103
+	}
+	else
+		mapannounce .@map$,"剩余目标 " + .@mob_dead_num + "个",bc_map,"0x00ff99";
+	end;
+}
+
+6@tower,156,151,2	script	#4th Beeper	CLEAR_NPC,{
+	end;
+
+OnEnable:
+	initnpctimer;
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"当然, 时间差不多了, 我要化妆一下准备出场了!",bc_map,"0x00ffcc";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"你想知道我是谁吗?",bc_map,"0x00ffcc";
+	end;
+
+OnTimer10500:
+	set .@map$, instance_mapname("6@tower");
+	mapannounce .@map$,"你马上就会知道了, 你将面对死亡!",bc_map,"0x00ffcc";
+	stopnpctimer;
+	monster .@map$,156,147,"纳户特基格",1956,1,instance_npcname("#4th Beeper")+"::OnMyMobDead";
+	end;
+
+OnMyMobDead:
+	donpcevent instance_npcname("迷失的灵魂#102")+"::OnEnable";
+	end;
+}
+
+6@tower,169,127,2	script	迷失的灵魂#102	4_M_NFDEADSWDMAN,{
+	if (checkweight(1201,1) == 0) {
+		mes "你带了太多的东西. 你为什么不把它们整理一下, 然后再回来?";
+		close;
+	}
+	mes "[迷失的灵魂]";
+	mes "是你, 将我们从纳户特基格的魔掌下解放出来.";
+	next;
+	mes "[迷失的灵魂]";
+	mes "谢谢你.现在我们可以摆脱这样的寒冷和黑暗的地方......到天堂.";
+	next;
+	if ((countitem(13412) > 0) && (countitem(13413) > 0)) {
+		mes "[迷失的灵魂]";
+		mes "嘿, 你竟然获得了纳户特基格的一些残骸.";
+		next;
+		mes "[迷失的灵魂]";
+		mes "他们可以制作成2把单手剑, 不过我还能够将它们熔炼成1把双手剑.";
+		next;
+		switch(select("- 我要双手剑.:- 不用了谢谢.")) {
+		case 1:
+			mes "[迷失的灵魂]";
+			mes "这是我唯一能报答你的, 会出现单手剑, 如果你想使双手剑我可以把它们熔炼在一起?";
+			next;
+			switch(select("- 我要双手剑.:- 不用了谢谢.")) {
+			case 1:
+				mes "[迷失的灵魂]";
+				mes "好, 那么我将他们熔炼成一把双手剑.";
+				next;
+				delitem 13412,1; //Twin_Edge_B
+				delitem 13413,1; //Twin_Edge_R
+				getitem 1185,1; //Violet_Fear
+				break;
+			case 2:
+				mes "[迷失的灵魂]";
+				mes "我明白. 我猜你是个不贪婪, 但却有雄心壮志的冒险家.";
+				next;
+				break;
+			}
+			break;
+		case 2:
+			mes "[迷失的灵魂]";
+			mes "我明白. 我猜你是个不贪婪, 但却有雄心壮志的冒险家.";
+			next;
+			break;
+		}
+	}
+	mes "[迷失的灵魂]";
+	mes "真想和多聊聊, 但我...我得走了.";
+	next;
+	mes "[迷失的灵魂]";
+	mes "永别了, 年轻的冒险家. 祝你好运.";
+	close2;
+	warp "alberta",223,36;
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("迷失的灵魂#102");
+	end;
+
+OnEnable:
+	initnpctimer;
+	enablenpc instance_npcname("迷失的灵魂#102");
+	donpcevent instance_npcname("#Effect30")+"::OnEnable";
+	//SetItemPartyInMap in_102floor 104
+	end;
+
+OnTimer500:
+	mapannounce instance_mapname("6@tower"),"这...这不可能发生! 我竟然失败了!",bc_map,"0xffff00";
+	end;
+
+OnTimer5500:
+	mapannounce instance_mapname("6@tower"),"不! 我的灵魂... 我的身体...! 不~!",bc_map,"0xffff00";
+	end;
+
+OnTimer10500:
+	mapannounce instance_mapname("6@tower"),"纳户特基格身体变成黑色的灰尘, 飘散在风中.",bc_map,"0x00ffcc";
+	stopnpctimer;
+	end;
+}
+
+6@tower,169,127,2	script	#Effect30	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#Effect30");
+	end;
+
+OnEnable:
+	specialeffect EF_CONE;
+	initnpctimer;
+	end;
+
+OnTimer1000:
+	stopnpctimer;
+	donpcevent instance_npcname("#Effect31")+"::OnEnable";
+	end;
+}
+
+6@tower,169,127,2	script	#Effect31	CLEAR_NPC,{
+	end;
+
+OnInstanceInit:
+	disablenpc instance_npcname("#Effect31");
+	end;
+
+OnEnable:
+	specialeffect EF_CONE;
+	initnpctimer;
+	end;
+
+OnTimer1000:
+	stopnpctimer;
+	donpcevent instance_npcname("#Effect30")+"::OnEnable";
+	end;
+}
