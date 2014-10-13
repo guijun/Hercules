@@ -4,7 +4,7 @@
 
 #ifndef MAP_PATH_H
 #define MAP_PATH_H
-
+#include "../config/xa_patch.h"
 #include "map.h" // enum cell_chk
 #include "../common/cbasetypes.h"
 
@@ -42,7 +42,9 @@ struct path_interface {
 	int (*check_distance) (int dx, int dy, int distance);
 	unsigned int (*distance) (int dx, int dy);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct path_interface *path;
 
 void path_defaults(void);

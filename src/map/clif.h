@@ -4,7 +4,7 @@
 
 #ifndef MAP_CLIF_H
 #define MAP_CLIF_H
-
+#include "../config/xa_patch.h"
 #include <stdarg.h>
 
 #include "map.h"
@@ -1286,7 +1286,9 @@ struct clif_interface {
 	void (*pNPCMarketClosed) (int fd, struct map_session_data *sd);
 	void (*pNPCMarketPurchase) (int fd, struct map_session_data *sd);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct clif_interface *clif;
 
 void clif_defaults(void);

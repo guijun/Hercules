@@ -4,7 +4,7 @@
 
 #ifndef MAP_DUEL_H
 #define MAP_DUEL_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 struct map_session_data;
@@ -40,8 +40,14 @@ struct duel_interface {
 	
 	void (*init) (bool minimal);
 	void (*final) (void);
-} duel_s;
-
+#if(XA_EXTERN_DEF_PATCH)
+	};
+#else
+	}	duel_s;
+#endif
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct duel_interface *duel;
 
 void duel_defaults(void);

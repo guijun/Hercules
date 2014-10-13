@@ -4,7 +4,7 @@
 
 #ifndef MAP_LOG_H
 #define MAP_LOG_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 #include "../common/sql.h"
 
@@ -128,7 +128,9 @@ struct log_interface {
 	char (*chattype2char) (e_log_chat_type type);
 	bool (*should_log_item) (int nameid, int amount, int refine, struct item_data *id);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct log_interface *logs;
 
 void log_defaults(void);

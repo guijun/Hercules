@@ -4,7 +4,7 @@
 
 #ifndef MAP_MAPREG_H
 #define MAP_MAPREG_H
-
+#include "../config/xa_patch.h"
 #include "script.h" // struct reg_db
 #include "../common/cbasetypes.h"
 #include "../common/db.h"
@@ -45,7 +45,9 @@ struct mapreg_interface {
 	void (*reload) (void);
 	bool (*config_read) (const char *w1, const char *w2);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct mapreg_interface *mapreg;
 
 void mapreg_defaults(void);

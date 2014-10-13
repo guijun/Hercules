@@ -4,7 +4,7 @@
 
 #ifndef MAP_STORAGE_H
 #define MAP_STORAGE_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 #include "../common/db.h"
 
@@ -29,6 +29,9 @@ struct storage_interface {
 	void (*sortitem) (struct item* items, unsigned int size);
 	int (*reconnect_sub) (DBKey key, DBData *data, va_list ap);
 };
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct storage_interface *storage;
 
 struct guild_storage_interface {
@@ -53,7 +56,9 @@ struct guild_storage_interface {
 	int (*saved) (int guild_id); //Ack from char server that guild store was saved.
 	DBData (*create) (DBKey key, va_list args);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct guild_storage_interface *gstorage;
 
 void storage_defaults(void);

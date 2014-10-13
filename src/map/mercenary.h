@@ -3,7 +3,7 @@
 // Portions Copyright (c) Athena Dev Teams
 #ifndef MAP_MERCENARY_H
 #define MAP_MERCENARY_H
-
+#include "../config/xa_patch.h"
 #include "status.h" // struct status_data, struct status_change
 #include "unit.h" // struct unit_data
 #include "../common/cbasetypes.h"
@@ -94,7 +94,9 @@ struct mercenary_interface {
 	bool (*read_db_sub) (char* str[], int columns, int current);
 	bool (*read_skill_db_sub) (char* str[], int columns, int current);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct mercenary_interface *mercenary;
 
 void mercenary_defaults(void);

@@ -3,7 +3,7 @@
 
 #ifndef MAP_DATE_H
 #define MAP_DATE_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 int date_get_year(void);

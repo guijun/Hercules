@@ -4,7 +4,7 @@
 
 #ifndef MAP_PET_H
 #define MAP_PET_H
-
+#include "../config/xa_patch.h"
 #include "map.h" // struct block_list
 #include "status.h" // enum sc_type
 #include "unit.h" // struct unit_data
@@ -156,7 +156,9 @@ struct pet_interface {
 	int (*skill_support_timer) (int tid, int64 tick, int id, intptr_t data);
 	int (*read_db) ();
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct pet_interface *pet;
 
 void pet_defaults(void);

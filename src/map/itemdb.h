@@ -4,7 +4,7 @@
 
 #ifndef MAP_ITEMDB_H
 #define MAP_ITEMDB_H
-
+#include "../config/xa_patch.h"
 #include "map.h"
 #include "../common/cbasetypes.h"
 #include "../common/conf.h"
@@ -612,7 +612,9 @@ struct itemdb_interface {
 	void (*clear) (bool total);
 	struct item_combo * (*id2combo) (unsigned short id);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct itemdb_interface *itemdb;
 
 void itemdb_defaults(void);

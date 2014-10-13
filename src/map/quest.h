@@ -4,7 +4,7 @@
 
 #ifndef MAP_QUEST_H
 #define MAP_QUEST_H
-
+#include "../config/xa_patch.h"
 #include "map.h" // TBL_PC
 #include "../common/cbasetypes.h"
 #include "../common/mmo.h" // MAX_QUEST_OBJECTIVES
@@ -47,7 +47,9 @@ struct quest_interface {
 	void (*clear) (void);
 	int (*read_db) (void);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct quest_interface *quest;
 
 void quest_defaults(void);

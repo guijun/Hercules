@@ -4,7 +4,7 @@
 
 #ifndef MAP_BATTLE_H
 #define MAP_BATTLE_H
-
+#include "../config/xa_patch.h"
 #include "map.h" //ELE_MAX
 #include "../common/cbasetypes.h"
 
@@ -606,7 +606,9 @@ struct battle_interface {
 	/* damages area, originally for royal guard's reflect damage */
 	int (*damage_area) (struct block_list *bl, va_list ap);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct battle_interface *battle;
 
 void battle_defaults(void);

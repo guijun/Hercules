@@ -3,7 +3,7 @@
 
 #ifndef MAP_HPMMAP_H
 #define MAP_HPMMAP_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 #include "../map/atcommand.h"
 #include "../common/HPM.h"

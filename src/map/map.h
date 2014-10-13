@@ -4,7 +4,7 @@
 
 #ifndef MAP_MAP_H
 #define MAP_MAP_H
-
+#include "../config/xa_patch.h"
 #include <stdarg.h>
 
 #include "atcommand.h"
@@ -748,7 +748,9 @@ struct mapit_interface {
 	struct block_list*      (*prev) (struct s_mapiterator* iter);
 	bool                    (*exists) (struct s_mapiterator* iter);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct mapit_interface *mapit;
 
 #define mapit_getallusers() (mapit->alloc(MAPIT_NORMAL,BL_PC))
@@ -1066,7 +1068,9 @@ struct map_interface {
 	bool (*remove_questinfo) (int m, struct npc_data *nd);
 	struct map_zone_data *(*merge_zone) (struct map_zone_data *main, struct map_zone_data *other);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct map_interface *map;
 
 void map_defaults(void);

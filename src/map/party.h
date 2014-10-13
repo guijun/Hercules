@@ -4,7 +4,7 @@
 
 #ifndef MAP_PARTY_H
 #define MAP_PARTY_H
-
+#include "../config/xa_patch.h"
 #include <stdarg.h>
 
 #include "map.h" // TBL_PC
@@ -138,7 +138,9 @@ struct party_interface {
 	struct party_booking_ad_info* (*create_booking_data) (void);
 	int (*db_final) (DBKey key, DBData *data, va_list ap);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct party_interface *party;
 
 void party_defaults(void);

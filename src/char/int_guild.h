@@ -3,7 +3,7 @@
 
 #ifndef CHAR_INT_GUILD_H
 #define CHAR_INT_GUILD_H
-
+#include "../config/xa_patch.h"
 enum {
 	GS_BASIC = 0x0001,
 	GS_MEMBER = 0x0002,

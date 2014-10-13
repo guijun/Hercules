@@ -3,7 +3,7 @@
 
 #ifndef CHAR_INT_MAIL_H
 #define CHAR_INT_MAIL_H
-
+#include "../config/xa_patch.h"
 struct item;
 struct mail_message;
 

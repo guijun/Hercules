@@ -3,7 +3,7 @@
 
 #ifndef LOGIN_LOGINLOG_H
 #define LOGIN_LOGINLOG_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 unsigned long loginlog_failedattempts(uint32 ip, unsigned int minutes);

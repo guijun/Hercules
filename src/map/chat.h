@@ -4,7 +4,7 @@
 
 #ifndef MAP_CHAT_H
 #define MAP_CHAT_H
-
+#include "../config/xa_patch.h"
 #include "map.h" // struct block_list, CHATROOM_TITLE_SIZE
 #include "../common/cbasetypes.h"
 #include "../common/db.h"
@@ -55,7 +55,9 @@ struct chat_interface {
 	bool (*trigger_event) (struct chat_data *cd);
 	struct chat_data* (*create) (struct block_list* bl, const char* title, const char* pass, int limit, bool pub, int trigger, const char* ev, int zeny, int minLvl, int maxLvl);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct chat_interface *chat;
 
 void chat_defaults(void);

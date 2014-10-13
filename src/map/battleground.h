@@ -4,7 +4,7 @@
 
 #ifndef MAP_BATTLEGROUND_H
 #define MAP_BATTLEGROUND_H
-
+#include "../config/xa_patch.h"
 #include "clif.h"
 #include "guild.h"
 #include "../common/mmo.h" // struct party
@@ -117,7 +117,9 @@ struct battleground_interface {
 	/* */
 	void (*config_read) (void);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct battleground_interface *bg;
 
 void battleground_defaults(void);

@@ -4,7 +4,7 @@
 
 #ifndef MAP_INSTANCE_H
 #define MAP_INSTANCE_H
-
+#include "../config/xa_patch.h"
 #include "script.h" // struct reg_db
 #include "../common/cbasetypes.h"
 #include "../common/mmo.h" // struct point
@@ -83,7 +83,9 @@ struct instance_interface {
 	bool (*valid) (int instance_id);
 	int (*destroy_timer) (int tid, int64 tick, int id, intptr_t data);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct instance_interface *instance;
 
 void instance_defaults(void);

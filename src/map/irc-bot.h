@@ -5,7 +5,7 @@
 
 #ifndef MAP_IRC_BOT_H
 #define MAP_IRC_BOT_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 #define IRC_NICK_LENGTH 40
@@ -58,7 +58,9 @@ struct irc_bot_interface {
 	void (*userleave) (int fd, char *cmd, char *source, char *target, char *msg);
 	void (*usernick) (int fd, char *cmd, char *source, char *target, char *msg);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct irc_bot_interface *ircbot;
 
 void ircbot_defaults(void);

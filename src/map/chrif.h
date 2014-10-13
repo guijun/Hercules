@@ -4,7 +4,7 @@
 
 #ifndef MAP_CHRIF_H
 #define MAP_CHRIF_H
-
+#include "../config/xa_patch.h"
 #include <time.h>
 
 #include "map.h" //TBL_stuff
@@ -147,7 +147,9 @@ struct chrif_interface {
 	void (*save_scdata_single) (int account_id, int char_id, short type, struct status_change_entry *sce);
 	void (*del_scdata_single) (int account_id, int char_id, short type);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct chrif_interface *chrif;
 
 void chrif_defaults(void);

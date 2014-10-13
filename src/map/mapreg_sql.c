@@ -3,7 +3,7 @@
 // Portions Copyright (c) Athena Dev Teams
 
 #define HERCULES_CORE
-
+#include "../config/xa_patch.h"
 #include "mapreg.h"
 
 #include <stdlib.h>
@@ -21,6 +21,9 @@
 #include "../common/timer.h"
 
 struct mapreg_interface mapreg_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct mapreg_interface *mapreg;
+#endif
 
 #define MAPREG_AUTOSAVE_INTERVAL (300*1000)
 

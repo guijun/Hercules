@@ -3,7 +3,7 @@
 
 #ifndef CHAR_INT_ELEMENTAL_H
 #define CHAR_INT_ELEMENTAL_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 void inter_elemental_sql_init(void);

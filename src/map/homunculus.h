@@ -4,7 +4,7 @@
 
 #ifndef MAP_HOMUNCULUS_H
 #define MAP_HOMUNCULUS_H
-
+#include "../config/xa_patch.h"
 #include "pc.h"
 #include "status.h" // struct status_data, struct status_change
 #include "unit.h" // struct unit_data
@@ -143,7 +143,9 @@ struct homunculus_interface {
 	void (*delspiritball) (struct homun_data *hd, int count, int type);
 	int8 (*get_intimacy_grade) (struct homun_data *hd);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct homunculus_interface *homun;
 
 void homunculus_defaults(void);

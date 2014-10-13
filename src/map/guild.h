@@ -4,7 +4,7 @@
 
 #ifndef MAP_GUILD_H
 #define MAP_GUILD_H
-
+#include "../config/xa_patch.h"
 #include "map.h" // EVENT_NAME_LENGTH, TBL_PC
 #include "../common/cbasetypes.h"
 #include "../common/db.h"
@@ -162,7 +162,9 @@ struct guild_interface {
 	int (*get_alliance_count) (struct guild *g,int flag);
 	void (*castle_reconnect_sub) (void *key, void *data, va_list ap);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct guild_interface *guild;
 
 void guild_defaults(void);

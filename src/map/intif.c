@@ -37,6 +37,9 @@
 #include "../common/timer.h"
 
 struct intif_interface intif_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct intif_interface *intif;
+#endif
 
 #define inter_fd (chrif->fd) // alias
 

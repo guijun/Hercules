@@ -4,7 +4,7 @@
 
 #ifndef CHAR_INTER_H
 #define CHAR_INTER_H
-
+#include "../config/xa_patch.h"
 #include "char.h"
 #include "../common/cbasetypes.h"
 #include "../common/sql.h"

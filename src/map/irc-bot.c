@@ -24,6 +24,9 @@
 //#define IRCBOT_DEBUG
 
 struct irc_bot_interface irc_bot_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct irc_bot_interface *ircbot;
+#endif
 
 char send_string[IRC_MESSAGE_LENGTH];
 

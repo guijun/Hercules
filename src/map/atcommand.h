@@ -4,7 +4,7 @@
 
 #ifndef MAP_ATCOMMAND_H
 #define MAP_ATCOMMAND_H
-
+#include "../config/xa_patch.h"
 #include "pc_groups.h"
 #include "../common/conf.h"
 #include "../common/db.h"
@@ -113,7 +113,9 @@ struct atcommand_interface {
 	bool (*add) (char *name, AtCommandFunc func, bool replace);
 	const char* (*msg) (int msg_number);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct atcommand_interface *atcommand;
 
 void atcommand_defaults(void);

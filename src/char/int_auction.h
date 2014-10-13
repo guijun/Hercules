@@ -3,7 +3,7 @@
 
 #ifndef CHAR_INT_AUCTION_H
 #define CHAR_INT_AUCTION_H
-
+#include "../config/xa_patch.h"
 int inter_auction_parse_frommap(int fd);
 
 int inter_auction_sql_init(void);

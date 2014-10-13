@@ -3,7 +3,7 @@
 // Portions Copyright (c) Athena Dev Teams
 
 #define HERCULES_CORE
-
+#include "../config/xa_patch.h"
 #include "ipban.h"
 
 #include <stdlib.h>

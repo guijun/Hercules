@@ -5,7 +5,7 @@
 
 #ifndef MAP_PACKETS_H
 #define MAP_PACKETS_H
-
+#include "../config/xa_patch.h"
 #ifndef packet
 	#define packet(a,b,...)
 #endif

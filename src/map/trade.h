@@ -4,7 +4,7 @@
 
 #ifndef MAP_TRADE_H
 #define MAP_TRADE_H
-
+#include "../config/xa_patch.h"
 //Max distance from traders to enable a trade to take place.
 //TODO: battle_config candidate?
 #define TRADE_DISTANCE 2
@@ -22,7 +22,9 @@ struct trade_interface {
 	void (*cancel) (struct map_session_data *sd);
 	void (*commit) (struct map_session_data *sd);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct trade_interface *trade;
 
 void trade_defaults(void);

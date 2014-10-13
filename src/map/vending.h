@@ -4,7 +4,7 @@
 
 #ifndef MAP_VENDING_H
 #define MAP_VENDING_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 #include "../common/db.h"
 
@@ -31,7 +31,9 @@ struct vending_interface {
 	bool (*search) (struct map_session_data* sd, unsigned short nameid);
 	bool (*searchall) (struct map_session_data* sd, const struct s_search_store_search* s);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct vending_interface *vending;
 
 void vending_defaults(void);

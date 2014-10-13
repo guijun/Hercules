@@ -4,7 +4,7 @@
 
 #ifndef CHAR_PINCODE_H
 #define CHAR_PINCODE_H
-
+#include "../config/xa_patch.h"
 #include "char.h"
 
 #define PINCODE_OK 0
@@ -34,8 +34,15 @@ struct pincode_interface {
 	int  (*compare) (int fd, struct char_session_data* sd, char* pin);
 	void (*check) (int fd, struct char_session_data* sd);
 	bool (*config_read) (char *w1, char *w2);
+#if(XA_EXTERN_DEF_PATCH)
+};
+#else
 } pincode_s;
+#endif
 
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct pincode_interface *pincode;
 
 void pincode_defaults(void);

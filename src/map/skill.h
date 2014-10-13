@@ -4,7 +4,7 @@
 
 #ifndef MAP_SKILL_H
 #define MAP_SKILL_H
-
+#include "../config/xa_patch.h"
 #include "../config/core.h" // RENEWAL_CAST
 
 #include "map.h" // struct block_list
@@ -2046,7 +2046,9 @@ struct skill_interface {
 	int (*get_new_group_id) (void);
 	bool (*check_shadowform) (struct block_list *bl, int64 damage, int hit);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct skill_interface *skill;
 
 void skill_defaults(void);

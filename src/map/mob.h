@@ -4,7 +4,7 @@
 
 #ifndef MAP_MOB_H
 #define MAP_MOB_H
-
+#include "../config/xa_patch.h"
 #include "map.h" // struct status_data, struct view_data, struct mob_skill
 #include "status.h" // struct status_data, struct status_change
 #include "unit.h" // struct unit_data
@@ -365,7 +365,9 @@ struct mob_interface {
 	void (*load) (bool minimal);
 	void (*clear_spawninfo) ();
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct mob_interface *mob;
 
 void mob_defaults(void);

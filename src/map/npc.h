@@ -4,7 +4,7 @@
 
 #ifndef MAP_NPC_H
 #define MAP_NPC_H
-
+#include "../config/xa_patch.h"
 #include "map.h" // struct block_list
 #include "status.h" // struct status_change
 #include "unit.h" // struct unit_data
@@ -320,7 +320,9 @@ struct npc_chat_interface {
 	struct pcrematch_set* (*lookup_pcreset) (struct npc_data* nd, int setid);
 	void (*finalize_pcrematch_entry) (struct pcrematch_entry* e);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct npc_chat_interface *npc_chat;
 
 /**
@@ -338,7 +340,9 @@ struct pcre_interface {
 	int (*copy_named_substring) (const pcre *code, const char *subject, int *ovector, int stringcount, const char *stringname, char *buffer, int buffersize);
 	int (*get_substring) (const char *subject, int *ovector, int stringcount, int stringnumber, const char **stringptr);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct pcre_interface *libpcre;
 
 /**

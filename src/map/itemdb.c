@@ -25,6 +25,9 @@
 #include "../common/utils.h"
 
 struct itemdb_interface itemdb_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct itemdb_interface *itemdb;
+#endif
 
 /**
  * Search for item name

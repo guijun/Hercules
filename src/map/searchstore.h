@@ -4,7 +4,7 @@
 
 #ifndef MAP_SEARCHSTORE_H
 #define MAP_SEARCHSTORE_H
-
+#include "../config/xa_patch.h"
 #include <time.h>
 
 #include "map.h" // MESSAGE_SIZE
@@ -95,6 +95,9 @@ struct searchstore_interface {
 	bool (*result) (struct map_session_data* sd, unsigned int store_id, int account_id, const char* store_name, unsigned short nameid, unsigned short amount, unsigned int price, const short* card, unsigned char refine);
 };
 
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct searchstore_interface *searchstore;
 
 void searchstore_defaults (void);

@@ -3,4 +3,5 @@
 
 #define XA_EXPAND_UPPER_LIMIT 1
 #define XA_PC_PCG_FIX 1
+#define XA_EXTERN_DEF_PATCH 1
 #endif

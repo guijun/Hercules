@@ -35,6 +35,9 @@
 #include "../common/utils.h"
 
 struct party_interface party_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct party_interface *party;
+#endif
 
 /*==========================================
  * Fills the given party_member structure according to the sd provided.

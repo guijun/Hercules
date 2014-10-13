@@ -4,7 +4,7 @@
 
 #ifndef MAP_STATUS_H
 #define MAP_STATUS_H
-
+#include "../config/xa_patch.h"
 #include "../config/core.h" // defType, RENEWAL, RENEWAL_ASPD
 
 #include "../common/cbasetypes.h"
@@ -2114,7 +2114,9 @@ struct status_interface {
 	bool (*readdb_refine) (char *fields[], int columns, int current);
 	bool (*readdb_scconfig) (char *fields[], int columns, int current);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct status_interface *status;
 
 void status_defaults(void);

@@ -4,7 +4,7 @@
 
 #ifndef MAP_MAIL_H
 #define MAP_MAIL_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 struct item;
@@ -22,7 +22,9 @@ struct mail_interface {
 	void (*deliveryfail) (struct map_session_data *sd, struct mail_message *msg);
 	bool (*invalid_operation) (struct map_session_data *sd);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct mail_interface *mail;
 
 void mail_defaults(void);

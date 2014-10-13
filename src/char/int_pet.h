@@ -3,7 +3,7 @@
 
 #ifndef CHAR_INT_PET_H
 #define CHAR_INT_PET_H
-
+#include "../config/xa_patch.h"
 struct s_pet;
 
 int inter_pet_init(void);

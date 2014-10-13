@@ -4,7 +4,7 @@
 
 #ifndef MAP_BUYINGSTORE_H
 #define MAP_BUYINGSTORE_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 #include "../common/mmo.h" // MAX_SLOTS
 
@@ -70,7 +70,9 @@ struct buyingstore_interface {
 	bool (*searchall) (struct map_session_data* sd, const struct s_search_store_search* s);
 	unsigned int (*getuid) (void);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct buyingstore_interface *buyingstore;
 
 void buyingstore_defaults (void);

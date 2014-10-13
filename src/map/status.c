@@ -44,6 +44,9 @@
 #include "../common/utils.h"
 
 struct status_interface status_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct status_interface *status;
+#endif
 
 /**
 * Returns the status change associated with a skill.

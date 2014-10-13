@@ -4,7 +4,7 @@
 
 #ifndef MAP_SCRIPT_H
 #define MAP_SCRIPT_H
-
+#include "../config/xa_patch.h"
 #include <errno.h>
 #include <setjmp.h>
 
@@ -710,7 +710,9 @@ struct script_interface {
 	void (*hardcoded_constants) (void);
 	unsigned short (*mapindexname2id) (struct script_state *st, const char* name);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct script_interface *script;
 
 void script_defaults(void);

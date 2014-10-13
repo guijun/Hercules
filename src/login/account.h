@@ -4,7 +4,7 @@
 
 #ifndef LOGIN_ACCOUNT_H
 #define LOGIN_ACCOUNT_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 #include "../common/mmo.h" // ACCOUNT_REG2_NUM
 #include "../common/sql.h" // Sql

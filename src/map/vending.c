@@ -25,6 +25,9 @@
 #include "../common/utils.h"
 
 struct vending_interface vending_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct vending_interface *vending;
+#endif
 
 /// Returns an unique vending shop id.
 static inline unsigned int getid(void) {

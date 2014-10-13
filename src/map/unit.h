@@ -4,7 +4,7 @@
 
 #ifndef MAP_UNIT_H
 #define MAP_UNIT_H
-
+#include "../config/xa_patch.h"
 #include "clif.h"  // clr_type
 #include "path.h" // struct walkpath_data
 #include "skill.h" // 'MAX_SKILLTIMERSKILL, struct skill_timerskill, struct skill_unit_group, struct skill_unit_group_tickset
@@ -119,7 +119,9 @@ struct unit_interface {
 	void (*free_pc) (struct map_session_data *sd);
 	int (*free) (struct block_list *bl, clr_type clrtype);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct unit_interface *unit;
 
 void unit_defaults(void);

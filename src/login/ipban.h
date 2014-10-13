@@ -3,7 +3,7 @@
 
 #ifndef LOGIN_IPBAN_H
 #define LOGIN_IPBAN_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 // initialize

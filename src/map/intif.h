@@ -4,7 +4,7 @@
 
 #ifndef MAP_INTIF_H
 #define MAP_INTIF_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 /**
@@ -181,7 +181,9 @@ struct intif_interface {
 	void (*pSaveHomunculusOk) (int fd);
 	void (*pDeleteHomunculusOk) (int fd);
 };
-
+#if(XA_EXTERN_DEF_PATCH)
+extern 
+#endif
 struct intif_interface *intif;
 
 void intif_defaults(void);

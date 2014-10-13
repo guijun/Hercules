@@ -3,7 +3,7 @@
 
 #ifndef CHAR_INT_PARTY_H
 #define CHAR_INT_PARTY_H
-
+#include "../config/xa_patch.h"
 //Party Flags on what to save/delete.
 enum {
 	PS_CREATE = 0x01, //Create a new party entry (index holds leader's info)

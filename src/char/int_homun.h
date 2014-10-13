@@ -3,7 +3,7 @@
 
 #ifndef CHAR_INT_HOMUN_H
 #define CHAR_INT_HOMUN_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 struct s_homunculus;
