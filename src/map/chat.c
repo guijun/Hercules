@@ -24,9 +24,6 @@
 #include "../common/strlib.h"
 
 struct chat_interface chat_s;
-#if(XA_EXTERN_DEF_PATCH)
-struct chat_interface *chat;
-#endif
 
 /// Initializes a chatroom object (common functionality for both pc and npc chatrooms).
 /// Returns a chatroom object on success, or NULL on failure.
