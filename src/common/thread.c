@@ -7,7 +7,7 @@
 // For more information, see LICENCE in the main folder
 
 #define HERCULES_CORE
-
+#include "../config/xa_patch.h"
 #include "thread.h"
 
 #include "../common/sysinfo.h" // sysinfo->getpagesize()

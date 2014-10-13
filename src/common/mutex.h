@@ -3,7 +3,7 @@
 
 #ifndef COMMON_MUTEX_H
 #define COMMON_MUTEX_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 typedef struct ramutex ramutex; // Mutex

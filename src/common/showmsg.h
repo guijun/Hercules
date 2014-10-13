@@ -4,7 +4,7 @@
 
 #ifndef COMMON_SHOWMSG_H
 #define COMMON_SHOWMSG_H
-
+#include "../config/xa_patch.h"
 #include <stdarg.h>
 
 #include "../common/cbasetypes.h"

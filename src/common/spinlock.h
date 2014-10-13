@@ -1,6 +1,6 @@
 #ifndef COMMON_SPINLOCK_H
 #define COMMON_SPINLOCK_H
-
+#include "../config/xa_patch.h"
 //
 // CAS based Spinlock Implementation
 //

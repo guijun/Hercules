@@ -3,7 +3,7 @@
 
 #ifndef COMMON_RANDOM_H
 #define COMMON_RANDOM_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 void rnd_init(void);

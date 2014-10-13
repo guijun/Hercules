@@ -4,7 +4,7 @@
 
 #ifndef COMMON_NULLPO_H
 #define COMMON_NULLPO_H
-
+#include "../config/xa_patch.h"
 #include "../common/cbasetypes.h"
 
 // enabled by default on debug builds

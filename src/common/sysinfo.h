@@ -18,6 +18,7 @@ struct sysinfo_private;
 /**
  * sysinfo.c interface
  **/
+
 struct sysinfo_interface {
 	struct sysinfo_private *p;
 
@@ -44,7 +45,7 @@ struct sysinfo_interface {
 	void (*final) (void);
 };
 #if(XA_EXTERN_DEF_PATCH)
-static 
+extern 
 #endif
 struct sysinfo_interface *sysinfo;
 

@@ -40,6 +40,10 @@ struct sysinfo_private {
 
 /// sysinfo.c interface source
 struct sysinfo_interface sysinfo_s;
+#if(XA_EXTERN_DEF_PATCH)
+struct sysinfo_interface *sysinfo;
+#endif
+
 struct sysinfo_private sysinfo_p;
 
 #define VCSTYPE_UNKNOWN 0
