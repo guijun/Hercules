@@ -28,11 +28,6 @@
 #	include <unistd.h>
 #endif
 
-#if(XA_EXTERN_DEF_PATCH)
-struct HPM_interface HPM_s;
-struct HPM_interface *HPM;
-#endif
-
 struct malloc_interface iMalloc_HPM;
 
 struct malloc_interface *HPMiMalloc;

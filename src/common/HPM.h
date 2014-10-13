@@ -100,6 +100,9 @@ struct HPConfListenStorage {
 };
 
 /* Hercules Plugin Manager Interface */
+#if(XA_EXTERN_DEF_PATCH)
+static 
+#endif
 struct HPM_interface {
 	/* vars */
 	unsigned int version[2];
@@ -152,14 +155,10 @@ struct HPM_interface {
 	bool (*parseConf) (const char *w1, const char *w2, enum HPluginConfType point);
 	/* validates plugin data */
 	bool (*DataCheck) (struct s_HPMDataCheck *src, unsigned int size, char *name);
-#if(XA_EXTERN_DEF_PATCH)
-};
-#else
 } HPM_s;
-#endif
 
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+static 
 #endif
 struct HPM_interface *HPM;
 
