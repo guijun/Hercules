@@ -35,7 +35,9 @@
 #include "../common/socket.h"
 #include "../common/strlib.h"
 #include "../common/timer.h"
-
+#if(XA_EXPAND_STORAGE)
+#include "../common/lz4_utils.h"
+#endif
 struct intif_interface intif_s;
 #if(XA_EXTERN_DEF_PATCH)
 struct intif_interface *intif;
@@ -421,6 +423,26 @@ int intif_send_guild_storage(int account_id,struct guild_storage *gstor)
 {
 	if (intif->CheckForCharServer())
 		return 0;
+
+
+#if(XA_EXPAND_STORAGE)
+		{
+			char* gstorage_lz4 = NULL;
+			size_t lz4_len=0;
+			gstorage_lz4=Lz4Encode((char*)gstor,sizeof(struct guild_storage),&lz4_len);
+			if (gstorage_lz4)
+			{
+				WFIFOHEAD(inter_fd, lz4_len+12);
+				WFIFOW(inter_fd,0) = 0x3019;
+				WFIFOW(inter_fd,2) = lz4_len+12;
+				WFIFOL(inter_fd,4) = account_id;
+				WFIFOL(inter_fd,8) = gstor->guild_id;
+				memcpy(WFIFOP(inter_fd,12),gstorage_lz4,lz4_len);
+		 		WFIFOSET(inter_fd, WFIFOW(inter_fd,2));
+		 		aFree(gstorage_lz4);
+			}
+		};
+#else
 	WFIFOHEAD(inter_fd,sizeof(struct guild_storage)+12);
 	WFIFOW(inter_fd,0) = 0x3019;
 	WFIFOW(inter_fd,2) = (unsigned short)sizeof(struct guild_storage)+12;
@@ -428,6 +450,7 @@ int intif_send_guild_storage(int account_id,struct guild_storage *gstor)
 	WFIFOL(inter_fd,8) = gstor->guild_id;
 	memcpy( WFIFOP(inter_fd,12),gstor, sizeof(struct guild_storage) );
 	WFIFOSET(inter_fd,WFIFOW(inter_fd,2));
+#endif
 	return 0;
 }
 
@@ -1119,8 +1142,32 @@ void intif_parse_LoadGuildStorage(int fd)
  		gstor->storage_status = 0;
 		return;
 	}
-
+#if(XA_EXPAND_STORAGE)
+		{
+			char* gstorage_lz4 = RFIFOP(fd,13);
+			size_t lz4_len=RFIFOW(fd,2)-13;
+			size_t dec_len = 0;
+			char* gstorage_dec = Lz4Decode(gstorage_lz4,lz4_len,&dec_len);
+			if (gstorage_dec)
+			{
+				if (dec_len == sizeof(struct guild_storage))
+				{
+					memcpy(gstor,gstorage_dec,sizeof(struct guild_storage));
+				}
+				else
+				{
+				ShowError("intif_parse_LoadGuildStorage: gstorage Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct guild_storage));
+				}
+				aFree(gstorage_dec);
+			}
+			else
+			{
+				ShowError("intif_parse_LoadGuildStorage: gstorage Lz4Decode fail\n");
+			}
+		};
+#else
 	memcpy(gstor,RFIFOP(fd,13),sizeof(struct guild_storage));
+#endif
 	if( flag )
 		gstorage->open(sd);
 }

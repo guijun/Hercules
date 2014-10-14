@@ -19,7 +19,9 @@
 #include "../common/socket.h"
 #include "../common/sql.h"
 #include "../common/strlib.h" // StringBuf
-
+#if(XA_EXPAND_STORAGE)
+#include "../common/lz4_utils.h"
+#endif
 #define STORAGE_MEMINC	16
 
 /// Save storage data to sql
@@ -170,6 +172,29 @@ int mapif_load_guild_storage(int fd,int account_id,int guild_id, char flag)
 		Sql_ShowDebug(sql_handle);
 	else if( SQL->NumRows(sql_handle) > 0 )
 	{// guild exists
+#if(XA_EXPAND_STORAGE)
+		SQL->FreeResult(sql_handle);
+		{
+			char* gstorage_lz4 = NULL;
+			size_t lz4_len=0;
+			struct guild_storage gstorage;
+			guild_storage_fromsql(guild_id, &gstorage);
+			gstorage_lz4=Lz4Encode(&gstorage,sizeof(gstorage),&lz4_len);
+			if (gstorage_lz4)
+			{
+				WFIFOHEAD(fd, lz4_len+13);
+				WFIFOW(fd,0) = 0x3818;
+				WFIFOW(fd,2) = lz4_len+13;
+				WFIFOL(fd,4) = account_id;
+				WFIFOL(fd,8) = guild_id;
+				WFIFOB(fd,12) = flag; //1 open storage, 0 don't open
+				memcpy(WFIFOP(fd,13),gstorage_lz4,lz4_len);
+		 		WFIFOSET(fd, WFIFOW(fd,2));
+		 		aFree(gstorage_lz4);
+			}
+		};
+#else
+
 		WFIFOHEAD(fd, sizeof(struct guild_storage)+13);
 		WFIFOW(fd,0) = 0x3818;
 		WFIFOW(fd,2) = sizeof(struct guild_storage)+13;
@@ -177,8 +202,9 @@ int mapif_load_guild_storage(int fd,int account_id,int guild_id, char flag)
 		WFIFOL(fd,8) = guild_id;
 		WFIFOB(fd,12) = flag; //1 open storage, 0 don't open
 		guild_storage_fromsql(guild_id, (struct guild_storage*)WFIFOP(fd,13));
-	
+
  		WFIFOSET(fd, WFIFOW(fd,2));
+ #endif
 		return 0;
 	}
 	// guild does not exist
@@ -229,7 +255,35 @@ int mapif_parse_SaveGuildStorage(int fd)
 		} else if(SQL->NumRows(sql_handle) > 0) {
 			// guild exists
 			SQL->FreeResult(sql_handle);
+
+#if(XA_EXPAND_STORAGE)
+			{
+				char* gstorage_lz4 = RFIFOP(fd,12);
+				size_t lz4_len=RFIFOW(fd,2)-12;
+				size_t dec_len = 0;
+				char* gstorage_dec = Lz4Decode(gstorage_lz4,lz4_len,&dec_len);
+				if (gstorage_dec)
+				{
+					if (dec_len == sizeof(struct guild_storage))
+					{
+						guild_storage_tosql(guild_id, (struct guild_storage*)gstorage_dec);
+					}
+					else
+					{
+					ShowError("inter storage: gstorage Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct guild_storage));
+					}
+					aFree(gstorage_dec);
+				}
+				else
+				{
+					ShowError("inter storage: gstorage Lz4Decode fail\n");
+				}
+			};
+#else
+
+
 			guild_storage_tosql(guild_id, (struct guild_storage*)RFIFOP(fd,12));
+#endif
 			mapif_save_guild_storage_ack(fd, RFIFOL(fd,4), guild_id, 0);
 			return 0;
 		}
