@@ -709,6 +709,7 @@ with_MYSQL_CFLAGS
 with_MYSQL_LIBS
 with_pcre
 with_zlib
+with_lz4
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1381,7 +1382,10 @@ Optional Packages:
                           to /usr/local or /usr if not found in /usr/local).
                           Assumes that the header files are in DIR/include and
                           the library files are in DIR/lib
-
+  --with-lz4=DIR         root directory path of lz4 installation (defaults
+                          to /usr/local or /usr if not found in /usr/local).
+                          Assumes that the header files are in DIR/include and
+                          the library files are in DIR/lib
 Some influential environment variables:
   CC          C compiler command
   CFLAGS      C compiler flags

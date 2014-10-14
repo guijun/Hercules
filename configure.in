@@ -445,6 +445,21 @@ AC_ARG_WITH(
 	]
 )
 
+AC_ARG_WITH(
+	[lz4],
+	AC_HELP_STRING(
+		[--with-lz4=DIR],
+		[root directory path of lz4 installation (defaults to /usr/local or /usr if not found in /usr/local).
+		 Assumes that the header files are in DIR/include and the library files are in DIR/lib]
+	),
+	[
+		test -n "$withval" && LZ4_HOME="$withval"
+	],
+	[
+		LZ4_HOME=/usr/local
+		test ! -f "${LZ4_HOME}/include/lz4.h" && LZ4_HOME=/usr
+	]
+)
 
 
 ###############################################################################
@@ -1104,6 +1119,15 @@ fi
 AC_SEARCH_LIBS([inflateEnd], [z], [],[AC_MSG_ERROR([zlib library not found or incompatible, please specify the correct path with --with-zlib=DIR... stopping])])
 AC_CHECK_HEADER([zlib.h], [], [AC_MSG_ERROR([zlib header not found, please specify the correct path with --with-zlib=DIR... stopping])])
 
+#
+# lz4 library (required)
+#
+if test -n "${LZ4_HOME}" ; then
+	LDFLAGS="$LDFLAGS -L${LZ4_HOME}/lib"
+	CPPFLAGS="$CPPFLAGS -I${LZ4_HOME}/include"
+fi
+AC_SEARCH_LIBS([LZ4_compress], [lz4], [],[AC_MSG_ERROR([lz4 library not found or incompatible, please specify the correct path with --with-lz4=DIR... stopping])])
+AC_CHECK_HEADER([lz4.h], [], [AC_MSG_ERROR([lz4 header not found, please specify the correct path with --with-lz4=DIR... stopping])])
 
 #
 # math library (required)
