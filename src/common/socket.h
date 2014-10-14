@@ -17,7 +17,9 @@
 #	include <sys/socket.h>
 #	include <sys/types.h>
 #endif
-
+#if(XA_ENABLE_LZ4)
+	#include <lz4.h>
+#endif
 struct HPluginData;
 
 #define FIFOSIZE_SERVERLINK 256*1024

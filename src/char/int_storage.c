@@ -177,6 +177,7 @@ int mapif_load_guild_storage(int fd,int account_id,int guild_id, char flag)
 		WFIFOL(fd,8) = guild_id;
 		WFIFOB(fd,12) = flag; //1 open storage, 0 don't open
 		guild_storage_fromsql(guild_id, (struct guild_storage*)WFIFOP(fd,13));
+	
  		WFIFOSET(fd, WFIFOW(fd,2));
 		return 0;
 	}
