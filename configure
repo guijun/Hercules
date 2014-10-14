@@ -3828,6 +3828,19 @@ else
 
 fi
 
+# Check whether --with-lz4 was given.
+if test "${with_lz4+set}" = set; then :
+  withval=$with_lz4;
+    test -n "$withval" && LZ4_HOME="$withval"
+
+else
+
+    LZ4_HOME=/usr/local
+    test ! -f "${LZ4_HOME}/include/lz4.h" && LZ4_HOME=/usr
+
+
+fi
+
 
 
 
@@ -6672,7 +6685,77 @@ else
   as_fn_error $? "zlib header not found, please specify the correct path with --with-zlib=DIR... stopping" "$LINENO" 5
 fi
 
+#
+# lz4 library (required)
+#
+if test -n "${LZ4_HOME}" ; then
+  LDFLAGS="$LDFLAGS -L${LZ4_HOME}/lib"
+  CPPFLAGS="$CPPFLAGS -I${LZ4_HOME}/include"
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for library containing LZ4_compress" >&5
+$as_echo_n "checking for library containing LZ4_compress... " >&6; }
+if ${ac_cv_search_LZ4_compress+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_func_search_save_LIBS=$LIBS
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
 
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char LZ4_compress();
+int
+main ()
+{
+return LZ4_compress ();
+  ;
+  return 0;
+}
+_ACEOF
+for ac_lib in '' lz4; do
+  if test -z "$ac_lib"; then
+    ac_res="none required"
+  else
+    ac_res=-l$ac_lib
+    LIBS="-l$ac_lib  $ac_func_search_save_LIBS"
+  fi
+  if ac_fn_c_try_link "$LINENO"; then :
+  ac_cv_search_LZ4_compress=$ac_res
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext
+  if ${ac_cv_search_LZ4_compress+:} false; then :
+  break
+fi
+done
+if ${ac_cv_search_LZ4_compress+:} false; then :
+
+else
+  ac_cv_search_LZ4_compress=no
+fi
+rm conftest.$ac_ext
+LIBS=$ac_func_search_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_search_LZ4_compress" >&5
+$as_echo "$ac_cv_search_LZ4_compress" >&6; }
+ac_res=$ac_cv_search_LZ4_compress
+if test "$ac_res" != no; then :
+  test "$ac_res" = "none required" || LIBS="$ac_res $LIBS"
+
+else
+  as_fn_error $? "lz4 library not found or incompatible, please specify the correct path with --with-lz4=DIR... stopping" "$LINENO" 5
+fi
+
+ac_fn_c_check_header_mongrel "$LINENO" "lz4.h" "ac_cv_header_lz4_h" "$ac_includes_default"
+if test "x$ac_cv_header_lz4_h" = xyes; then :
+
+else
+  as_fn_error $? "lz4 header not found, please specify the correct path with --with-lz4=DIR... stopping" "$LINENO" 5
+fi
 
 
 #
