@@ -3159,7 +3159,35 @@ int parse_frommap(int fd)
 					character->char_id == cid))
 				{
 					struct mmo_charstatus char_dat;
-					memcpy(&char_dat, RFIFOP(fd,13), sizeof(struct mmo_charstatus));
+
+					#if(XA_EXPAND_STORAGE)
+							{
+								char* charstatus_lz4 = RFIFOP(fd,13);
+								size_t lz4_len=RFIFOW(fd,2) - 13;
+								size_t dec_len = 0;
+								char* charstatus_dec = Lz4Decode(charstatus_lz4,lz4_len,&dec_len);
+								if (charstatus_dec)
+								{
+									if (dec_len == sizeof(struct mmo_charstatus))
+									{
+										memcpy(&char_dat,charstatus_dec,sizeof(struct mmo_charstatus));
+									}
+									else
+									{
+									ShowError("parse_frommap: mmo_charstatus Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct mmo_charstatus));
+									}
+									aFree(charstatus_dec);
+								}
+								else
+								{
+									ShowError("parse_frommap: mmo_charstatus Lz4Decode fail\n");
+								memcpy(&char_dat, RFIFOP(fd,13), sizeof(struct mmo_charstatus));
+								}
+							};
+					#else
+						memcpy(&char_dat, RFIFOP(fd,13), sizeof(struct mmo_charstatus));
+					#endif
+
 					mmo_char_tosql(cid, &char_dat);
 				} else {	//This may be valid on char-server reconnection, when re-sending characters that already logged off.
 					ShowError("parse_from_map (save-char): Received data for non-existing/offline character (%d:%d).\n", aid, cid);
@@ -3680,8 +3708,28 @@ int parse_frommap(int fd)
 					WFIFOL(fd,16) = 0;
 					WFIFOL(fd,20) = 0;
 					WFIFOB(fd,24) = 0;
+
+			#if(XA_EXPAND_STORAGE)
+					{
+						char* sd_status_lz4 = NULL;
+						size_t lz4_len=0;
+						sd_status_lz4=Lz4Encode((char*)cd,sizeof(struct mmo_charstatus),&lz4_len);
+						if (sd_status_lz4)
+						{
+							memcpy(WFIFOP(fd,25),sd_status_lz4,lz4_len);
+							WFIFOW(fd,2) = lz4_len + 25;
+					 		aFree(sd_status_lz4);
+						}
+						else
+						{
+							memcpy(WFIFOP(fd,25), cd, sizeof(struct mmo_charstatus));
+						}
+					};
+			#else
 					memcpy(WFIFOP(fd,25), cd, sizeof(struct mmo_charstatus));
+			#endif
 					WFIFOSET(fd, WFIFOW(fd,2));
+
 					
 					set_char_online(id, char_id, account_id);
 					break;

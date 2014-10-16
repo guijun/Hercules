@@ -37,7 +37,9 @@
 #include "../common/socket.h"
 #include "../common/strlib.h"
 #include "../common/timer.h"
-
+#if(XA_EXPAND_STORAGE)
+#include "../common/lz4_utils.h"
+#endif
 struct chrif_interface chrif_s;
 #if(XA_EXTERN_DEF_PATCH)
 struct chrif_interface *chrif;
@@ -284,7 +286,27 @@ bool chrif_save(struct map_session_data *sd, int flag) {
 	WFIFOL(chrif->fd,4) = sd->status.account_id;
 	WFIFOL(chrif->fd,8) = sd->status.char_id;
 	WFIFOB(chrif->fd,12) = (flag==1)?1:0; //Flag to tell char-server this character is quitting.
+
+
+#if(XA_EXPAND_STORAGE)
+		{
+			char* sd_status_lz4 = NULL;
+			size_t lz4_len=0;
+			sd_status_lz4=Lz4Encode((char*)&sd->status,sizeof(sd->status),&lz4_len);
+			if (sd_status_lz4)
+			{
+				memcpy(WFIFOP(chrif->fd,13),sd_status_lz4,lz4_len);
+				WFIFOW(chrif->fd,2) = lz4_len + 13;
+		 		aFree(sd_status_lz4);
+			}
+			else
+			{
+				memcpy(WFIFOP(chrif->fd,13), &sd->status, sizeof(sd->status));
+			}
+		};
+#else
 	memcpy(WFIFOP(chrif->fd,13), &sd->status, sizeof(sd->status));
+#endif
 	WFIFOSET(chrif->fd, WFIFOW(chrif->fd,2));
 
 	if( sd->status.pet_id > 0 && sd->pd )
@@ -573,6 +595,9 @@ void chrif_authok(int fd) {
 	uint32 login_id1,login_id2;
 	time_t expiration_time;
 	struct mmo_charstatus* charstatus;
+#if(XA_EXPAND_STORAGE)
+	struct mmo_charstatus recv_charstatus;	
+#endif
 	struct auth_node *node;
 	bool changing_mapservers;
 	TBL_PC* sd;
@@ -589,7 +614,36 @@ void chrif_authok(int fd) {
 	expiration_time = (time_t)(int32)RFIFOL(fd,16);
 	group_id = RFIFOL(fd,20);
 	changing_mapservers = (RFIFOB(fd,24));
-	charstatus = (struct mmo_charstatus*)RFIFOP(fd,25);
+
+#if(XA_EXPAND_STORAGE)
+		{
+			char* charstatus_lz4 = RFIFOP(fd,25);
+			size_t lz4_len=RFIFOW(fd,2) - 25;
+			size_t dec_len = 0;
+			char* charstatus_dec = Lz4Decode(charstatus_lz4,lz4_len,&dec_len);
+			if (charstatus_dec)
+			{
+				if (dec_len == sizeof(struct mmo_charstatus))
+				{
+					memcpy(&recv_charstatus,charstatus_dec,sizeof(struct mmo_charstatus));
+				}
+				else
+				{
+				ShowError("chrif_authok: mmo_charstatus Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct mmo_charstatus));
+				}
+				aFree(charstatus_dec);
+				charstatus = &recv_charstatus;
+			}
+			else
+			{
+				ShowError("chrif_authok: mmo_charstatus Lz4Decode fail\n");
+			        charstatus = (struct mmo_charstatus*)RFIFOP(fd,25);
+			}
+		};
+#else
+		charstatus = (struct mmo_charstatus*)RFIFOP(fd,25);
+#endif
+
 	char_id = charstatus->char_id;
 
 	//Check if we don't already have player data in our server
