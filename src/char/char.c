@@ -3148,11 +3148,15 @@ int parse_frommap(int fd)
 				int aid = RFIFOL(fd,4), cid = RFIFOL(fd,8), size = RFIFOW(fd,2);
 				struct online_char_data* character;
 
+#if(XA_EXPAND_STORAGE)
+	// Size isn't const before lz4
+#else
 				if (size - 13 != sizeof(struct mmo_charstatus)) {
 					ShowError("parse_from_map (save-char): Size mismatch! %d != %"PRIuS"\n", size-13, sizeof(struct mmo_charstatus));
 					RFIFOSKIP(fd,size);
 					break;
 				}
+#endif
 				//Check account only if this ain't final save. Final-save goes through because of the char-map reconnect
 				if (RFIFOB(fd,12) || (
 					(character = (struct online_char_data*)idb_get(online_char_db, aid)) != NULL &&
@@ -3174,14 +3178,14 @@ int parse_frommap(int fd)
 									}
 									else
 									{
-									ShowError("parse_frommap: mmo_charstatus Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct mmo_charstatus));
+										ShowError("parse_frommap: mmo_charstatus Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct mmo_charstatus));
 									}
 									aFree(charstatus_dec);
 								}
 								else
 								{
 									ShowError("parse_frommap: mmo_charstatus Lz4Decode fail\n");
-								memcpy(&char_dat, RFIFOP(fd,13), sizeof(struct mmo_charstatus));
+									memcpy(&char_dat, RFIFOP(fd,13), sizeof(struct mmo_charstatus));
 								}
 							};
 					#else

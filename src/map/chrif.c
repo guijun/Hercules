@@ -601,13 +601,15 @@ void chrif_authok(int fd) {
 	struct auth_node *node;
 	bool changing_mapservers;
 	TBL_PC* sd;
-
+#if(XA_EXPAND_STORAGE)
+	// Size isn't const before lz4
+#else
 	//Check if both servers agree on the struct's size
 	if( RFIFOW(fd,2) - 25 != sizeof(struct mmo_charstatus) ) {
 		ShowError("chrif_authok: Data size mismatch! %d != %"PRIuS"\n", RFIFOW(fd,2) - 25, sizeof(struct mmo_charstatus));
 		return;
 	}
-
+#endif
 	account_id = RFIFOL(fd,4);
 	login_id1 = RFIFOL(fd,8);
 	login_id2 = RFIFOL(fd,12);
