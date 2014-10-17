@@ -3759,7 +3759,25 @@ int parse_frommap(int fd)
 					WFIFOL(fd,16) = (uint32)node->expiration_time; // FIXME: will wrap to negative after "19-Jan-2038, 03:14:07 AM GMT"
 					WFIFOL(fd,20) = node->group_id;
 					WFIFOB(fd,24) = node->changing_mapservers;
+			#if(XA_EXPAND_STORAGE)
+					{
+						char* sd_status_lz4 = NULL;
+						size_t lz4_len=0;
+						sd_status_lz4=Lz4Encode((char*)cd,sizeof(struct mmo_charstatus),&lz4_len);
+						if (sd_status_lz4)
+						{
+							memcpy(WFIFOP(fd,25),sd_status_lz4,lz4_len);
+							WFIFOW(fd,2) = lz4_len + 25;
+					 		aFree(sd_status_lz4);
+						}
+						else
+						{
+							memcpy(WFIFOP(fd,25), cd, sizeof(struct mmo_charstatus));
+						}
+					};
+			#else
 					memcpy(WFIFOP(fd,25), cd, sizeof(struct mmo_charstatus));
+			#endif
 					WFIFOSET(fd, WFIFOW(fd,2));
 
 					// only use the auth once and mark user online
