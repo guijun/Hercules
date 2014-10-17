@@ -246,10 +246,13 @@ int mapif_parse_SaveGuildStorage(int fd)
 	RFIFOHEAD(fd);
 	guild_id = RFIFOL(fd,8);
 	len = RFIFOW(fd,2);
-
+#if(XA_EXPAND_STORAGE)
+	#else
 	if (sizeof(struct guild_storage) != len - 12) {
 		ShowError("inter storage: data size mismatch: %d != %"PRIuS"\n", len - 12, sizeof(struct guild_storage));
-	} else {
+	} else 
+#endif
+		{
 		if (SQL_ERROR == SQL->Query(sql_handle, "SELECT `guild_id` FROM `%s` WHERE `guild_id`='%d'", guild_db, guild_id)) {
 			Sql_ShowDebug(sql_handle);
 		} else if(SQL->NumRows(sql_handle) > 0) {

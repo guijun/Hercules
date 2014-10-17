@@ -1137,11 +1137,14 @@ void intif_parse_LoadGuildStorage(int fd)
 		ShowWarning("intif_parse_LoadGuildStorage: received storage for an already modified non-saved storage! (User %d:%d)\n", flag?sd->status.account_id:0, flag?sd->status.char_id:0);
 		return;
 	}
+#if(XA_EXPAND_STORAGE)
+#else	
 	if (RFIFOW(fd,2)-13 != sizeof(struct guild_storage)) {
 		ShowError("intif_parse_LoadGuildStorage: data size mismatch %d != %"PRIuS"\n", RFIFOW(fd,2)-13, sizeof(struct guild_storage));
  		gstor->storage_status = 0;
 		return;
 	}
+#endif
 #if(XA_EXPAND_STORAGE)
 		{
 			char* gstorage_lz4 = RFIFOP(fd,13);
