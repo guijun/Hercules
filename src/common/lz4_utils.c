@@ -2,10 +2,10 @@
 #if defined(__cplusplus)
 extern "C" {
 #endif
-#include <stdlib.h>   /* malloc, calloc, free */
-#include <string.h>
 #include "../config/xa_patch.h"
 #include "../common/lz4_utils.h"
+#include "../common/malloc.h"
+#include <string.h>
 
 size_t CALC_MAX_OUT_LEN(int compresserId,size_t in_len)
 {
@@ -44,7 +44,7 @@ cc8* Lz4Decode(cc8* inbuffer,size_t in_len,size_t* out_len)
 		return NULL;
 	};
 
-	outBuffer = (cc8*)calloc(header->originalSize,1);
+	outBuffer = (cc8*)aCalloc(header->originalSize,1);
 
 	switch (packerId)
 	{
@@ -62,7 +62,7 @@ cc8* Lz4Decode(cc8* inbuffer,size_t in_len,size_t* out_len)
 			break;
 	}
 
-	free((void*)outBuffer);
+	aFree((void*)outBuffer);
 	return NULL;
 }
 
@@ -72,7 +72,7 @@ cc8* Lz4Encode(cc8* inbuffer,size_t in_len,size_t* out_len)
 	size_t new_len;
 	cc8* outBuffer = NULL;
 	lz4_header_t* header = NULL;
-	outBuffer = (cc8*)calloc(CALC_MAX_OUT_LEN(PACKER_LZ4,in_len),1);
+	outBuffer = (cc8*)aCalloc(CALC_MAX_OUT_LEN(PACKER_LZ4,in_len),1);
 	header = (lz4_header_t*)outBuffer;
 	strcpy((char*)(&(header->sign)),LZ4HEADERSIGN);
 
@@ -86,7 +86,7 @@ cc8* Lz4Encode(cc8* inbuffer,size_t in_len,size_t* out_len)
 		header->compressedSize = new_len;
 		return outBuffer;
 	}
-	free((void*)outBuffer);
+	aFree((void*)outBuffer);
 	return NULL;
 }
 #ifdef __cplusplus

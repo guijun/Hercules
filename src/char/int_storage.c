@@ -190,7 +190,7 @@ int mapif_load_guild_storage(int fd,int account_id,int guild_id, char flag)
 				WFIFOB(fd,12) = flag; //1 open storage, 0 don't open
 				memcpy(WFIFOP(fd,13),gstorage_lz4,lz4_len);
 		 		WFIFOSET(fd, WFIFOW(fd,2));
-		 		free(gstorage_lz4);
+		 		aFree(gstorage_lz4);
 			}
 		};
 #else
@@ -272,7 +272,7 @@ int mapif_parse_SaveGuildStorage(int fd)
 					{
 					ShowError("inter storage: gstorage Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct guild_storage));
 					}
-					free(gstorage_dec);
+					aFree(gstorage_dec);
 				}
 				else
 				{

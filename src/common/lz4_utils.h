@@ -3,26 +3,21 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-#include <stdlib.h>   /* malloc, calloc, free */
-#include <string.h>
 #include "../common/cbasetypes.h"
 #include "../config/xa_patch.h"
-
-
-//#include "stdio.h"
+#include "../common/malloc.h"
+#include "stdio.h"
 #include <lz4.h>
 
 #define cc8 const char
 
 #define LZ4HEADERSIGN "LZ4\0"
-#pragma pack(1)
 typedef struct {
   unsigned char sign[4];
   uint32  originalSize;
   uint32  compressedSize;
 }
 lz4_header_t;
-#pragma pack()
 
 #define PACKER_LZ4 1
 size_t CALC_MAX_OUT_LEN(int compresserId,size_t in_len);

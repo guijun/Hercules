@@ -439,7 +439,7 @@ int intif_send_guild_storage(int account_id,struct guild_storage *gstor)
 				WFIFOL(inter_fd,8) = gstor->guild_id;
 				memcpy(WFIFOP(inter_fd,12),gstorage_lz4,lz4_len);
 		 		WFIFOSET(inter_fd, WFIFOW(inter_fd,2));
-		 		free(gstorage_lz4);
+		 		aFree(gstorage_lz4);
 			}
 		};
 #else
@@ -1158,7 +1158,7 @@ void intif_parse_LoadGuildStorage(int fd)
 				{
 				ShowError("intif_parse_LoadGuildStorage: gstorage Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct guild_storage));
 				}
-				free(gstorage_dec);
+				aFree(gstorage_dec);
 			}
 			else
 			{
