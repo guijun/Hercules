@@ -3180,7 +3180,7 @@ int parse_frommap(int fd)
 									{
 										ShowError("parse_frommap: mmo_charstatus Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct mmo_charstatus));
 									}
-									aFree(charstatus_dec);
+									free(charstatus_dec);
 								}
 								else
 								{
@@ -3722,7 +3722,7 @@ int parse_frommap(int fd)
 						{
 							memcpy(WFIFOP(fd,25),sd_status_lz4,lz4_len);
 							WFIFOW(fd,2) = lz4_len + 25;
-					 		aFree(sd_status_lz4);
+					 		free(sd_status_lz4);
 						}
 						else
 						{
@@ -3768,7 +3768,7 @@ int parse_frommap(int fd)
 						{
 							memcpy(WFIFOP(fd,25),sd_status_lz4,lz4_len);
 							WFIFOW(fd,2) = lz4_len + 25;
-					 		aFree(sd_status_lz4);
+					 		free(sd_status_lz4);
 						}
 						else
 						{

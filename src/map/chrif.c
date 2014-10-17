@@ -297,7 +297,7 @@ bool chrif_save(struct map_session_data *sd, int flag) {
 			{
 				memcpy(WFIFOP(chrif->fd,13),sd_status_lz4,lz4_len);
 				WFIFOW(chrif->fd,2) = lz4_len + 13;
-		 		aFree(sd_status_lz4);
+		 		free(sd_status_lz4);
 			}
 			else
 			{
@@ -633,7 +633,7 @@ void chrif_authok(int fd) {
 				{
 				ShowError("chrif_authok: mmo_charstatus Lz4Decode size mismatch %d != %"PRIuS"\n", dec_len, sizeof(struct mmo_charstatus));
 				}
-				aFree(charstatus_dec);
+				free(charstatus_dec);
 				charstatus = &recv_charstatus;
 			}
 			else
