@@ -12,13 +12,14 @@ extern "C" {
 #define cc8 const char
 
 #define LZ4HEADERSIGN "LZ4\0"
+#pragma pack(1)
 typedef struct {
   unsigned char sign[4];
   uint32  originalSize;
   uint32  compressedSize;
 }
 lz4_header_t;
-
+#pragma pack()
 #define PACKER_LZ4 1
 size_t CALC_MAX_OUT_LEN(int compresserId,size_t in_len);
 cc8* Lz4Decode(cc8* inbuffer,size_t in_len,size_t* out_len);
