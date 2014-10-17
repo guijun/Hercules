@@ -36,7 +36,9 @@
 #include "../common/strlib.h"
 #include "../common/timer.h"
 #include "../common/utils.h"
-
+#if(XA_EXPAND_STORAGE)
+#include "../common/lz4_utils.h"
+#endif
 // private declarations
 #define CHAR_CONF_NAME	"conf/char-server.conf"
 #define LAN_CONF_NAME	"conf/subnet.conf"
