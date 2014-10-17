@@ -5109,7 +5109,6 @@ int char_lan_config_read(const char *lancfgName)
 			                remove_control_chars(w6);
 					subnet[subnet_count].char_ip_for_client = str2ip(w5);
                                         subnet[subnet_count].map_ip_for_client = str2ip(w6);
-                                        printf("%s %s",w5,w6);
 					break;
                                 }
 			if( (subnet[subnet_count].char_ip & subnet[subnet_count].mask) != (subnet[subnet_count].map_ip & subnet[subnet_count].mask) )
