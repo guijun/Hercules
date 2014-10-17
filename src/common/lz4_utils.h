@@ -3,10 +3,12 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "../common/cbasetypes.h"
 #include "../config/xa_patch.h"
+#include "../common/malloc.h"
 #include "stdio.h"
 #include <lz4.h>
-#include "../common/cbasetypes.h"
+
 #define cc8 const char
 
 #define LZ4HEADERSIGN "LZ4\0"
