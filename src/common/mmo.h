@@ -92,7 +92,7 @@
 #	define MAX_CARTS 5
 #endif
 #if(XA_EXPAND_UPPER_LIMIT)
-	#define MAX_INVENTORY 100
+	#define MAX_INVENTORY 400
 #else
 	#define MAX_INVENTORY 100
 #endif
@@ -118,7 +118,7 @@
 	#define DEFAULT_WALK_SPEED 150
 	#define MIN_WALK_SPEED 20 /* below 20 clips animation */
 	#define MAX_WALK_SPEED 1000
-	#define MAX_STORAGE 600
+	#define MAX_STORAGE 800
 	#define MAX_GUILD_STORAGE 1000
 	#define MAX_PARTY 24
 	#define MAX_GUILD (16+10*10)     // Increased max guild members +6 per 1 extension levels [Lupus]
