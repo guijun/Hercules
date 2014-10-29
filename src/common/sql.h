@@ -268,7 +268,7 @@ struct sql_interface {
 
 } sql_s;
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+extern
 #endif
 struct sql_interface *SQL;
 
@@ -291,5 +291,5 @@ void Sql_HerculesUpdateSkip(Sql* self,const char *filename);
 #endif
 
 void Sql_Init(void);
-
+void Sql_Final(void);
 #endif /* COMMON_SQL_H */

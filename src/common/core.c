@@ -209,7 +209,7 @@ int main (int argc, char **argv) {
 			}
 		}
 	}
-	
+
 	iMalloc->init();// needed for Show* in display_title() [FlavioJS]
 
 	sysinfo->init();
@@ -229,7 +229,7 @@ int main (int argc, char **argv) {
 	rathread_init();
 	DB->init();
 	signals_init();
-	
+
 #ifdef _WIN32
 	cevents_init();
 #endif
@@ -239,11 +239,11 @@ int main (int argc, char **argv) {
 	/* timer first */
 	rnd_init();
 	srand((unsigned int)timer->gettick());
-	
+
 	console->init();
-	
+
 	HCache->init();
-	
+
 	HPM->init();
 
 	sockt->init();
@@ -258,13 +258,14 @@ int main (int argc, char **argv) {
 	}
 
 	console->final();
-	
+
 	retval = do_final();
 	HPM->final();
 	timer->final();
 	sockt->final();
 	DB->final();
 	rathread_final();
+	Sql_Final();
 	ers_final();
 #endif
 	//sysinfo->final(); Called by iMalloc->final()

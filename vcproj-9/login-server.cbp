@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="login-server" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug Win32">
+				<Option output="../login-server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="login-server/Debug Win32" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_WIN32" />
+					<Add option="-D__WIN32" />
+					<Add option="-D_DEBUG" />
+					<Add option="-DFD_SETSIZE=4096" />
+					<Add option="-DLIBCONFIG_STATIC" />
+					<Add option="-DYY_USE_CONST" />
+					<Add option="-DWITH_SQL" />
+					<Add option="-W" />
+					<Add option="-g" />
+					<Add option="-O0" />
+					<Add directory="../3rdparty/libconfig" />
+					<Add directory="../3rdparty/mysql/include" />
+					<Add directory="../3rdparty/msinttypes/include" />
+					<Add directory="../3rdparty/mt19937ar" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../3rdparty/libconfig" />
+					<Add directory="../3rdparty/mysql/include" />
+					<Add directory="../3rdparty/msinttypes/include" />
+					<Add directory="../3rdparty/mt19937ar" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="libcmtd" />
+					<Add library="oldnames" />
+					<Add library="ws2_32" />
+					<Add library="libmysql" />
+					<Add directory="../3rdparty/mysql/lib" />
+				</Linker>
+			</Target>
+			<Target title="Release Win32">
+				<Option output="../login-server" prefix_auto="1" extension_auto="1" />
+				<Option object_output="login-server/Release Win32" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-DWIN32" />
+					<Add option="-D_WIN32" />
+					<Add option="-D__WIN32" />
+					<Add option="-DNDEBUG" />
+					<Add option="-DFD_SETSIZE=4096" />
+					<Add option="-DLIBCONFIG_STATIC" />
+					<Add option="-DYY_USE_CONST" />
+					<Add option="-DWITH_SQL" />
+					<Add option="-W" />
+					<Add option="-O2" />
+					<Add directory="../3rdparty/libconfig" />
+					<Add directory="../3rdparty/mysql/include" />
+					<Add directory="../3rdparty/msinttypes/include" />
+					<Add directory="../3rdparty/mt19937ar" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add directory="../3rdparty/libconfig" />
+					<Add directory="../3rdparty/mysql/include" />
+					<Add directory="../3rdparty/msinttypes/include" />
+					<Add directory="../3rdparty/mt19937ar" />
+				</ResourceCompiler>
+				<Linker>
+					<Add library="libcmt" />
+					<Add library="oldnames" />
+					<Add library="ws2_32" />
+					<Add library="libmysql" />
+					<Add directory="../3rdparty/mysql/lib" />
+				</Linker>
+			</Target>
+		</Build>
+		<Unit filename="../3rdparty/libconfig/grammar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../3rdparty/libconfig/grammar.h" />
+		<Unit filename="../3rdparty/libconfig/libconfig.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../3rdparty/libconfig/libconfig.h" />
+		<Unit filename="../3rdparty/libconfig/parsectx.h" />
+		<Unit filename="../3rdparty/libconfig/scanctx.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../3rdparty/libconfig/scanctx.h" />
+		<Unit filename="../3rdparty/libconfig/scanner.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../3rdparty/libconfig/scanner.h" />
+		<Unit filename="../3rdparty/libconfig/strbuf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../3rdparty/libconfig/strbuf.h" />
+		<Unit filename="../3rdparty/libconfig/wincompat.h" />
+		<Unit filename="../3rdparty/mt19937ar/mt19937ar.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../3rdparty/mt19937ar/mt19937ar.h" />
+		<Unit filename="../src/common/HPM.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/HPM.h" />
+		<Unit filename="../src/common/HPMi.h" />
+		<Unit filename="../src/common/cbasetypes.h" />
+		<Unit filename="../src/common/conf.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/conf.h" />
+		<Unit filename="../src/common/console.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/console.h" />
+		<Unit filename="../src/common/core.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/core.h" />
+		<Unit filename="../src/common/db.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/db.h" />
+		<Unit filename="../src/common/ers.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/ers.h" />
+		<Unit filename="../src/common/malloc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/malloc.h" />
+		<Unit filename="../src/common/md5calc.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/md5calc.h" />
+		<Unit filename="../src/common/mmo.h" />
+		<Unit filename="../src/common/mutex.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/mutex.h" />
+		<Unit filename="../src/common/nullpo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/nullpo.h" />
+		<Unit filename="../src/common/random.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/random.h" />
+		<Unit filename="../src/common/showmsg.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/showmsg.h" />
+		<Unit filename="../src/common/socket.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/socket.h" />
+		<Unit filename="../src/common/sql.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/sql.h" />
+		<Unit filename="../src/common/strlib.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/strlib.h" />
+		<Unit filename="../src/common/sysinfo.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/sysinfo.h" />
+		<Unit filename="../src/common/thread.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/thread.h" />
+		<Unit filename="../src/common/timer.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/timer.h" />
+		<Unit filename="../src/common/utils.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/common/utils.h" />
+		<Unit filename="../src/common/winapi.h" />
+		<Unit filename="../src/login/account.h" />
+		<Unit filename="../src/login/account_sql.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/login/ipban.h" />
+		<Unit filename="../src/login/ipban_sql.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/login/login.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../src/login/login.h" />
+		<Unit filename="../src/login/loginlog.h" />
+		<Unit filename="../src/login/loginlog_sql.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Extensions>
+			<envvars />
+			<code_completion />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

@@ -14,7 +14,7 @@
 #include "../common/showmsg.h"
 #include "../common/strlib.h"
 #include "../common/timer.h"
-
+#include "../common/db.h"
 #ifdef WIN32
 #	include "../common/winapi.h" // Needed before mysql.h
 #endif
@@ -38,6 +38,7 @@ struct Sql {
 	int keepalive;
 };
 
+static DBMap* sqlpoll_db; // int char_id -> struct mmo_charstatus*
 
 
 // Column length receiver.
@@ -284,7 +285,66 @@ int Sql_QueryV(Sql* self, const char* query, va_list args)
 	return SQL_SUCCESS;
 }
 
+/// Executes a query.
+int Sql_QueryV_Send(Sql* self, const char* query, va_list args)
+{
+	if( self == NULL )
+		return SQL_ERROR;
 
+	SQL->FreeResult(self);
+	StrBuf->Clear(&self->buf);
+	StrBuf->Vprintf(&self->buf, query, args);
+	if( mysql_send_query(&self->handle, StrBuf->Value(&self->buf), (unsigned long)StrBuf->Length(&self->buf)) )
+	{
+		ShowSQL("DB error - %s\n", mysql_error(&self->handle));
+		hercules_mysql_error_handler(mysql_errno(&self->handle));
+		return SQL_ERROR;
+	}
+	return SQL_SUCCESS;
+}
+
+/// read result.
+int Sql_QueryV_Read(Sql* self)
+{
+	self->result = mysql_store_result(&self->handle);
+	if( mysql_errno(&self->handle) != 0 )
+	{
+		ShowSQL("DB error - %s\n", mysql_error(&self->handle));
+		hercules_mysql_error_handler(mysql_errno(&self->handle));
+		return SQL_ERROR;
+	}
+	return SQL_SUCCESS;
+}
+
+int Sql_recv(int fd)
+{
+    Sql* self = idb_get(sqlpoll_db,fd);
+    if (self)
+    {
+        Sql_PollDel(self);
+        //TODO Call result process callback
+    }
+    return 0;
+};
+int Sql_send(int fd)
+{
+    return 0;
+};
+int Sql_parse(int fd)
+{
+    return 0;
+};
+
+int Sql_PollAdd(Sql* self)
+{
+    idb_put(sqlpoll_db,self->handle.net.fd,self);
+    return SQL_SUCCESS;
+}
+int Sql_PollDel(Sql* self)
+{
+    idb_remove(sqlpoll_db,self->handle.net.fd);
+    return SQL_SUCCESS;
+}
 
 /// Executes a query.
 int Sql_QueryStr(Sql* self, const char* query)
@@ -1005,10 +1065,10 @@ void Sql_HerculesUpdateCheck(Sql* self) {
 	FILE* ifp;/* index fp */
 	unsigned int performed = 0;
 	StringBuf buf;
-	
+
 	if( self == NULL )
 		return;/* return silently, build has no mysql connection */
-	
+
 	if( !( ifp = fopen("sql-files/upgrades/index.txt", "r") ) ) {
 		ShowError("SQL upgrade index was not found!\n");
 		return;
@@ -1056,7 +1116,7 @@ void Sql_HerculesUpdateCheck(Sql* self) {
 		ShowMessage("%s",StrBuf->Value(&buf));
 		ShowSQL("To manually skip, type: 'sql update skip <file name>'\n");
 	}
-	
+
 	StrBuf->Destroy(&buf);
 }
 
@@ -1064,21 +1124,21 @@ void Sql_HerculesUpdateSkip(Sql* self,const char *filename) {
 	char path[41];// "sql-files/upgrades/" (19) + "yyyy-mm-dd--hh-mm" (17) + ".sql" (4) + 1
 	char timestamp[11];// "1360186680" (10) + 1
 	FILE* ifp;/* index fp */
-	
+
 	if( !self ) {
 		ShowError("SQL not hooked!\n");
 		return;
 	}
-	
+
 	snprintf(path,41,"sql-files/upgrades/%s",filename);
-	
+
 	if( !( ifp = fopen(path, "r") ) ) {
 		ShowError("Upgrade file '%s' was not found!\n",filename);
 		return;
 	}
-	
+
 	fseek (ifp,1,SEEK_SET);/* woo. skip the # */
-	
+
 	if( fgets(timestamp,sizeof(timestamp),ifp) ) {
 		unsigned int timestampui = (unsigned int)atol(timestamp);
 		if( SQL_ERROR == SQL->Query(self, "SELECT 1 FROM `sql_updates` WHERE `timestamp` = '%u' LIMIT 1", timestampui) )
@@ -1099,6 +1159,11 @@ void Sql_HerculesUpdateSkip(Sql* self,const char *filename) {
 
 void Sql_Init(void) {
 	Sql_inter_server_read("conf/inter-server.conf",true);
+	sqlpoll_db = idb_alloc(DB_OPT_BASE);
+}
+void Sql_Final(void) {
+
+	sqlpoll_db->destroy(sqlpoll_db,NULL);
 }
 void sql_defaults(void) {
 	SQL = &sql_s;

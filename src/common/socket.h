@@ -84,6 +84,10 @@ struct socket_data {
 		unsigned char eof : 1;
 		unsigned char server : 1;
 		unsigned char ping : 2;
+#if(XA_ASYNC_SQL)
+		//is this a sql fd?
+		unsigned char sql: 1;
+#endif
 	} flag;
 
 	uint32 client_addr; // remote client address
