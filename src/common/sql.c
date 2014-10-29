@@ -1166,7 +1166,9 @@ void Sql_Init(void) {
 }
 void Sql_Final(void) {
 
-	sqlpoll_db->destroy(sqlpoll_db,NULL);
+//	sqlpoll_db->destroy(sqlpoll_db,NULL);
+	db_destroy(sqlpoll_db);
+
 }
 void sql_defaults(void) {
 	SQL = &sql_s;

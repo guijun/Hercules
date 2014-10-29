@@ -225,9 +225,9 @@ int main (int argc, char **argv) {
 #else// not MINICORE
 	set_server_type();
 
-	Sql_Init();
 	rathread_init();
 	DB->init();
+	Sql_Init();
 	signals_init();
 
 #ifdef _WIN32
@@ -263,9 +263,9 @@ int main (int argc, char **argv) {
 	HPM->final();
 	timer->final();
 	sockt->final();
+	Sql_Final();
 	DB->final();
 	rathread_final();
-	Sql_Final();
 	ers_final();
 #endif
 	//sysinfo->final(); Called by iMalloc->final()
