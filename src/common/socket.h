@@ -103,7 +103,7 @@ struct socket_data {
 	ParseFunc func_parse;
 
 	void* session_data; // stores application-specific data related to the session
-	
+
 	struct HPluginData **hdata;
 	unsigned int hdatac;
 };
@@ -175,12 +175,13 @@ struct socket_interface {
 	void (*set_eof) (int fd);
 };
 #if(XA_EXTERN_DEF_PATCH)
-extern 
+extern
 #endif
 struct socket_interface *sockt;
 
 void socket_defaults(void);
-
+int pool_fd_add(int fd, RecvFunc func_recv, SendFunc func_send, ParseFunc func_parse);
+int pool_fd_del(int fd);
 /* the purpose of these macros is simply to not make calling them be an annoyance */
 #ifndef H_SOCKET_C
 	#define make_listen_bind(ip, port) ( sockt->make_listen_bind(ip, port) )

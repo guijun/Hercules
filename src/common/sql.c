@@ -15,6 +15,7 @@
 #include "../common/strlib.h"
 #include "../common/timer.h"
 #include "../common/db.h"
+#include "../common/socket.h"
 #ifdef WIN32
 #	include "../common/winapi.h" // Needed before mysql.h
 #endif
@@ -300,6 +301,7 @@ int Sql_QueryV_Send(Sql* self, const char* query, va_list args)
 		hercules_mysql_error_handler(mysql_errno(&self->handle));
 		return SQL_ERROR;
 	}
+
 	return SQL_SUCCESS;
 }
 
@@ -338,6 +340,7 @@ int Sql_parse(int fd)
 int Sql_PollAdd(Sql* self)
 {
     idb_put(sqlpoll_db,self->handle.net.fd,self);
+
     return SQL_SUCCESS;
 }
 int Sql_PollDel(Sql* self)
