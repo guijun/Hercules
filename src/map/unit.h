@@ -1,17 +1,46 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef MAP_UNIT_H
 #define MAP_UNIT_H
 
-#include "clif.h"  // clr_type
-#include "path.h" // struct walkpath_data
-#include "skill.h" // 'MAX_SKILLTIMERSKILL, struct skill_timerskill, struct skill_unit_group, struct skill_unit_group_tickset
-#include "../common/cbasetypes.h"
+#include "map/clif.h"  // clr_type
+#include "map/path.h" // struct walkpath_data
+#include "map/skill.h" // 'MAX_SKILLTIMERSKILL, struct skill_timerskill, struct skill_unit_group, struct skill_unit_group_tickset
+#include "common/hercules.h"
 
 struct map_session_data;
 struct block_list;
+
+/**
+ * Bitmask values usable as a flag in unit_stopwalking
+ */
+enum unit_stopwalking_flag {
+	STOPWALKING_FLAG_NONE     = 0x00,
+	STOPWALKING_FLAG_FIXPOS   = 0x01, ///< Issue a fixpos packet afterwards
+	STOPWALKING_FLAG_ONESTEP  = 0x02, ///< Force the unit to move one cell if it hasn't yet
+	STOPWALKING_FLAG_NEXTCELL = 0x04, ///< Enable moving to the next cell when unit was already half-way there
+	                                  ///  (may cause on-touch/place side-effects, such as a scripted map change)
+	STOPWALKING_FLAG_MASK     = 0xff, ///< Mask all of the above
+	// Note: Upper bytes are reserved for duration.
+};
 
 struct unit_data {
 	struct block_list *bl;
@@ -43,6 +72,7 @@ struct unit_data {
 		unsigned change_walk_target : 1 ;
 		unsigned skillcastcancel : 1 ;
 		unsigned attack_continue : 1 ;
+		unsigned step_attack : 1;
 		unsigned walk_easy : 1 ;
 		unsigned running : 1;
 		unsigned speed_changed : 1;
@@ -51,13 +81,11 @@ struct unit_data {
 
 struct view_data {
 #ifdef __64BIT__
-	unsigned int class_;
-#endif
-	unsigned short
-#ifndef __64BIT__
-		class_,
-#endif
-		weapon,
+	uint32 class_; // FIXME: This shouldn't really depend on the architecture.
+#else // not __64BIT__
+	uint16 class_;
+#endif // __64BIT__
+	uint16 weapon,
 		shield, //Or left-hand weapon.
 		robe,
 		head_top,
@@ -65,13 +93,11 @@ struct view_data {
 		head_bottom,
 		hair_style,
 		hair_color,
-		cloth_color;
+		cloth_color,
+		body_style;
 	char sex;
 	unsigned dead_sit : 2;
 };
-
-extern const short dirx[8];
-extern const short diry[8];
 
 struct unit_interface {
 	int (*init) (bool minimal);
@@ -125,8 +151,13 @@ struct unit_interface {
 	int (*free) (struct block_list *bl, clr_type clrtype);
 };
 
-struct unit_interface *unit;
+#ifdef HERCULES_CORE
+extern const short dirx[8];
+extern const short diry[8];
 
 void unit_defaults(void);
+#endif // HERCULES_CORE
+
+HPShared struct unit_interface *unit;
 
 #endif /* MAP_UNIT_H */

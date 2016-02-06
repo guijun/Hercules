@@ -1,18 +1,40 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  Euphy
+//= Copyright (C)  Joseph
+//= Copyright (C)  Masao
+//= Copyright (C)  Gepard
+//= Copyright (C)  Muad_Dib
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= Sura Job Quest
-//===== By: ==================================================
-//= Muad_Dib, Gepard
-//===== Current Version: =====================================
-//= 1.3
-//===== Description: =========================================
-//= [Official Conversion]
+//================= Description ===========================================
 //= Job change Quest from Monk / Champion -> Sura.
-//===== Additional Comments: =================================
-//= 1.0 First Version. [Masao]
-//= 1.1 Removed disablenpc which causes players stucked in waitingroom. [Joseph]
-//= 1.2 Updated script, optimized. [Euphy]
-//= 1.3 Added GM management function. [Euphy]
-//============================================================
+//================= Current Version =======================================
+//= 1.3
+//=========================================================================
 
 ve_in,237,125,0	script	King Crab#job_shu	1_M_PAY_ELDER,{
 	if (job_shu == 0) {
@@ -140,7 +162,7 @@ ve_in,237,125,0	script	King Crab#job_shu	1_M_PAY_ELDER,{
 		mes "...";
 		mes ".....";
 		mes "........(cheeks glowing)";
-		set job_shu,1;
+		job_shu = 1;
 		setquest 11155;
 		close;
 	} else {
@@ -214,7 +236,7 @@ OnTimer600000:
 ve_in,97,149,0	script	#Suraryokan	HIDDEN_WARP_NPC,3,3,{
 OnTouch:
 	if (job_shu == 1) {
-		set .@n$, "["+strcharinfo(0)+"]";
+		.@n$ = "["+strcharinfo(0)+"]";
 		mes "[???]";
 		mes "Who is it?!";
 		next;
@@ -263,7 +285,7 @@ OnTouch:
 		next;
 		mes "[???]";
 		mes "What the hell do you want?";
-		set job_shu,2;
+		job_shu = 2;
 		close;
 	}
 	end;
@@ -367,7 +389,7 @@ ve_in,98,159,0	script	Fighter#job_shu	4_F_SURA,{
 			mes "[???]";
 			mes "Okay, then^f57d7d go and kill 100 Desert Wolves.^000000";
 			mes "After that, I'll think about it again.";
-			set job_shu,3;
+			job_shu = 3;
 			changequest 11155,11156;
 			close;
 		case 2:
@@ -377,7 +399,7 @@ ve_in,98,159,0	script	Fighter#job_shu	4_F_SURA,{
 			close;
 		}
 	} else if (job_shu == 3) {
-		if (checkquest(11156,HUNTING) == 2) {
+		if (questprogress(11156,HUNTING) == 2) {
 			mes "[???]";
 			mes "Wow~";
 			mes "Did you really kill all those wolves?";
@@ -393,7 +415,7 @@ ve_in,98,159,0	script	Fighter#job_shu	4_F_SURA,{
 			next;
 			mes "[Bruno]";
 			mes "Tell him that 'Bruno' sent you there and after that, just suit yourself.";
-			set job_shu,4;
+			job_shu = 4;
 			changequest 11156,11157;
 			close;
 		}
@@ -468,7 +490,7 @@ yuno_fild07,254,176,7	script	Buddy#job_shu	4_M_MONK,{
 		next;
 		mes "[Buddy]";
 		mes "This way...";
-		set job_shu,5;
+		job_shu = 5;
 		changequest 11157,11158;
 		close2;
 		warp "sword_1-1",215,244;
@@ -636,10 +658,10 @@ OnTimer315000:
 	end;
 OnTimer320000:
 	mapannounce "sword_2-1","I guess you're not ready to meet the master yet...",bc_map;
+	mapwarp "sword_2-1","yuno_fild07",255,178;
 	donpcevent "#Sura_garajjom::OnDisable";
 	donpcevent "Drawing Room::OnEnable";
-	mapwarp "sword_2-1","yuno_fild07",255,178;
-	stopnpctimer;
+	donpcevent "Buddy#Sura_Salon::OnDisable";
 	end;
 }
 
@@ -752,7 +774,7 @@ sword_1-1,223,167,2	script	Master#job_shu	4_M_SURA,{
 			mes "You can't become a Sura unless you use all your skill points.";
 			close;
 		}
-		if (checkweight(1201,1) == 0 || MaxWeight - Weight < 3500) {
+		if (checkweight(Knife,1) == 0 || MaxWeight - Weight < 3500) {
 			mes "You seem to be heavily burdened. Please remove some of it.";
 			close;
 		}
@@ -794,7 +816,7 @@ sword_1-1,223,167,2	script	Master#job_shu	4_M_SURA,{
 		mes "[Master]";
 		mes "I hope those days will not come but... I'll willingly be the ghost and kill all enemies.";
 		next;
-		if (ismounting()) {
+		if (hascashmount()) {
 			mes "[Master]";
 			mes "So... please get down from your riding pet!";
 			mes "It is a loss of etiquette on this situation.";
@@ -802,11 +824,11 @@ sword_1-1,223,167,2	script	Master#job_shu	4_M_SURA,{
 		}
 		mes "[Master]";
 		mes "You should train yourself steadily until that day.";
-		set job_shu,100;
+		job_shu = 100;
 		jobchange roclass(eaclass()|EAJL_THIRD);
 		completequest 11158;
-		getitem 5754,1; //Blazing_Soul
-		getitem 2795,1; //Green_Apple_Ring
+		getitem Blazing_Soul,1;
+		getitem Green_Apple_Ring,1;
 		close;
 	} else if (job_shu > 5) {
 		mes "Once I was also an ordinary young man who traveled a lot and met many friends.";

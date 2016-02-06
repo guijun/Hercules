@@ -1,36 +1,49 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #define HERCULES_CORE
 
 #include "ipban.h"
 
-#include <stdlib.h>
-#include <string.h>
+#include "login/login.h"
+#include "login/loginlog.h"
+#include "common/cbasetypes.h"
+#include "common/nullpo.h"
+#include "common/sql.h"
+#include "common/strlib.h"
+#include "common/timer.h"
 
-#include "login.h"
-#include "loginlog.h"
-#include "../common/cbasetypes.h"
-#include "../common/db.h"
-#include "../common/malloc.h"
-#include "../common/sql.h"
-#include "../common/socket.h"
-#include "../common/strlib.h"
-#include "../common/timer.h"
+#include <stdlib.h>
 
 // global sql settings
 static char   global_db_hostname[32] = "127.0.0.1";
 static uint16 global_db_port = 3306;
 static char   global_db_username[32] = "ragnarok";
-static char   global_db_password[32] = "ragnarok";
+static char   global_db_password[100] = "ragnarok";
 static char   global_db_database[32] = "ragnarok";
 static char   global_codepage[32] = "";
 // local sql settings
 static char   ipban_db_hostname[32] = "";
 static uint16 ipban_db_port = 0;
 static char   ipban_db_username[32] = "";
-static char   ipban_db_password[32] = "";
+static char   ipban_db_password[100] = "";
 static char   ipban_db_database[32] = "";
 static char   ipban_codepage[32] = "";
 static char   ipban_table[32] = "ipbanlist";
@@ -55,7 +68,7 @@ void ipban_init(void)
 
 	ipban_inited = true;
 
-	if( !login_config.ipban )
+	if (!login->config->ipban)
 		return;// ipban disabled
 
 	if( ipban_db_hostname[0] != '\0' )
@@ -88,10 +101,10 @@ void ipban_init(void)
 	if( codepage[0] != '\0' && SQL_ERROR == SQL->SetEncoding(sql_handle, codepage) )
 		Sql_ShowDebug(sql_handle);
 
-	if( login_config.ipban_cleanup_interval > 0 )
+	if (login->config->ipban_cleanup_interval > 0)
 	{ // set up periodic cleanup of connection history and active bans
 		timer->add_func_list(ipban_cleanup, "ipban_cleanup");
-		cleanup_timer_id = timer->add_interval(timer->gettick()+10, ipban_cleanup, 0, 0, login_config.ipban_cleanup_interval*1000);
+		cleanup_timer_id = timer->add_interval(timer->gettick()+10, ipban_cleanup, 0, 0, login->config->ipban_cleanup_interval*1000);
 	} else // make sure it gets cleaned up on login-server start regardless of interval-based cleanups
 		ipban_cleanup(0,0,0,0);
 }
@@ -99,13 +112,13 @@ void ipban_init(void)
 // finalize
 void ipban_final(void)
 {
-	if( !login_config.ipban )
+	if (!login->config->ipban)
 		return;// ipban disabled
 
-	if( login_config.ipban_cleanup_interval > 0 )
+	if (login->config->ipban_cleanup_interval > 0)
 		// release data
 		timer->delete(cleanup_timer_id, ipban_cleanup);
-	
+
 	ipban_cleanup(0,0,0,0); // always clean up on login-server stop
 
 	// close connections
@@ -118,6 +131,8 @@ bool ipban_config_read(const char* key, const char* value)
 {
 	const char* signature;
 
+	nullpo_ret(key);
+	nullpo_ret(value);
 	if( ipban_inited )
 		return false;// settings can only be changed before init
 
@@ -181,19 +196,19 @@ bool ipban_config_read(const char* key, const char* value)
 	{
 		key += strlen(signature);
 		if( strcmpi(key, "enable") == 0 )
-			login_config.ipban = (bool)config_switch(value);
+			login->config->ipban = (bool)config_switch(value);
 		else
 		if( strcmpi(key, "dynamic_pass_failure_ban") == 0 )
-			login_config.dynamic_pass_failure_ban = (bool)config_switch(value);
+			login->config->dynamic_pass_failure_ban = (bool)config_switch(value);
 		else
 		if( strcmpi(key, "dynamic_pass_failure_ban_interval") == 0 )
-			login_config.dynamic_pass_failure_ban_interval = atoi(value);
+			login->config->dynamic_pass_failure_ban_interval = atoi(value);
 		else
 		if( strcmpi(key, "dynamic_pass_failure_ban_limit") == 0 )
-			login_config.dynamic_pass_failure_ban_limit = atoi(value);
+			login->config->dynamic_pass_failure_ban_limit = atoi(value);
 		else
 		if( strcmpi(key, "dynamic_pass_failure_ban_duration") == 0 )
-			login_config.dynamic_pass_failure_ban_duration = atoi(value);
+			login->config->dynamic_pass_failure_ban_duration = atoi(value);
 		else
 			return false;// not found
 		return true;
@@ -209,7 +224,7 @@ bool ipban_check(uint32 ip)
 	char* data = NULL;
 	int matches;
 
-	if( !login_config.ipban )
+	if (!login->config->ipban)
 		return false;// ipban disabled
 
 	if( SQL_ERROR == SQL->Query(sql_handle, "SELECT count(*) FROM `%s` WHERE `rtime` > NOW() AND (`list` = '%u.*.*.*' OR `list` = '%u.%u.*.*' OR `list` = '%u.%u.%u.*' OR `list` = '%u.%u.%u.%u')",
@@ -220,8 +235,8 @@ bool ipban_check(uint32 ip)
 		return true;
 	}
 
-	if( SQL_ERROR == SQL->NextRow(sql_handle) )
-		return true;// Shouldn't happen, but just in case...
+	if( SQL_SUCCESS != SQL->NextRow(sql_handle) )
+		return false;
 
 	SQL->GetData(sql_handle, 0, &data, NULL);
 	matches = atoi(data);
@@ -235,24 +250,26 @@ void ipban_log(uint32 ip)
 {
 	unsigned long failures;
 
-	if( !login_config.ipban )
+	if (!login->config->ipban)
 		return;// ipban disabled
 
-	failures = loginlog_failedattempts(ip, login_config.dynamic_pass_failure_ban_interval);// how many times failed account? in one ip.
+	failures = loginlog_failedattempts(ip, login->config->dynamic_pass_failure_ban_interval);// how many times failed account? in one ip.
 
 	// if over the limit, add a temporary ban entry
-	if( failures >= login_config.dynamic_pass_failure_ban_limit )
+	if (failures >= login->config->dynamic_pass_failure_ban_limit)
 	{
 		uint8* p = (uint8*)&ip;
-		if( SQL_ERROR == SQL->Query(sql_handle, "INSERT INTO `%s`(`list`,`btime`,`rtime`,`reason`) VALUES ('%u.%u.%u.*', NOW() , NOW() +  INTERVAL %d MINUTE ,'Password error ban')",
-			ipban_table, p[3], p[2], p[1], login_config.dynamic_pass_failure_ban_duration) )
+		if (SQL_ERROR == SQL->Query(sql_handle, "INSERT INTO `%s`(`list`,`btime`,`rtime`,`reason`) VALUES ('%u.%u.%u.*', NOW() , NOW() +  INTERVAL %d MINUTE ,'Password error ban')",
+			ipban_table, p[3], p[2], p[1], login->config->dynamic_pass_failure_ban_duration))
+		{
 			Sql_ShowDebug(sql_handle);
+		}
 	}
 }
 
 // remove expired bans
 int ipban_cleanup(int tid, int64 tick, int id, intptr_t data) {
-	if( !login_config.ipban )
+	if (!login->config->ipban)
 		return 0;// ipban disabled
 
 	if( SQL_ERROR == SQL->Query(sql_handle, "DELETE FROM `%s` WHERE `rtime` <= NOW()", ipban_table) )

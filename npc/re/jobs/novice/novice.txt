@@ -1,27 +1,42 @@
-//===== Hercules Script ======================================
-//= Renewal Novice Training Grounds
-//===== By: ==================================================
-//= Kisuka
-//===== Current Version: =====================================
-//= 1.5
-//===== Description: =========================================
-//= [Official Conversion]
-//= A tutorial for new players starting at new_1-1 (53,111).
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
 //=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  Joseph
+//= Copyright (C)  Euphy
+//= Copyright (C)  Kisuka
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
+//= Renewal Novice Training Grounds
+//================= Description ===========================================
+//= A tutorial for new players starting at new_1-1 (53,111).
 //= This script was replaced by the Izlude Academy in 2012.
-//===== Additional Comments: =================================
-//= 1.0 First version, hand scripted from iRO. [Kisuka]
-//= 1.1 Updated warps, savepoints, NPC locations. [Kisuka]
-//= 1.2 Cleaning. [Euphy]
-//= 1.3 Fixed Eden Group Officer's level requirement. [Joseph]
-//= 1.4 Fixed checkquest to check quest accordingly. [Joseph]
-//= 1.4a Added 'npcskill' command. [Euphy]
-//= 1.5 Replaced with the official kRO scripts. [Euphy]
-//============================================================
+//================= Current Version =======================================
+//= 1.5
+//=========================================================================
 
-// Main NPCs
-//============================================================
--	script	Sprakki#newbe01::NvSprakkiA	-1,{
+//== Main NPCs =============================================
+-	script	Sprakki#newbe01::NvSprakkiA	FAKE_NPC,{
 	if (job_novice_q == 0) {
 		mes "[Sprakki]";
 		mes "Hello there! Welcome to the World of Ragnarok Online. My name is Sprakki and I'm in charge of giving you basic gameplay tips.";
@@ -44,7 +59,7 @@
 		mes "[Sprakki]";
 		mes "Walk over that bridge and there's a castle used as the Training Center.";
 		mes "I will be waiting for you inside of that Castle. Please come to the castle by yourself.";
-		set job_novice_q,1;
+		job_novice_q = 1;
 		setquest 7117;
 		next;
 		cutin "tutorial02",3;
@@ -83,7 +98,7 @@ new_3-1,53,114,3	duplicate(NvSprakkiA)	Sprakki#nv3a	4_F_01
 new_4-1,53,114,3	duplicate(NvSprakkiA)	Sprakki#nv4a	4_F_01
 new_5-1,53,114,3	duplicate(NvSprakkiA)	Sprakki#nv5a	4_F_01
 
--	script	Sprakki#newbe05::NvSprakkiB	-1,{
+-	script	Sprakki#newbe05::NvSprakkiB	FAKE_NPC,{
 	if (job_novice_q == 0) {
 		mes "[Sprakki]";
 		mes "Hello there! Welcome to the World of Ragnarok Online.";
@@ -103,7 +118,7 @@ new_5-1,53,114,3	duplicate(NvSprakkiA)	Sprakki#nv5a	4_F_01
 		mes "[Sprakki]";
 		mes "Well then, I will give you a quest to talk to me.";
 		mes "After the conversation is over, talk to me again by left-clicking on me.";
-		set job_novice_q,1;
+		job_novice_q = 1;
 		setquest 7117;
 		next;
 		cutin "tutorial02",3;
@@ -121,7 +136,7 @@ new_5-1,53,114,3	duplicate(NvSprakkiA)	Sprakki#nv5a	4_F_01
 			mes "[Sprakki]";
 			mes "Great!";
 			mes "Now you know how to move and talk to others, right?";
-			set job_novice_q,2;
+			job_novice_q = 2;
 			getexp 600,5;
 			completequest 7117;
 			next;
@@ -152,19 +167,19 @@ new_5-1,53,114,3	duplicate(NvSprakkiA)	Sprakki#nv5a	4_F_01
 			warp strnpcinfo(4),100,100;
 			end;
 		case 2:
-			set nov_1st_cos,0;
-			set nov_2nd_cos,0;
-			set nov_3_swordman,0;
-			set nov_3_archer,0;
-			set nov_3_thief,0;
-			set nov_3_magician,0;
-			set nov_3_acolyte,0;
-			set nov_3_merchant,0;
+			nov_1st_cos = 0;
+			nov_2nd_cos = 0;
+			nov_3_swordman = 0;
+			nov_3_archer = 0;
+			nov_3_thief = 0;
+			nov_3_magician = 0;
+			nov_3_acolyte = 0;
+			nov_3_merchant = 0;
 			mes "[Sprakki]";
 			mes "Ok, You want to start right away.";
 			mes "Which Town do you want to start at?";
 			next;
-			set .@select, select("Prontera:Morroc:Geffen:Payon:Alberta:Izlude");
+			.@select = select("Prontera:Morroc:Geffen:Payon:Alberta:Izlude");
 			mes "[Sprakki]";
 			mes "I see.";
 			mes "Go ahead and grow stronger! Look toward a brighter future ahead of you.";
@@ -214,7 +229,7 @@ new_3-2,100,29,4	duplicate(NvSprakkiB)	Sprakki#nv3b	4_F_01
 new_4-2,100,29,4	duplicate(NvSprakkiB)	Sprakki#nv4b	4_F_01
 new_5-2,100,29,4	duplicate(NvSprakkiB)	Sprakki#nv5b	4_F_01
 
--	script	Brade#newbe02::NvBradeA	-1,{
+-	script	Brade#newbe02::NvBradeA	FAKE_NPC,{
 	if (job_novice_q < 2) {
 		mes "[Instructor Brade]";
 		mes "Hello there! Welcome to the World of Ragnarok Online.";
@@ -242,16 +257,16 @@ new_5-2,100,29,4	duplicate(NvSprakkiB)	Sprakki#nv5b	4_F_01
 		mes "[Instructor Brade]";
 		mes "First off, try moving around.";
 		mes "After moving around, talk to me again.";
-		set nov_1st_cos,0;
-		set nov_2nd_cos,0;
-		set nov_3_swordman,0;
-		set nov_3_archer,0;
-		set nov_3_thief,0;
-		set nov_3_magician,0;
-		set nov_3_acolyte,0;
-		set nov_3_merchant,0;
-		set treasure_alb,0;
-		set job_novice_q,2;
+		nov_1st_cos = 0;
+		nov_2nd_cos = 0;
+		nov_3_swordman = 0;
+		nov_3_archer = 0;
+		nov_3_thief = 0;
+		nov_3_magician = 0;
+		nov_3_acolyte = 0;
+		nov_3_merchant = 0;
+		treasure_alb = 0;
+		job_novice_q = 2;
 		setquest 7118;
 		next;
 		cutin "tutorial02",3;
@@ -272,7 +287,7 @@ new_5-2,100,29,4	duplicate(NvSprakkiB)	Sprakki#nv5b	4_F_01
 			mes "[Instructor Brade]";
 			mes "Great.";
 			mes "You've completed the given quest successfully, so I will reward you with experience points.";
-			set job_novice_q,3;
+			job_novice_q = 3;
 			getexp 900,10;
 			completequest 7118;
 			next;
@@ -300,14 +315,14 @@ new_5-2,100,29,4	duplicate(NvSprakkiB)	Sprakki#nv5b	4_F_01
 			mes "Take these.";
 			mes "Basic equipments and recovery potions.";
 		}
-		set job_novice_q,4;
-		getitem 2352,1; //Novice_Plate
-		getitem 2510,1; //Novice_Hood
-		getitem 2414,1; //Novice_Boots
-		getitem 5055,1; //Novice_Egg_Cap
-		getitem 1243,1; //Novice_Knife
-		getitem 2112,1; //Novice_Guard
-		getitem 569,300; //Novice_Potion
+		job_novice_q = 4;
+		getitem Novice_Plate,1;
+		getitem Novice_Hood,1;
+		getitem Novice_Boots,1;
+		getitem Novice_Egg_Cap,1;
+		getitem Novice_Knife,1;
+		getitem Novice_Guard,1;
+		getitem Novice_Potion,300;
 		setquest 7119;
 		next;
 		mes "[Instructor Brade]";
@@ -358,10 +373,10 @@ new_5-2,100,29,4	duplicate(NvSprakkiB)	Sprakki#nv5b	4_F_01
 		mes "[Instructor Brade]";
 		mes "You are all set.";
 		mes "You are coming along just fine.";
-		set job_novice_q,5;
+		job_novice_q = 5;
 		getexp 1200,15;
-		getitem 12323,50; //N_Fly_Wing
-		getitem 12324,20; //N_Butterfly_Wing
+		getitem N_Fly_Wing,50;
+		getitem N_Butterfly_Wing,20;
 		completequest 7119;
 		next;
 		mes "[Instructor Brade]";
@@ -429,8 +444,8 @@ new_5-2,100,29,4	duplicate(NvSprakkiB)	Sprakki#nv5b	4_F_01
 		mes "[Instructor Brade]";
 		mes "You've come along fine this far.";
 		mes "This is not much, but take this as a reward.";
-		set job_novice_q,7;
-		getitem 2393,1; //N_Adventurer's_Suit
+		job_novice_q = 7;
+		getitem N_Adventurer's_Suit,1;
 		completequest 7120;
 		close;
 	} else if (job_novice_q == 7) {
@@ -484,7 +499,7 @@ new_3-2,100,105,3	duplicate(NvBradeA)	Brade#nv3a	4_M_JOB_KNIGHT1
 new_4-2,100,105,3	duplicate(NvBradeA)	Brade#nv4a	4_M_JOB_KNIGHT1
 new_5-2,100,105,3	duplicate(NvBradeA)	Brade#nv5a	4_M_JOB_KNIGHT1
 
--	script	Jinha#newbe03::NvJinha	-1,{
+-	script	Jinha#newbe03::NvJinha	FAKE_NPC,{
 	if (job_novice_q < 5) {
 		mes "[Jinha]";
 		mes "What can I help you with?";
@@ -514,7 +529,7 @@ new_5-2,100,105,3	duplicate(NvBradeA)	Brade#nv5a	4_M_JOB_KNIGHT1
 			mes "[Jinha]";
 			mes "Well, you can directly go to the next step of the course.";
 			mes "Go back to Instructor Brade.";
-			set job_novice_q,6;
+			job_novice_q = 6;
 			close;
 		} else {
 			mes "[Jinha]";
@@ -537,8 +552,8 @@ new_5-2,100,105,3	duplicate(NvBradeA)	Brade#nv5a	4_M_JOB_KNIGHT1
 			mes "Hot Key is ^4d4dffALT + S^000000.";
 			mes "Why don't you try the skill?";
 			skill "NV_FIRSTAID",1,0;
-			set skill_nov,3; // Has future uses - do not remove! [Euphy]
-			set job_novice_q,6;
+			skill_nov = 3; // Has future uses - do not remove! [Euphy]
+			job_novice_q = 6;
 			next;
 			mes "[Jinha]";
 			mes "Good, now you know how to use the First Aid Skill, you have to move on to the next step.";
@@ -579,9 +594,8 @@ new_3-2,115,120,3	duplicate(NvJinha)	Jinha#nv3	1_M_ORIENT01
 new_4-2,115,120,3	duplicate(NvJinha)	Jinha#nv4	1_M_ORIENT01
 new_5-2,115,120,3	duplicate(NvJinha)	Jinha#nv5	1_M_ORIENT01
 
-// People/Services in Ragnarok
-//============================================================
--	script	Chocolat#newbe06::NvChocolat	-1,{
+//== People/Services in Ragnarok ===========================
+-	script	Chocolat#newbe06::NvChocolat	FAKE_NPC,{
 	if (job_novice_q < 7) {
 		mes "[Chocolat]";
 		mes "Hmm? Strange.";
@@ -625,7 +639,7 @@ new_5-2,115,120,3	duplicate(NvJinha)	Jinha#nv5	1_M_ORIENT01
 				mes "[Chocolat]";
 				mes "Well then, let's hear from each of them.";
 				mes "Start by talking to the [Kafra] Employee.";
-				set job_novice_q,8;
+				job_novice_q = 8;
 				setquest 7121;
 				next;
 				mes "^4d4dff- You've received a quest from Chocolat.";
@@ -669,7 +683,7 @@ new_5-2,115,120,3	duplicate(NvJinha)	Jinha#nv5	1_M_ORIENT01
 		mes "[Chocolat]";
 		mes "Well then, let's hear from each of them.";
 		mes "Start by talking to the [Kafra] Employee.";
-		set job_novice_q,8;
+		job_novice_q = 8;
 		setquest 7121;
 		close;
 	} else if (job_novice_q == 8) {
@@ -713,11 +727,11 @@ new_5-2,115,120,3	duplicate(NvJinha)	Jinha#nv5	1_M_ORIENT01
 		next;
 		mes "[Chocolat]";
 		mes "Besides these guys, there's many merchants selling various kind of items, so go check them out.";
-		set job_novice_q,12;
+		job_novice_q = 12;
 		completequest 7121;
 		getexp 1800,20;
-		getitem 7059,20; //Cargo_Free_Ticket
-		getitem 7060,30; //Warp_Free_Ticket
+		getitem Cargo_Free_Ticket,20;
+		getitem Warp_Free_Ticket,30;
 		next;
 		mes "[Chocolat]";
 		mes "You've completed all the quests I gave you.";
@@ -732,7 +746,7 @@ new_5-2,115,120,3	duplicate(NvJinha)	Jinha#nv5	1_M_ORIENT01
 		mes "Real Combat Training will be given by Instructor Brade. You met him earlier.";
 		mes "I will send you to the Real Combat Training Field.";
 		close2;
-		set .@map$, "new_"+charat(strnpcinfo(4),4)+"-3";
+		.@map$ = "new_"+charat(strnpcinfo(4),4)+"-3";
 		savepoint .@map$,96,21;
 		warp .@map$,96,21;
 		end;
@@ -750,7 +764,7 @@ new_5-2,115,120,3	duplicate(NvJinha)	Jinha#nv5	1_M_ORIENT01
 			mes "[Chocolat]";
 			mes "I will send you to the Real Combat Training Field.";
 			close2;
-			set .@map$, "new_"+charat(strnpcinfo(4),4)+"-3";
+			.@map$ = "new_"+charat(strnpcinfo(4),4)+"-3";
 			savepoint .@map$,96,21;
 			warp .@map$,96,21;
 			end;
@@ -763,7 +777,7 @@ new_3-2,33,172,4	duplicate(NvChocolat)	Chocolat#nv3	4W_KID
 new_4-2,33,172,4	duplicate(NvChocolat)	Chocolat#nv4	4W_KID
 new_5-2,33,172,4	duplicate(NvChocolat)	Chocolat#nv5	4W_KID
 
--	script	Kafra Employee#newbe07::NvKafra	-1,{
+-	script	Kafra Employee#newbe07::NvKafra	FAKE_NPC,{
 	if (job_novice_q < 8) {
 		mes "[Kafra Employee]";
 		mes "Hello.";
@@ -791,13 +805,13 @@ new_5-2,33,172,4	duplicate(NvChocolat)	Chocolat#nv5	4W_KID
 		callsub L_Services,2; //Storage
 		next;
 		callsub L_Services,3; //Teleport
-		set job_novice_q,9;
+		job_novice_q = 9;
 		next;
 		mes "[Kafra Employee]";
 		mes "Do you want to hear another explanation?";
 		next;
 		while(1) {
-			set .@select, select("About Save:About Storage:About Teleport:About Cart:No More.");
+			.@select = select("About Save:About Storage:About Teleport:About Cart:No More.");
 			if (.@select == 5) {
 				mes "[Kafra Employee]";
 				mes "I hope you are satisfied with my explanation";
@@ -895,7 +909,7 @@ new_5-2,33,172,4	duplicate(NvChocolat)	Chocolat#nv5	4W_KID
 			mes "informed about?";
 			next;
 			while(1) {
-				set .@select, select("About Save:About Storage:About Teleport:About Cart:No More.");
+				.@select = select("About Save:About Storage:About Teleport:About Cart:No More.");
 				if (.@select == 5) {
 					mes "[Kafra Employee]";
 					mes "I hope you are satisfied with my explanation";
@@ -1007,7 +1021,7 @@ new_3-2,30,176,4	duplicate(NvKafra)	Kafra Employee#nv3	4_F_KAFRA1
 new_4-2,30,176,4	duplicate(NvKafra)	Kafra Employee#nv4	4_F_KAFRA1
 new_5-2,30,176,4	duplicate(NvKafra)	Kafra Employee#nv5	4_F_KAFRA1
 
--	script	Cool Event Corp. Staff::NvCool	-1,{
+-	script	Cool Event Corp. Staff::NvCool	FAKE_NPC,{
 	if (job_novice_q < 9) {
 		mes "[Cool Event Corp. Staff]";
 		mes "This is not my turn.";
@@ -1033,7 +1047,7 @@ new_5-2,30,176,4	duplicate(NvKafra)	Kafra Employee#nv5	4_F_KAFRA1
 		next;
 		mes "[Cool Event Corp. Staff]";
 		mes "Mostly all of us wear red coats in the places that the Kafra Employee's don't work in.";
-		set job_novice_q,10;
+		job_novice_q = 10;
 		close;
 	} else {
 		mes "[Cool Event Corp. Staff]";
@@ -1047,7 +1061,7 @@ new_3-2,33,176,4	duplicate(NvCool)	Cool Event Corp. Staff::NvCool3	4_M_ZONDAMAN
 new_4-2,33,176,4	duplicate(NvCool)	Cool Event Corp. Staff::NvCool4	4_M_ZONDAMAN
 new_5-2,33,176,4	duplicate(NvCool)	Cool Event Corp. Staff::NvCool5	4_M_ZONDAMAN
 
--	script	Guide::NvGuide	-1,{
+-	script	Guide::NvGuide	FAKE_NPC,{
 	if (job_novice_q < 10) {
 		mes "[Guide]";
 		mes "It ain't my turn yet.";
@@ -1066,7 +1080,7 @@ new_5-2,33,176,4	duplicate(NvCool)	Cool Event Corp. Staff::NvCool5	4_M_ZONDAMAN
 		mes "[Guide]";
 		mes "If you want to go to your first town, you can ask the Kafra Employee to the left.";
 		mes "You can move there with the Teleport Service.";
-		set job_novice_q,11;
+		job_novice_q = 11;
 		close;
 	} else {
 		mes "[Guide]";
@@ -1101,9 +1115,8 @@ new_3-2,36,176,4	duplicate(NvGuide)	Guide#nv3	8W_SOLDIER
 new_4-2,36,176,4	duplicate(NvGuide)	Guide#nv4	8W_SOLDIER
 new_5-2,36,176,4	duplicate(NvGuide)	Guide#nv5	8W_SOLDIER
 
-// Real Combat Training
-//============================================================
--	script	Brade#newbe04::NvBradeB	-1,{
+//== Real Combat Training ==================================
+-	script	Brade#newbe04::NvBradeB	FAKE_NPC,{
 	if (job_novice_q < 12) {
 		if (job_novice_q < 2) {
 			mes "[Brade]";
@@ -1125,7 +1138,7 @@ new_5-2,36,176,4	duplicate(NvGuide)	Guide#nv5	8W_SOLDIER
 				mes "[Brade]";
 				mes "Then we will start your training.";
 				mes "I'll write down the registration form.";
-				set job_novice_q,12;
+				job_novice_q = 12;
 				close;
 			}
 		} else {
@@ -1144,7 +1157,7 @@ new_5-2,36,176,4	duplicate(NvGuide)	Guide#nv5	8W_SOLDIER
 				mes "[Brade]";
 				mes "Then we will start your training.";
 				mes "I'll write down the registration form.";
-				set job_novice_q,12;
+				job_novice_q = 12;
 				close;
 			}
 		}
@@ -1168,9 +1181,9 @@ new_5-2,36,176,4	duplicate(NvGuide)	Guide#nv5	8W_SOLDIER
 		mes "[Brade]";
 		mes "Then, let's go Poring hunting.";
 		mes "Please hunt 'Poring's on Level 1 of the training grounds.";
-		set job_novice_q,13;
+		job_novice_q = 13;
 		setquest 7122;
-		getitem 569,100; //Novice_Potion
+		getitem Novice_Potion,100;
 		savepoint strnpcinfo(4),96,21;
 		next;
 		mes "^4d4dff- You've received a quest from Instructor Brade.";
@@ -1178,12 +1191,12 @@ new_5-2,36,176,4	duplicate(NvGuide)	Guide#nv5	8W_SOLDIER
 		close2;
 	} else if (job_novice_q < 15) {
 		if (job_novice_q == 13) {
-			if (checkquest(7122,HUNTING) == 2) {
+			if (questprogress(7122,HUNTING) == 2) {
 				mes "[Brade]";
 				mes "You can see it is not so hard, huh?";
 				mes "Nice job.";
-				set job_novice_q,14;
-				getitem 13040,1; //N_Cutter
+				job_novice_q = 14;
+				getitem N_Cutter,1;
 				getexp 3000,30;
 				completequest 7122;
 				next;
@@ -1222,7 +1235,7 @@ new_5-2,36,176,4	duplicate(NvGuide)	Guide#nv5	8W_SOLDIER
 		mes "[Brade]";
 		mes "Equip a manual of the job which you want to experience, and you will be able to use some basic skills of that corresponding job.";
 		mes "Try those skills and decide which job to choose.";
-		set job_novice_q,15;
+		job_novice_q = 15;
 		close;
 	} else {
 		mes "[Brade]";
@@ -1315,7 +1328,7 @@ new_3-3,96,30,4	duplicate(NvBradeB)	Brade#nv3b	4_M_JOB_KNIGHT1
 new_4-3,96,30,4	duplicate(NvBradeB)	Brade#nv4b	4_M_JOB_KNIGHT1
 new_5-3,96,30,4	duplicate(NvBradeB)	Brade#nv5b	4_M_JOB_KNIGHT1
 
--	script	Swordman Guide#newbe10::NvSwordman	-1,{
+-	script	Swordman Guide#newbe10::NvSwordman	FAKE_NPC,{
 	if (job_novice_q < 15) {
 		mes "[Swordman Guildsman]";
 		mes "I won't help you until you finish Brade's instructions.";
@@ -1355,7 +1368,7 @@ new_5-3,96,30,4	duplicate(NvBradeB)	Brade#nv5b	4_M_JOB_KNIGHT1
 		mes "As a Swordman you can advance to a ^8E2323Knight^000000 or ^8E2323Crusader^000000 class as your 2nd class profession.";
 		mes "And just recently third professions have been discovered.";
 		next;
-		if (isequipped(2819) || countitem(2819)) {
+		if (isequipped(2819) || countitem(Swordman_Manual)) {
 			mes "[Swordman Guildsman]";
 			mes "Try the Swordman skills listed in the manual.";
 			mes "Open your skill menu by pressing Alt + S";
@@ -1373,7 +1386,7 @@ new_5-3,96,30,4	duplicate(NvBradeB)	Brade#nv5b	4_M_JOB_KNIGHT1
 			mes "I'll just take any manuals from any other classes you have.";
 			next;
 			callfunc "F_NvErase";
-			getitem 2819,1; //Swordman_Manual
+			getitem Swordman_Manual,1;
 			next;
 			mes "[Swordman Guildsman]";
 			mes "After equipping the Manual, open your Skill menu by pressing ALT+S.";
@@ -1412,8 +1425,8 @@ new_5-3,96,30,4	duplicate(NvBradeB)	Brade#nv5b	4_M_JOB_KNIGHT1
 			end;
 		}
 	case 3:
-		set .@quest, checkquest(7123);
-		if (.@quest == -1) {
+		.@quest = questprogress(7123);
+		if (!.@quest) {
 			mes "[Swordman Guildsman]";
 			mes "You want me to give you a quest?";
 			mes "Umm. Let me see.";
@@ -1432,14 +1445,14 @@ new_5-3,96,30,4	duplicate(NvBradeB)	Brade#nv5b	4_M_JOB_KNIGHT1
 			mes "I'll wait for you here.";
 			mes "Wish you a good luck.";
 			close;
-		} else if (.@quest == 0 || .@quest == 1) {
-			if (checkquest(7123,HUNTING) == 2) {
+		} else if (.@quest == 1) {
+			if (questprogress(7123,HUNTING) == 2) {
 				mes "[Swordman Guildsman]";
 				mes "Great.";
 				mes "I think that you're good enough to be a Swordman.";
 				mes "I'll give you some potions as a reward.";
 				completequest 7123;
-				getitem 569,200; //Novice_Potion
+				getitem Novice_Potion,200;
 				getexp 5000,100;
 				close;
 			} else {
@@ -1475,7 +1488,7 @@ new_3-3,97,41,3	duplicate(NvSwordman)	Swordman Guide#nv3	4_F_JOB_KNIGHT
 new_4-3,97,41,3	duplicate(NvSwordman)	Swordman Guide#nv4	4_F_JOB_KNIGHT
 new_5-3,97,41,3	duplicate(NvSwordman)	Swordman Guide#nv5	4_F_JOB_KNIGHT
 
--	script	Acolyte Guide#newbe10::NvAcolyte	-1,{
+-	script	Acolyte Guide#newbe10::NvAcolyte	FAKE_NPC,{
 	if (job_novice_q < 15) {
 		mes "[Prontera Acolyte]";
 		mes "You look like you are not done with Instructor Brade's lessons.";
@@ -1496,7 +1509,7 @@ new_5-3,97,41,3	duplicate(NvSwordman)	Swordman Guide#nv5	4_F_JOB_KNIGHT
 		mes "[Prontera Acolyte]";
 		mes "^8E2323As an Acolyte, you can upgrade your future job to Priest or Monk^8E2323.";
 		next;
-		if (isequipped(2821) || countitem(2821)) {
+		if (isequipped(2821) || countitem(Acolyte_Manual)) {
 			mes "[Prontera Acolyte]";
 			mes "Try the Acolyte Skills with the manual you have. It will help you understand the job easier.";
 			mes "Open your Skill Tree by pressing ^4d4dffAlt + S^000000 and minimize the window by pressing the ^4d4dff'-'^000000 button on the top right corner of the window to see the available skills.";
@@ -1513,7 +1526,7 @@ new_5-3,97,41,3	duplicate(NvSwordman)	Swordman Guide#nv5	4_F_JOB_KNIGHT
 			mes "I will take away those other job's manuals while you study this one.";
 			next;
 			callfunc "F_NvErase";
-			getitem 2821,1; //Acolyte_Manual
+			getitem Acolyte_Manual,1;
 			next;
 			mes "[Prontera Acolyte]";
 			mes "Make sure to equip the Skill Manual by double-clicking it in the Inventory Window.";
@@ -1565,7 +1578,7 @@ new_3-3,101,41,3	duplicate(NvAcolyte)	Acolyte Guide#nv3	4_F_SISTER
 new_4-3,101,41,3	duplicate(NvAcolyte)	Acolyte Guide#nv4	4_F_SISTER
 new_5-3,101,41,3	duplicate(NvAcolyte)	Acolyte Guide#nv5	4_F_SISTER
 
--	script	Thief Guide#newbe10::NvThief	-1,{
+-	script	Thief Guide#newbe10::NvThief	FAKE_NPC,{
 	if (job_novice_q < 15) {
 		mes "[Thief Guild Member]";
 		mes "You look like you are not done with Instructor Brade's lessons.";
@@ -1591,7 +1604,7 @@ new_5-3,101,41,3	duplicate(NvAcolyte)	Acolyte Guide#nv5	4_F_SISTER
 		mes "[Thief Guild Member]";
 		mes "Thieves can change their jobs to ^8E2323Assassins^000000 or ^8E2323Rogues^000000.";
 		next;
-		if (isequipped(2820) || countitem(2820)) {
+		if (isequipped(2820) || countitem(Thief_Manual)) {
 			mes "[Thief Guild Member]";
 			mes "The class manual can help you understand what it is to be a Thief by using the skills that are essential to all Thieves.";
 			close;
@@ -1607,7 +1620,7 @@ new_5-3,101,41,3	duplicate(NvAcolyte)	Acolyte Guide#nv5	4_F_SISTER
 			mes "I'll just take the other class manuals while I'm at it.";
 			next;
 			callfunc "F_NvErase";
-			getitem 2820,1; //Thief_Manual
+			getitem Thief_Manual,1;
 			next;
 			mes "[Thief Guild Member]";
 			mes "Make sure to equip the Skill Manual by double-clicking it in the Inventory Window.";
@@ -1646,8 +1659,8 @@ new_5-3,101,41,3	duplicate(NvAcolyte)	Acolyte Guide#nv5	4_F_SISTER
 			end;
 		}
 	case 3:
-		set .@quest, checkquest(7127);
-		if (.@quest == -1) {
+		.@quest = questprogress(7127);
+		if (!.@quest) {
 			mes "[Thief Guild Member]";
 			mes "Quests?";
 			mes "Hmm, what will be good for you?";
@@ -1662,13 +1675,13 @@ new_5-3,101,41,3	duplicate(NvAcolyte)	Acolyte Guide#nv5	4_F_SISTER
 			mes "If you equip the Thief manual, you can have the effect of the skill, Double Attack.";
 			mes "Double Attack and Hide are the main skills of the Thief.";
 			close;
-		} else if (.@quest == 0 || .@quest == 1) {
-			if (checkquest(7127,HUNTING) == 2) {
+		} else if (.@quest == 1) {
+			if (questprogress(7127,HUNTING) == 2) {
 				mes "[Thief Guild Member]";
 				mes "You are very strong.";
 				mes "These are not many but let me give you a reward for your effort.";
 				completequest 7127;
-				getitem 12323,50; //N_Fly_Wing
+				getitem N_Fly_Wing,50;
 				getexp 5000,100;
 				close;
 			} else {
@@ -1702,7 +1715,7 @@ new_3-3,105,41,3	duplicate(NvThief)	Thief Guide#nv3	2_M_THIEFMASTER
 new_4-3,105,41,3	duplicate(NvThief)	Thief Guide#nv4	2_M_THIEFMASTER
 new_5-3,105,41,3	duplicate(NvThief)	Thief Guide#nv5	2_M_THIEFMASTER
 
--	script	Merchant Guide#newbe10::NvMerchant	-1,{
+-	script	Merchant Guide#newbe10::NvMerchant	FAKE_NPC,{
 	if (job_novice_q < 15) {
 		mes "[Merchant Guildsman]";
 		mes "You are still in the process of training with sir Brad.";
@@ -1730,7 +1743,7 @@ new_5-3,105,41,3	duplicate(NvThief)	Thief Guide#nv5	2_M_THIEFMASTER
 		mes "^8E2323Merchants can transform to a Blacksmith";
 		mes "^8E2323or an Alchemist^000000 as their second job.";
 		next;
-		if (isequipped(2823) || countitem(2823)) {
+		if (isequipped(2823) || countitem(Merchant_Manual)) {
 			mes "[Merchant Guildsman]";
 			mes "I think you should test Merchant skills before you decide what to do.";
 			close;
@@ -1745,7 +1758,7 @@ new_5-3,105,41,3	duplicate(NvThief)	Thief Guide#nv5	2_M_THIEFMASTER
 			mes "I will take other job manuals from you while I'm at it.";
 			next;
 			callfunc "F_NvErase";
-			getitem 2823,1; //Merchant_Manual
+			getitem Merchant_Manual,1;
 			next;
 			mes "[Merchant Guildsman]";
 			mes "Make sure to equip the Skill Manual by double-clicking it in the Inventory Window.";
@@ -1784,8 +1797,8 @@ new_5-3,105,41,3	duplicate(NvThief)	Thief Guide#nv5	2_M_THIEFMASTER
 			end;
 		}
 	case 3:
-		set .@quest, checkquest(7126);
-		if (.@quest == -1) {
+		.@quest = questprogress(7126);
+		if (!.@quest) {
 			mes "[Merchant Guildsman]";
 			mes "Huh? Quest??";
 			mes "Humm... What would be suited for you...?";
@@ -1799,7 +1812,7 @@ new_5-3,105,41,3	duplicate(NvThief)	Thief Guide#nv5	2_M_THIEFMASTER
 			mes "I will wait for you here.";
 			mes "Good luck!";
 			close;
-		} else if (.@quest == 0 || .@quest == 1) {
+		} else if (.@quest == 1) {
 			if (Zeny >= 300) {
 				mes "[Merchant Guildsman]";
 				mes "Excellent!";
@@ -1816,7 +1829,7 @@ new_5-3,105,41,3	duplicate(NvThief)	Thief Guide#nv5	2_M_THIEFMASTER
 				mes "Alright! What about Phracon?";
 				mes "Phracon is a metallic element which you can use for refining weapons.";
 				completequest 7126;
-				getitem 1010,7; //Phracon
+				getitem Phracon,7;
 				getexp 5000,100;
 				close;
 			} else {
@@ -1858,7 +1871,7 @@ new_3-3,109,41,3	duplicate(NvMerchant)	Merchant Guide#nv3	4W_M_01
 new_4-3,109,41,3	duplicate(NvMerchant)	Merchant Guide#nv4	4W_M_01
 new_5-3,109,41,3	duplicate(NvMerchant)	Merchant Guide#nv5	4W_M_01
 
--	script	Archer Guide#newbe10::NvArcher	-1,{
+-	script	Archer Guide#newbe10::NvArcher	FAKE_NPC,{
 	if (job_novice_q < 15) {
 		mes "[Archer Guildsman]";
 		mes "You are still in the process of training with sir Brade.";
@@ -1887,7 +1900,7 @@ new_5-3,109,41,3	duplicate(NvMerchant)	Merchant Guide#nv5	4W_M_01
 		mes "Besides Hunters, Archers can transform to a Bard, if they are male.";
 		mes "They can transform to a Dancer, if they are female^000000.";
 		next;
-		if (isequipped(2822) || countitem(2822)) {
+		if (isequipped(2822) || countitem(Archer_Manual)) {
 			mes "[Archer Guildsman]";
 			mes "I think you should test Archer skills before you decide what to do.";
 			mes "I can provide you our test skill manual.";
@@ -1904,7 +1917,7 @@ new_5-3,109,41,3	duplicate(NvMerchant)	Merchant Guide#nv5	4W_M_01
 			mes "I will take the other job manuals from you while you test the Archer manual out.";
 			next;
 			callfunc "F_NvErase";
-			getitem 2822,1; //Archer_Manual
+			getitem Archer_Manual,1;
 			next;
 			mes "[Archer Guildsman]";
 			mes "Make sure to equip the Skill Manual by double-clicking it in the Inventory Window.";
@@ -1955,7 +1968,7 @@ new_3-3,113,41,3	duplicate(NvArcher)	Archer Guide#nv3	4_F_JOB_HUNTER
 new_4-3,113,41,3	duplicate(NvArcher)	Archer Guide#nv4	4_F_JOB_HUNTER
 new_5-3,113,41,3	duplicate(NvArcher)	Archer Guide#nv5	4_F_JOB_HUNTER
 
--	script	Mage Guide#newbe10::NvMage	-1,{
+-	script	Mage Guide#newbe10::NvMage	FAKE_NPC,{
 	if (job_novice_q < 15) {
 		mes "[Mage Guild Member]";
 		mes "You are still in the process of training with Instructor Brade.";
@@ -1990,7 +2003,7 @@ new_5-3,113,41,3	duplicate(NvArcher)	Archer Guide#nv5	4_F_JOB_HUNTER
 		mes "^8E2323Mages can transform to Wizards";
 		mes "^8E2323or Sages as their second job^000000.";
 		next;
-		if (isequipped(2824) || countitem(2824)) {
+		if (isequipped(2824) || countitem(Mage_Manual)) {
 			mes "[Mage Guild Member]";
 			mes "I think you should test Mage skills before you decide what to do.";
 			mes "I can provide you with our test skill registration form.";
@@ -2007,7 +2020,7 @@ new_5-3,113,41,3	duplicate(NvArcher)	Archer Guide#nv5	4_F_JOB_HUNTER
 			mes "I will take the other job registration forms and manuals from you.";
 			next;
 			callfunc "F_NvErase";
-			getitem 2824,1; //Mage_Manual
+			getitem Mage_Manual,1;
 			next;
 			mes "[Mage Guild Member]";
 			mes "After equipping the Manual, open your Skill menu by pressing ALT+S.";
@@ -2046,8 +2059,8 @@ new_5-3,113,41,3	duplicate(NvArcher)	Archer Guide#nv5	4_F_JOB_HUNTER
 			end;
 		}
 	case 3:
-		set .@quest, checkquest(7124);
-		if (.@quest == -1) {
+		.@quest = questprogress(7124);
+		if (!.@quest) {
 			mes "[Mage Guild Member]";
 			mes "Huh? Quest?";
 			mes "Hmm... What would be suited for you...?";
@@ -2062,15 +2075,15 @@ new_5-3,113,41,3	duplicate(NvArcher)	Archer Guide#nv5	4_F_JOB_HUNTER
 			mes "I will wait for you here.";
 			mes "Good luck!";
 			close;
-		} else if (.@quest == 0 || .@quest == 1) {
-			if (checkquest(7124,HUNTING) == 2) {
+		} else if (.@quest == 1) {
+			if (questprogress(7124,HUNTING) == 2) {
 				mes "[Mage Guild Member]";
 				mes "You have done an excellent job.";
 				mes "So, did you find any interests about Mages?";
 				mes "Alright. I will give something...";
 				mes "Here are Novice Butterfly Wings, please take them.";
 				completequest 7124;
-				getitem 12324,30; //N_Butterfly_Wing
+				getitem N_Butterfly_Wing,30;
 				getexp 5000,100;
 				close;
 			} else {
@@ -2105,7 +2118,7 @@ new_3-3,117,41,3	duplicate(NvMage)	Mage Guide#nv3	2_F_MAGICMASTER
 new_4-3,117,41,3	duplicate(NvMage)	Mage Guide#nv4	2_F_MAGICMASTER
 new_5-3,117,41,3	duplicate(NvMage)	Mage Guide#nv5	2_F_MAGICMASTER
 
--	script	Bruce#nv::NvBruce	-1,{
+-	script	Bruce#nv::NvBruce	FAKE_NPC,{
 	mes "[Bruce]";
 	mes "Hello?";
 	mes "I'm here to guide you about extra jobs and special classes.";
@@ -2168,10 +2181,9 @@ new_3-3,121,41,3	duplicate(NvBruce)	Bruce#nv3	1_M_LIBRARYMASTER
 new_4-3,121,41,3	duplicate(NvBruce)	Bruce#nv4	1_M_LIBRARYMASTER
 new_5-3,121,41,3	duplicate(NvBruce)	Bruce#nv5	1_M_LIBRARYMASTER
 
-// Eden Group Officer (iRO only)
-//============================================================
+//== Eden Group Officer (iRO only) =========================
 /*
--	script	Eden Group Officer::NvEden	-1,{
+-	script	Eden Group Officer::NvEden	FAKE_NPC,{
 	if (BaseLevel < 10) {
 		mes "[Eden Group Officer]";
 		mes "Hello, I am a representative of the Eden Group.";
@@ -2267,7 +2279,7 @@ S_Warp:
 	savepoint getarg(0),getarg(1),getarg(2);
 	warp getarg(0),getarg(3),getarg(4);
 	end;
-	
+
 OnTouch:
 	emotion e_gasp;
 	end;
@@ -2279,9 +2291,8 @@ new_4-3,97,50,4	duplicate(NvEden)	Eden Group Officer#nv4	4_F_NOVICE,5,5
 new_5-3,97,50,4	duplicate(NvEden)	Eden Group Officer#nv5	4_F_NOVICE,5,5
 */
 
-// Trainer
-//============================================================
--	script	::NvBrutus	-1,{
+//== Trainer ===============================================
+-	script	::NvBrutus	FAKE_NPC,{
 	mes "[Trainer Brutus]";
 	mes "These monsters are all weak and easy to kill. But be careful, a lot of them are aggressive and out for blood!";
 	next;
@@ -2296,12 +2307,12 @@ new_5-3,97,50,4	duplicate(NvEden)	Eden Group Officer#nv5	4_F_NOVICE,5,5
 		mes "[Trainer Brutus]";
 		mes "I see, then let me guide you to another level. Which level do you want to go to?";
 		next;
-		for(set .@i,1; .@i<6; set .@i,.@i+1) {
+		for(.@i = 1; .@i<6; ++.@i) {
 			if (!compare(strnpcinfo(2),"nv"+.@i))
-				set .@menu$, .@menu$+"Send me to Level "+.@i;
-			set .@menu$, .@menu$+":";
+				.@menu$ += "Send me to Level "+.@i;
+			.@menu$ += ":";
 		}
-		set .@i, select(.@menu$+"Cancel");
+		.@i = select(.@menu$+"Cancel");
 		if (.@i < 7)
 			warp "new_"+.@i+"-3",96,21;
 		close;
@@ -2343,8 +2354,7 @@ new_3-3,103,50,4	duplicate(NvBrutus)	Level 3 Trainer#nv3	4_M_02
 new_4-3,103,50,4	duplicate(NvBrutus)	Level 4 Trainer#nv4	4_M_02
 new_5-3,103,50,4	duplicate(NvBrutus)	Level 5 Trainer#nv5	4_M_02
 
-// Monster Spawns
-//============================================================
+//== Monster Spawns ========================================
 new_1-3,0,0,0,0	monster	Poring	1002,20,0,0,0
 new_1-3,0,0,0,0	monster	Drops	1113,10,0,0,0
 new_1-3,0,0,0,0	monster	Lunatic	1063,20,0,0,0
@@ -2369,8 +2379,7 @@ new_5-3,0,0,0,0	monster	Willow	1010,15,0,0,0
 new_5-3,0,0,0,0	monster	Fabre	1184,5,0,0,0
 new_5-3,0,0,0,0	monster	Picky	1049,15,0,0,0
 
-// Potato Merchant
-//============================================================
+//== Potato Merchant =======================================
 -	shop	Potato Merchant#newbe09::NvPotato	4_F_04,516:-1
 
 new_1-3,100,50,3	duplicate(NvPotato)	Potato Merchant#nv1	4_F_04
@@ -2379,9 +2388,8 @@ new_3-3,100,50,3	duplicate(NvPotato)	Potato Merchant#nv3	4_F_04
 new_4-3,100,50,3	duplicate(NvPotato)	Potato Merchant#nv4	4_F_04
 new_5-3,100,50,3	duplicate(NvPotato)	Potato Merchant#nv5	4_F_04
 
-// Random Stuff
-//============================================================
--	script	Bulletin Board::NvBulletin	-1,{
+//== Random Stuff ==========================================
+-	script	Bulletin Board::NvBulletin	FAKE_NPC,{
 	mes "^FF0000=================================";
 	mes "  ^E40CAA[Welcome] ^CC0000to^FF9000Novice^7FFF00 Training^00FF00 Grounds^E40CAA [Welcome] ";
 	mes "^FF0000=================================^000000";
@@ -2393,7 +2401,7 @@ new_3-1,66,114,4	duplicate(NvBulletin)	Bulletin Board#nv3	HIDDEN_NPC
 new_4-1,66,114,4	duplicate(NvBulletin)	Bulletin Board#nv4	HIDDEN_NPC
 new_5-1,66,114,4	duplicate(NvBulletin)	Bulletin Board#nv5	HIDDEN_NPC
 
--	script	Guard::NvGuardA	-1,{
+-	script	Guard::NvGuardA	FAKE_NPC,{
 	mes "[Training Grounds Guard]";
 	mes "Welcome to the Training Grounds.";
 	mes "You are now in the outer court yard. Please go inside the castle to begin your training.";
@@ -2405,7 +2413,7 @@ new_3-1,144,116,2	duplicate(NvGuardA)	Guard#nv3a	8W_SOLDIER
 new_4-1,144,116,2	duplicate(NvGuardA)	Guard#nv4a	8W_SOLDIER
 new_5-1,144,116,2	duplicate(NvGuardA)	Guard#nv5a	8W_SOLDIER
 
--	script	Guard::NvGuardB	-1,{
+-	script	Guard::NvGuardB	FAKE_NPC,{
 	mes "[Training Grounds Guard]";
 	if (rand(2)) {
 		mes "Come in! I would like to welcome you to the Training Grounds!";
@@ -2422,7 +2430,7 @@ new_3-1,144,107,2	duplicate(NvGuardB)	Guard#nv3b	8W_SOLDIER
 new_4-1,144,107,2	duplicate(NvGuardB)	Guard#nv4b	8W_SOLDIER
 new_5-1,144,107,2	duplicate(NvGuardB)	Guard#nv5b	8W_SOLDIER
 
--	script	Instructor#Edwin::NvEdwin	-1,{
+-	script	Instructor#Edwin::NvEdwin	FAKE_NPC,{
 	mes "[Edwin]";
 	mes "Eh? Why are you still here?";
 	mes "There are no more courses that you need to take.";
@@ -2443,25 +2451,24 @@ new_5-2,161,182,5	duplicate(NvEdwin)	Instructor#nv5	4_F_03
 
 function	script	F_NvErase	{
 	if (getarg(0,0)) {
-		if (checkquest(7123) > -1) erasequest 7123;
-		if (checkquest(7124) > -1) erasequest 7124;
-		if (checkquest(7126) > -1) erasequest 7126;
-		if (checkquest(7127) > -1) erasequest 7127;
+		if (questprogress(7123)) erasequest 7123;
+		if (questprogress(7124)) erasequest 7124;
+		if (questprogress(7126)) erasequest 7126;
+		if (questprogress(7127)) erasequest 7127;
 	}
 	nude;
-	setarray .@manuals[0],countitem(2819),countitem(2820),countitem(2821),countitem(2822),countitem(2823),countitem(2824);
-	if (.@manuals[0]) delitem 2819,.@manuals[0]; //Swordman_Manual
-	if (.@manuals[1]) delitem 2820,.@manuals[1]; //Thief_Manual
-	if (.@manuals[2]) delitem 2821,.@manuals[2]; //Acolyte_Manual
-	if (.@manuals[3]) delitem 2822,.@manuals[3]; //Archer_Manual
-	if (.@manuals[4]) delitem 2823,.@manuals[4]; //Merchant_Manual
-	if (.@manuals[5]) delitem 2824,.@manuals[5]; //Mage_Manual
+	setarray .@manuals[0],countitem(Swordman_Manual),countitem(Thief_Manual),countitem(Acolyte_Manual),countitem(Archer_Manual),countitem(Merchant_Manual),countitem(Mage_Manual);
+	if (.@manuals[0]) delitem Swordman_Manual,.@manuals[0];
+	if (.@manuals[1]) delitem Thief_Manual,.@manuals[1];
+	if (.@manuals[2]) delitem Acolyte_Manual,.@manuals[2];
+	if (.@manuals[3]) delitem Archer_Manual,.@manuals[3];
+	if (.@manuals[4]) delitem Merchant_Manual,.@manuals[4];
+	if (.@manuals[5]) delitem Mage_Manual,.@manuals[5];
 	return;
 }
 
-// Pre-Renewal Backwards Compatibility
-//============================================================
--	script	Final Tester::NvHanson	-1,{
+//== Pre-Renewal Backwards Compatibility ===================
+-	script	Final Tester::NvHanson	FAKE_NPC,{
 	if (nov_3_swordman < 40) {
 		mes "[Hanson]";
 		mes "Eh? Weird?";
@@ -2599,11 +2606,11 @@ L_Supplies:
 	next;
 	mes "[Hanson]";
 	mes "Free tickets for Kafra storage and transportation can be used for Kafra storage and teleport services.";
-	set nov_3_swordman,40;
-	getitem 7059,20; //Cargo_Free_Ticket
-	getitem 7060,30; //Warp_Free_Ticket
-	getitem 2393,1; //N_Adventurer's_Suit
-	getitem 13040,1; //N_Cutter
+	nov_3_swordman = 40;
+	getitem Cargo_Free_Ticket,20;
+	getitem Warp_Free_Ticket,30;
+	getitem N_Adventurer's_Suit,1;
+	getitem N_Cutter,1;
 	next;
 	mes "[Hanson]";
 	mes "You will now";
@@ -2659,9 +2666,8 @@ new_3-4,100,29,1	duplicate(NvHanson)	Final Tester#nv3	1_ETC_01
 new_4-4,100,29,1	duplicate(NvHanson)	Final Tester#nv4	1_ETC_01
 new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 
-// Job Test
-//============================================================
--	script	Job Guide Lark::NvLark	-1,{
+//== Job Test ==============================================
+-	script	Job Guide Lark::NvLark	FAKE_NPC,{
 	mes "[Lark]";
 	mes "Have you decided what job you're going to choose?";
 	next;
@@ -2672,7 +2678,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	mes "How about it?";
 	mes "Would you like to take the test?";
 	next;
-	set .@loop,1;
+	.@loop = 1;
 	while(.@loop) {
 		switch(select("Take the test.:What's the test for?:No, thank you.")) {
 		case 1:
@@ -2680,7 +2686,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 			mes "Great!";
 			mes "Let's start the test~";
 			next;
-			set .@loop,0;
+			.@loop = 0;
 			break;
 		case 2:
 			mes "[Lark]";
@@ -2716,23 +2722,23 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Fight against the punks:Cast Magic.:Call for Guards.:Throw rocks at them.")) {
 	case 1:
-		set .@question_01$, "You subdue them easily.";
-		set .@swordman_p, .@swordman_p+1;
-		set .@taekwon_p, .@taekwon_p+1;
-		set .@ninja_p, .@ninja_p+1;
+		.@question_01$ = "You subdue them easily.";
+		++.@swordman_p;
+		++.@taekwon_p;
+		++.@ninja_p;
 		break;
 	case 2:
-		set .@question_01$, "You cast a spell on them.";
-		set .@magician_p, .@magician_p+1;
+		.@question_01$ = "You cast a spell on them.";
+		++.@magician_p;
 		break;
 	case 3:
-		set .@question_01$, "You call for help and Guards come to your aid.";
-		set .@acolyte_p, .@acolyte_p+1;
+		.@question_01$ = "You call for help and Guards come to your aid.";
+		++.@acolyte_p;
 		break;
 	case 4:
-		set .@question_01$, "You skillfully throw rocks at the punks.";
-		set .@archer_p, .@archer_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		.@question_01$ = "You skillfully throw rocks at the punks.";
+		++.@archer_p;
+		++.@gunslinger_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2742,12 +2748,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Man:Woman")) {
 	case 1:
-		set .@question_02_01$, "he";
-		set .@question_02_02$, "son";
+		.@question_02_01$ = "he";
+		.@question_02_02$ = "son";
 		break;
 	case 2:
-		set .@question_02_01$, "she";
-		set .@question_02_02$, "daughter";
+		.@question_02_01$ = "she";
+		.@question_02_02$ = "daughter";
 		break;
 	}
 	mes "[Lark]";
@@ -2756,16 +2762,16 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Delivering an important object:Delivering a small souvenir:Delivering a message")) {
 	case 1:
-		set .@swordman_p, .@swordman_p+1;
-		set .@archer_p, .@archer_p+1;
-		set .@magician_p, .@magician_p+1;
+		++.@swordman_p;
+		++.@archer_p;
+		++.@magician_p;
 		break;
 	case 2:
-		set .@thief_p, .@thief_p+1;
-		set .@taekwon_p, .@taekwon_p+1;
+		++.@thief_p;
+		++.@taekwon_p;
 		break;
 	case 3:
-		set .@acolyte_p, .@acolyte_p+1;
+		++.@acolyte_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2774,31 +2780,31 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Capital city, Prontera:Mountain city, Payon:Port city, Alberta:Magic city, Geffen:Satelite city, Izlude:Desert city, Morocc:Industrial city, Einbroch:World of natural life, Amatsu:Garden city, Hugel")) {
 	case 1:
-		set .@acolyte_p, .@acolyte_p+1;
+		++.@acolyte_p;
 		break;
 	case 2:
-		set .@taekwon_p, .@taekwon_p+1;
+		++.@taekwon_p;
 		break;
 	case 3:
-		set .@merchant_p, .@merchant_p+1;
+		++.@merchant_p;
 		break;
 	case 4:
-		set .@magician_p, .@magician_p+1;
+		++.@magician_p;
 		break;
 	case 5:
-		set .@swordman_p, .@swordman_p+1;
+		++.@swordman_p;
 		break;
 	case 6:
-		set .@thief_p, .@thief_p+1;
+		++.@thief_p;
 		break;
 	case 7:
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@gunslinger_p;
 		break;
 	case 8:
-		set .@ninja_p, .@ninja_p+1;
+		++.@ninja_p;
 		break;
 	case 9:
-		set .@archer_p, .@archer_p+1;
+		++.@archer_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2806,17 +2812,17 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Happening:Not happening.")) {
 	case 1:
-		set .@thief_p, .@thief_p+1;
-		set .@swordman_p, .@swordman_p+1;
-		set .@ninja_p, .@ninja_p+1;
-		set .@taekwon_p, .@taekwon_p+1;
-		set .@magician_p, .@magician_p+1;
-		set .@thief_p, .@thief_p+1;
+		++.@thief_p;
+		++.@swordman_p;
+		++.@ninja_p;
+		++.@taekwon_p;
+		++.@magician_p;
+		++.@thief_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
-		set .@merchant_p, .@merchant_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@acolyte_p;
+		++.@merchant_p;
+		++.@gunslinger_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2825,61 +2831,61 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Study:Exercise:Service:Violence")) {
 	case 1:
-		set .@magician_p, .@magician_p+1;
+		++.@magician_p;
 		break;
 	case 2:
-		set .@thief_p, .@thief_p+1;
-		set .@swordman_p, .@swordman_p+1;
-		set .@taekwon_p, .@taekwon_p+1;
+		++.@thief_p;
+		++.@swordman_p;
+		++.@taekwon_p;
 		break;
 	case 3:
-		set .@acolyte_p, .@acolyte_p+1;
+		++.@acolyte_p;
 		break;
 	case 4:
-		set .@thief_p, .@thief_p+1;
-		set .@ninja_p, .@ninja_p+1;
+		++.@thief_p;
+		++.@ninja_p;
 		break;
 	}
 	switch(select("Change:Preservation")) {
 	case 1:
-		set .@magician_p, .@magician_p+1;
+		++.@magician_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
+		++.@acolyte_p;
 		break;
 	}
 	switch(select("Consumer:Seller:Producer")) {
 	case 1:
-		set .@swordman_p, .@swordman_p+1;
-		set .@thief_p, .@thief_p+1;
-		set .@acolyte_p, .@acolyte_p+1;
-		set .@archer_p, .@archer_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@swordman_p;
+		++.@thief_p;
+		++.@acolyte_p;
+		++.@archer_p;
+		++.@gunslinger_p;
 		break;
 	case 2:
-		set .@merchant_p, .@merchant_p+1;
+		++.@merchant_p;
 		break;
 	case 3:
-		set .@magician_p, .@magician_p+1;
+		++.@magician_p;
 		break;
 	}
 	switch(select("Speed:Caution")) {
 	case 1:
-		set .@thief_p, .@thief_p+1;
-		set .@ninja_p, .@ninja_p+1;
+		++.@thief_p;
+		++.@ninja_p;
 		break;
 	case 2:
-		set .@archer_p, .@archer_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@archer_p;
+		++.@gunslinger_p;
 		break;
 	}
 	switch(select("Theory:Experience")) {
 	case 1:
-		set .@magician_p, .@magician_p+1;
+		++.@magician_p;
 		break;
 	case 2:
-		set .@swordman_p, .@swordman_p+1;
-		set .@taekwon_p, .@taekwon_p+1;
+		++.@swordman_p;
+		++.@taekwon_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2891,11 +2897,11 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@merchant_p, .@merchant_p+1;
-		set .@ninja_p, .@ninja_p+1;
+		++.@merchant_p;
+		++.@ninja_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
+		++.@acolyte_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2903,12 +2909,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@ninja_p, .@ninja_p+1;
-		set .@archer_p, .@archer_p+1;
+		++.@ninja_p;
+		++.@archer_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@acolyte_p;
+		++.@gunslinger_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2916,12 +2922,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@swordman_p, .@swordman_p+1;
-		set .@merchant_p, .@merchant_p+1;
+		++.@swordman_p;
+		++.@merchant_p;
 		break;
 	case 2:
-		set .@magician_p, .@magician_p+1;
-		set .@taekwon_p, .@taekwon_p+1;
+		++.@magician_p;
+		++.@taekwon_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2929,12 +2935,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@taekwon_p, .@taekwon_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@taekwon_p;
+		++.@gunslinger_p;
 		break;
 	case 2:
-		set .@ninja_p, .@ninja_p+1;
-		set .@merchant_p, .@merchant_p+1;
+		++.@ninja_p;
+		++.@merchant_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2942,11 +2948,11 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@magician_p, .@magician_p+1;
+		++.@magician_p;
 		break;
 	case 2:
-		set .@archer_p, .@archer_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@archer_p;
+		++.@gunslinger_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2954,12 +2960,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@merchant_p, .@merchant_p+1;
-		set .@ninja_p, .@ninja_p+1;
+		++.@merchant_p;
+		++.@ninja_p;
 		break;
 	case 2:
-		set .@swordman_p, .@swordman_p+1;
-		set .@thief_p, .@thief_p+1;
+		++.@swordman_p;
+		++.@thief_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2967,12 +2973,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@thief_p, .@thief_p+1;
-		set .@swordman_p, .@swordman_p+1;
+		++.@thief_p;
+		++.@swordman_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
-		set .@taekwon_p, .@taekwon_p+1;
+		++.@acolyte_p;
+		++.@taekwon_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2980,12 +2986,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@magician_p, .@magician_p+1;
-		set .@merchant_p, .@merchant_p+1;
+		++.@magician_p;
+		++.@merchant_p;
 		break;
 	case 2:
-		set .@thief_p, .@thief_p+1;
-		set .@archer_p, .@archer_p+1;
+		++.@thief_p;
+		++.@archer_p;
 		break;
 	}
 	mes "[Lark]";
@@ -2993,12 +2999,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@ninja_p, .@ninja_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@ninja_p;
+		++.@gunslinger_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
-		set .@swordman_p, .@swordman_p+1;
+		++.@acolyte_p;
+		++.@swordman_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3006,12 +3012,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@acolyte_p, .@acolyte_p+1;
-		set .@swordman_p, .@swordman_p+1;
+		++.@acolyte_p;
+		++.@swordman_p;
 		break;
 	case 2:
-		set .@archer_p, .@archer_p+1;
-		set .@ninja_p, .@ninja_p+1;
+		++.@archer_p;
+		++.@ninja_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3019,11 +3025,11 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@thief_p, .@thief_p+1;
-		set .@ninja_p, .@ninja_p+1;
+		++.@thief_p;
+		++.@ninja_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
+		++.@acolyte_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3031,11 +3037,11 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@gunslinger_p, .@gunslinger_p+1;
-		set .@archer_p, .@archer_p+1;
+		++.@gunslinger_p;
+		++.@archer_p;
 		break;
 	case 2:
-		set .@taekwon_p, .@taekwon_p+1;
+		++.@taekwon_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3043,13 +3049,13 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@magician_p, .@magician_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
-		set .@archer_p, .@archer_p+1;
+		++.@magician_p;
+		++.@gunslinger_p;
+		++.@archer_p;
 		break;
 	case 2:
-		set .@taekwon_p, .@taekwon_p+1;
-		set .@magician_p, .@magician_p+1;
+		++.@taekwon_p;
+		++.@magician_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3057,11 +3063,11 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@swordman_p, .@swordman_p+1;
+		++.@swordman_p;
 		break;
 	case 2:
-		set .@thief_p, .@thief_p+1;
-		set .@ninja_p, .@ninja_p+1;
+		++.@thief_p;
+		++.@ninja_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3069,12 +3075,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@archer_p, .@archer_p+1;
-		set .@merchant_p, .@merchant_p+1;
+		++.@archer_p;
+		++.@merchant_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
-		set .@archer_p, .@archer_p+1;
+		++.@acolyte_p;
+		++.@archer_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3082,12 +3088,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@taekwon_p, .@taekwon_p+1;
-		set .@thief_p, .@thief_p+1;
+		++.@taekwon_p;
+		++.@thief_p;
 		break;
 	case 2:
-		set .@archer_p, .@archer_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@archer_p;
+		++.@gunslinger_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3095,12 +3101,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@swordman_p, .@swordman_p+1;
-		set .@merchant_p, .@merchant_p+1;
+		++.@swordman_p;
+		++.@merchant_p;
 		break;
 	case 2:
-		set .@magician_p, .@magician_p+1;
-		set .@thief_p, .@thief_p+1;
+		++.@magician_p;
+		++.@thief_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3108,12 +3114,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@gunslinger_p, .@gunslinger_p+1;
-		set .@archer_p, .@archer_p+1;
+		++.@gunslinger_p;
+		++.@archer_p;
 		break;
 	case 2:
-		set .@acolyte_p, .@acolyte_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@acolyte_p;
+		++.@gunslinger_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3121,12 +3127,12 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@thief_p, .@thief_p+1;
-		set .@gunslinger_p, .@gunslinger_p+1;
+		++.@thief_p;
+		++.@gunslinger_p;
 		break;
 	case 2:
-		set .@gunslinger_p, .@gunslinger_p+1;
-		set .@merchant_p, .@merchant_p+1;
+		++.@gunslinger_p;
+		++.@merchant_p;
 		break;
 	}
 	mes "[Lark]";
@@ -3134,11 +3140,11 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(select("Yes:No")) {
 	case 1:
-		set .@magician_p, .@magician_p+1;
+		++.@magician_p;
 		break;
 	case 2:
-		set .@ninja_p, .@ninja_p+1;
-		set .@archer_p, .@archer_p+1;
+		++.@ninja_p;
+		++.@archer_p;
 		break;
 	}
 
@@ -3146,14 +3152,14 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	// In the official script, higher .@who_job value always wins in a tie.
 	setarray .@points[0],
 		.@swordman_p, .@magician_p, .@archer_p, .@merchant_p, .@thief_p, .@acolyte_p, .@taekwon_p, .@gunslinger_p, .@ninja_p;
-	set .@max, .@points[0];
-	for(set .@i,1; .@i<9; set .@i,.@i+1) {
+	.@max = .@points[0];
+	for(.@i = 1; .@i<9; ++.@i) {
 		if (.@points[.@i] >= .@max) {
-			set .@max, .@points[.@i];
-			set .@ele, .@i;
+			.@max = .@points[.@i];
+			.@ele = .@i;
 		}
 	}
-	set .@who_job, .@ele+1; // To match the official script's numbering.
+	.@who_job = .@ele+1; // To match the official script's numbering.
 
 	mes "[Lark]";
 	mes "Thank you, have a long life.";
@@ -3169,7 +3175,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 	next;
 	switch(.@who_job) {
 	case 1:
-		set .@job$, "Swordman";
+		.@job$ = "Swordman";
 		mes "[Lark]";
 		mes "...simple and straightforward...";
 		mes "...strong beliefs can affect the world...";
@@ -3179,7 +3185,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		next;
 		break;
 	case 2:
-		set .@job$, "Wizard";
+		.@job$ = "Wizard";
 		mes "[Lark]";
 		mes "...to understand all these things alone deulmyeo...";
 		mes "...hard work and independent thinking...";
@@ -3189,7 +3195,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		next;
 		break;
 	case 3:
-		set .@job$, "Archer";
+		.@job$ = "Archer";
 		mes "[Lark]";
 		mes "...immeasurable, have many emotions...";
 		mes "...to people who are trying to understand...";
@@ -3200,7 +3206,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		next;
 		break;
 	case 4:
-		set .@job$, "Merchant";
+		.@job$ = "Merchant";
 		mes "[Lark]";
 		mes "...to identify people's sense of hearing...";
 		mes "...outstanding determination and goals...";
@@ -3209,7 +3215,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		next;
 		break;
 	case 5:
-		set .@job$, "Thief";
+		.@job$ = "Thief";
 		mes "[Lark]";
 		mes "...always makes life fun and who wants...";
 		mes "...always trying to find a new job...";
@@ -3219,7 +3225,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		next;
 		break;
 	case 6:
-		set .@job$, "Acolyte";
+		.@job$ = "Acolyte";
 		mes "[Lark]";
 		mes "...mentality makes him warm and considerate for others...";
 		mes "I know I have loved anyone,...";
@@ -3229,7 +3235,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		next;
 		break;
 	case 7:
-		set .@job$, "Taekwon Boy/Girl";
+		.@job$ = "Taekwon Boy/Girl";
 		mes "[Lark]";
 		mes "...to believe with a stubborn conviction...";
 		mes "...heart and spirit of the grassland is consistent: it...";
@@ -3240,7 +3246,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		next;
 		break;
 	case 8:
-		set .@job$, "Gunslinger";
+		.@job$ = "Gunslinger";
 		mes "[Lark]";
 		mes "People often praised Justice.";
 		mes "Sometimes fear and confusion may exist...";
@@ -3250,7 +3256,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		next;
 		break;
 	case 9:
-		set .@job$, "Ninja";
+		.@job$ = "Ninja";
 		mes "[Lark]";
 		mes "...to avoid the type of self-aspiring...";
 		mes "...married to a prominent goal and quietly avoiding...";
@@ -3297,7 +3303,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		mes "[Lark]";
 		mes "Yes, sir. Please select your desired job.";
 		next;
-		set .@who_job, select("Swordman:Wizard:Archer:Merchant:Thief:Acolyte:Taekwon Boy/Girl:Gunslinger:Ninja:I'll think again.");
+		.@who_job = select("Swordman:Wizard:Archer:Merchant:Thief:Acolyte:Taekwon Boy/Girl:Gunslinger:Ninja:I'll think again.");
 		if (.@who_job == 10) {
 			mes "[Lark]";
 			mes "The Novice Training Center has a lot of sea experience, please pay attention along the way.";
@@ -3306,7 +3312,7 @@ new_5-4,100,29,1	duplicate(NvHanson)	Final Tester#nv5	1_ETC_01
 		break;
 	}
 	callfunc "F_NvErase",1;
-	set .@str$, "^A62A2A'"+strcharinfo(0)+"^000000'! Take care and may Freya bless you on your journey.";
+	.@str$ = "^A62A2A'"+strcharinfo(0)+"^000000'! Take care and may Freya bless you on your journey.";
 	switch(.@who_job) {
 	case 1:
 		mes "[Lark]";

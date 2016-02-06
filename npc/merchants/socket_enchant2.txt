@@ -1,20 +1,41 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  Euphy
+//= Copyright (C)  L0ne_W0lf
+//= Copyright (C)  Gepard
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= Episode 12 Socket Enchant NPC
-//===== By: ==================================================
-//= Gepard
-//===== Current Version: =====================================
-//= 1.1a
-//===== Description: =========================================
-//= [Official Conversion]
+//================= Description ===========================================
 //= Adds slots to selected weapons and armor.
-//===== Additional Comments: =================================
-//= 1.0 First version.
-//= 1.1 Duplicates now spawn from floating NPCs. [L0ne_W0lf]
-//= 1.1a Added 'disable_items' command. [Euphy]
-//============================================================
+//================= Current Version =======================================
+//= 1.1a
+//=========================================================================
 
--	script	Leablem#dummy::SocketEnchant2	-1,{
-	if (checkweight(1201,1) == 0)
+-	script	Leablem#dummy::SocketEnchant2	FAKE_NPC,{
+	if (checkweight(Knife,1) == 0)
 	{
 		mes "- Wait a minute !! -";
 		mes "- Currently you're carrying -";
@@ -169,10 +190,10 @@
 					mes "A class? You seem to want little too much. But, no problem.";
 					mes "So, what kind of armor do you have?";
 					next;
-					switch(select("Pirate Bandana:Black Leather Boots"))
-					{
+					switch (select("Pirate Bandana:Black Leather Boots"+(RENEWAL?":Special Ninja Suit":""))) {
 						case 1: callfunc "Func_Socket2",2287,5350,50,61,500,985,1; // 50,61 - it's not a typo
 						case 2: callfunc "Func_Socket2",2425,2434,40,51,500,985,1;
+						case 3: callfunc "Func_Socket2",15053,15056,50,61,500,985,1;
 					}
 				case 4:
 					mes "[Leablem]";
@@ -271,13 +292,13 @@
 					mes "We don't have time to waste,";
 					mes "so let's get down to business right away.";
 					next;
-					if ((Zeny > 199999999) && (countitem(969) > 1) && (countitem(5022) > 0))
+					if ((Zeny > 199999999) && (countitem(Gold) > 1) && (countitem(Helm_Of_Sun) > 0))
 					{
 						mes "[Leablem]";
 						mes "Shall we start now?";
 						mes "Pray to your gods for good luck.";
 						next;
-						set .@a, rand(1,100);
+						.@a = rand(1,100);
 						if ((.@a > 4) && (.@a < 95))
 						{
 							specialeffect EF_LORD;
@@ -285,10 +306,10 @@
 							mes "Excellent! Wow, I guess the 90% success chance is true!";
 							mes "Look, the slot was added in the perfect place.";
 							mes "Congratulations.";
-							delitem 5022,1; //Helm_Of_Sun
-							delitem 969,2; //Gold
+							delitem Helm_Of_Sun,1;
+							delitem Gold,2;
 							Zeny -= 200000000;
-							getitem 5353,1; //Helm_Of_Sun_
+							getitem Helm_Of_Sun_,1;
 							next;
 							mes "[Leablem]";
 							mes "This is the first and last time I will do this for you.";
@@ -304,8 +325,8 @@
 							mes "My god, I guess we had the worst kind of luck...";
 							mes "What should we do? ...This is why";
 							mes "I didn't want to do in the first place!";
-							delitem 5022,1; //Helm_Of_Sun
-							delitem 969,2; //Gold
+							delitem Helm_Of_Sun,1;
+							delitem Gold,2;
 							Zeny -= 200000000;
 							next;
 							mes "[Leablem]";
@@ -417,7 +438,7 @@ function	script	Func_Socket2	{
 				mes "Alright then, let the work begin!";
 				mes "You'd better pray for a successful result.";
 				next;
-				set .@a, rand(1,100);
+				.@a = rand(1,100);
 				if ((.@a > getarg(2)) && (.@a < getarg(3)))
 				{
 					specialeffect EF_LORD;

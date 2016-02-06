@@ -1,5 +1,6 @@
 /* ----------------------------------------------------------------------------
    libconfig - A library for processing structured configuration files
+   Copyright (C) 2013-2015  Hercules Dev Team
    Copyright (C) 2005-2010  Mark A Lindner
 
    This file is part of libconfig.
@@ -40,7 +41,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#define PATH_TOKENS ":./"
+#define PATH_TOKENS ":/"
 #define CHUNK_SIZE 16
 #define FLOAT_PRECISION 10
 
@@ -537,12 +538,13 @@ static int __config_validate_name(const char *name)
   if(*p == '\0')
     return(CONFIG_FALSE);
 
-  if(! isalpha((int)*p) && (*p != '*'))
+  if(! isalpha((int)*p) && !isdigit((int)*p) && (*p != '*')) {
     return(CONFIG_FALSE);
+  }
 
   for(++p; *p; ++p)
   {
-    if(! (isalpha((int)*p) || isdigit((int)*p) || strchr("*_-'", (int)*p)))
+    if(! (isalpha((int)*p) || isdigit((int)*p) || strchr("*_-'.", (int)*p)))
       return(CONFIG_FALSE);
   }
 

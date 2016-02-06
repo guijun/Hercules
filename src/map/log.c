@@ -1,27 +1,45 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #define HERCULES_CORE
 
 #include "log.h"
+
+#include "map/battle.h"
+#include "map/itemdb.h"
+#include "map/map.h"
+#include "map/mob.h"
+#include "map/pc.h"
+#include "common/cbasetypes.h"
+#include "common/nullpo.h"
+#include "common/showmsg.h"
+#include "common/sql.h" // SQL_INNODB
+#include "common/strlib.h"
+#include "common/HPM.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "battle.h"
-#include "itemdb.h"
-#include "map.h"
-#include "mob.h"
-#include "pc.h"
-#include "../common/cbasetypes.h"
-#include "../common/nullpo.h"
-#include "../common/showmsg.h"
-#include "../common/sql.h" // SQL_INNODB
-#include "../common/strlib.h"
-
 struct log_interface log_s;
+struct log_interface *logs;
 
 /// obtain log type character for item/zeny logs
 char log_picktype2char(e_log_pick_type type) {
@@ -44,14 +62,13 @@ char log_picktype2char(e_log_pick_type type) {
 		case LOG_TYPE_BUYING_STORE:     return 'B';  // (B)uying Store
 		case LOG_TYPE_LOOT:             return 'L';  // (L)oot (consumed monster pick/drop)
 		case LOG_TYPE_BANK:             return 'K';  // Ban(K) Transactions
-		case LOG_TYPE_OTHER:			return 'X';  // Other
+		case LOG_TYPE_OTHER:            return 'X';  // Other
 	}
 
 	// should not get here, fallback
 	ShowDebug("log_picktype2char: Unknown pick type %d.\n", type);
 	return 'X';
 }
-
 
 /// obtain log type character for chat logs
 char log_chattype2char(e_log_chat_type type) {
@@ -67,7 +84,6 @@ char log_chattype2char(e_log_chat_type type) {
 	ShowDebug("log_chattype2char: Unknown chat type %d.\n", type);
 	return 'O';
 }
-
 
 /// check if this item should be logged according the settings
 bool should_log_item(int nameid, int amount, int refine, struct item_data *id) {
@@ -95,6 +111,8 @@ bool should_log_item(int nameid, int amount, int refine, struct item_data *id) {
 }
 void log_branch_sub_sql(struct map_session_data* sd) {
 	SqlStmt* stmt;
+
+	nullpo_retv(sd);
 	stmt = SQL->StmtMalloc(logs->mysql_handle);
 	if( SQL_SUCCESS != SQL->StmtPrepare(stmt, LOG_QUERY " INTO `%s` (`branch_date`, `account_id`, `char_id`, `char_name`, `map`) VALUES (NOW(), '%d', '%d', ?, '%s')", logs->config.log_branch, sd->status.account_id, sd->status.char_id, mapindex_id2name(sd->mapindex) )
 	   ||  SQL_SUCCESS != SQL->StmtBindParam(stmt, 0, SQLDT_STRING, sd->status.name, strnlen(sd->status.name, NAME_LENGTH))
@@ -110,7 +128,8 @@ void log_branch_sub_txt(struct map_session_data* sd) {
 	char timestring[255];
 	time_t curtime;
 	FILE* logfp;
-	
+
+	nullpo_retv(sd);
 	if( ( logfp = fopen(logs->config.log_branch, "a") ) == NULL )
 		return;
 	time(&curtime);
@@ -129,11 +148,12 @@ void log_branch(struct map_session_data* sd) {
 	logs->branch_sub(sd);
 }
 void log_pick_sub_sql(int id, int16 m, e_log_pick_type type, int amount, struct item* itm, struct item_data *data) {
+	nullpo_retv(itm);
 	if( SQL_ERROR == SQL->Query(logs->mysql_handle,
 	    LOG_QUERY " INTO `%s` (`time`, `char_id`, `type`, `nameid`, `amount`, `refine`, `card0`, `card1`, `card2`, `card3`, `map`, `unique_id`) "
 	    "VALUES (NOW(), '%d', '%c', '%d', '%d', '%d', '%d', '%d', '%d', '%d', '%s', '%"PRIu64"')",
 	    logs->config.log_pick, id, logs->picktype2char(type), itm->nameid, amount, itm->refine, itm->card[0], itm->card[1], itm->card[2], itm->card[3],
-	    map->list[m].name?map->list[m].name:"", itm->unique_id)
+	    map->list[m].name, itm->unique_id)
 	) {
 		Sql_ShowDebug(logs->mysql_handle);
 		return;
@@ -143,14 +163,15 @@ void log_pick_sub_txt(int id, int16 m, e_log_pick_type type, int amount, struct 
 	char timestring[255];
 	time_t curtime;
 	FILE* logfp;
-	
+
+	nullpo_retv(itm);
 	if( ( logfp = fopen(logs->config.log_pick, "a") ) == NULL )
 		return;
 	time(&curtime);
 	strftime(timestring, sizeof(timestring), "%m/%d/%Y %H:%M:%S", localtime(&curtime));
 	fprintf(logfp,"%s - %d\t%c\t%d,%d,%d,%d,%d,%d,%d,%s,'%"PRIu64"'\n",
 	        timestring, id, logs->picktype2char(type), itm->nameid, amount, itm->refine, itm->card[0], itm->card[1], itm->card[2], itm->card[3],
-		map->list[m].name?map->list[m].name:"", itm->unique_id);
+		map->list[m].name, itm->unique_id);
 	fclose(logfp);
 }
 /// logs item transactions (generic)
@@ -169,16 +190,19 @@ void log_pick(int id, int16 m, e_log_pick_type type, int amount, struct item* it
 /// logs item transactions (players)
 void log_pick_pc(struct map_session_data* sd, e_log_pick_type type, int amount, struct item* itm, struct item_data *data) {
 	nullpo_retv(sd);
+	nullpo_retv(itm);
 	log_pick(sd->status.char_id, sd->bl.m, type, amount, itm, data ? data : itemdb->exists(itm->nameid));
 }
-
 
 /// logs item transactions (monsters)
 void log_pick_mob(struct mob_data* md, e_log_pick_type type, int amount, struct item* itm, struct item_data *data) {
 	nullpo_retv(md);
+	nullpo_retv(itm);
 	log_pick(md->class_, md->bl.m, type, amount, itm, data ? data : itemdb->exists(itm->nameid));
 }
 void log_zeny_sub_sql(struct map_session_data* sd, e_log_pick_type type, struct map_session_data* src_sd, int amount) {
+	nullpo_retv(sd);
+	nullpo_retv(src_sd);
 	if( SQL_ERROR == SQL->Query(logs->mysql_handle, LOG_QUERY " INTO `%s` (`time`, `char_id`, `src_id`, `type`, `amount`, `map`) VALUES (NOW(), '%d', '%d', '%c', '%d', '%s')",
 							   logs->config.log_zeny, sd->status.char_id, src_sd->status.char_id, logs->picktype2char(type), amount, mapindex_id2name(sd->mapindex)) )
 	{
@@ -190,7 +214,9 @@ void log_zeny_sub_txt(struct map_session_data* sd, e_log_pick_type type, struct 
 	char timestring[255];
 	time_t curtime;
 	FILE* logfp;
-	
+
+	nullpo_retv(sd);
+	nullpo_retv(src_sd);
 	if( ( logfp = fopen(logs->config.log_zeny, "a") ) == NULL )
 		return;
 	time(&curtime);
@@ -209,6 +235,8 @@ void log_zeny(struct map_session_data* sd, e_log_pick_type type, struct map_sess
 	logs->zeny_sub(sd,type,src_sd,amount);
 }
 void log_mvpdrop_sub_sql(struct map_session_data* sd, int monster_id, int* log_mvp) {
+	nullpo_retv(sd);
+	nullpo_retv(log_mvp);
 	if( SQL_ERROR == SQL->Query(logs->mysql_handle, LOG_QUERY " INTO `%s` (`mvp_date`, `kill_char_id`, `monster_id`, `prize`, `mvpexp`, `map`) VALUES (NOW(), '%d', '%d', '%d', '%d', '%s') ",
 							   logs->config.log_mvpdrop, sd->status.char_id, monster_id, log_mvp[0], log_mvp[1], mapindex_id2name(sd->mapindex)) )
 	{
@@ -220,7 +248,9 @@ void log_mvpdrop_sub_txt(struct map_session_data* sd, int monster_id, int* log_m
 	char timestring[255];
 	time_t curtime;
 	FILE* logfp;
-	
+
+	nullpo_retv(sd);
+	nullpo_retv(log_mvp);
 	if( ( logfp = fopen(logs->config.log_mvpdrop,"a") ) == NULL )
 		return;
 	time(&curtime);
@@ -241,7 +271,9 @@ void log_mvpdrop(struct map_session_data* sd, int monster_id, int* log_mvp)
 
 void log_atcommand_sub_sql(struct map_session_data* sd, const char* message) {
 	SqlStmt* stmt;
-	
+
+	nullpo_retv(sd);
+	nullpo_retv(message);
 	stmt = SQL->StmtMalloc(logs->mysql_handle);
 	if( SQL_SUCCESS != SQL->StmtPrepare(stmt, LOG_QUERY " INTO `%s` (`atcommand_date`, `account_id`, `char_id`, `char_name`, `map`, `command`) VALUES (NOW(), '%d', '%d', ?, '%s', ?)", logs->config.log_gm, sd->status.account_id, sd->status.char_id, mapindex_id2name(sd->mapindex) )
 	   ||  SQL_SUCCESS != SQL->StmtBindParam(stmt, 0, SQLDT_STRING, sd->status.name, strnlen(sd->status.name, NAME_LENGTH))
@@ -258,7 +290,9 @@ void log_atcommand_sub_txt(struct map_session_data* sd, const char* message) {
 	char timestring[255];
 	time_t curtime;
 	FILE* logfp;
-	
+
+	nullpo_retv(sd);
+	nullpo_retv(message);
 	if( ( logfp = fopen(logs->config.log_gm, "a") ) == NULL )
 		return;
 	time(&curtime);
@@ -280,6 +314,9 @@ void log_atcommand(struct map_session_data* sd, const char* message)
 
 void log_npc_sub_sql(struct map_session_data *sd, const char *message) {
 	SqlStmt* stmt;
+
+	nullpo_retv(sd);
+	nullpo_retv(message);
 	stmt = SQL->StmtMalloc(logs->mysql_handle);
 	if( SQL_SUCCESS != SQL->StmtPrepare(stmt, LOG_QUERY " INTO `%s` (`npc_date`, `account_id`, `char_id`, `char_name`, `map`, `mes`) VALUES (NOW(), '%d', '%d', ?, '%s', ?)", logs->config.log_npc, sd->status.account_id, sd->status.char_id, mapindex_id2name(sd->mapindex) )
 	   ||  SQL_SUCCESS != SQL->StmtBindParam(stmt, 0, SQLDT_STRING, sd->status.name, strnlen(sd->status.name, NAME_LENGTH))
@@ -296,7 +333,9 @@ void log_npc_sub_txt(struct map_session_data *sd, const char *message) {
 	char timestring[255];
 	time_t curtime;
 	FILE* logfp;
-	
+
+	nullpo_retv(sd);
+	nullpo_retv(message);
 	if( ( logfp = fopen(logs->config.log_npc, "a") ) == NULL )
 		return;
 	time(&curtime);
@@ -315,9 +354,25 @@ void log_npc(struct map_session_data* sd, const char* message)
 	logs->npc_sub(sd,message);
 }
 
-void log_chat_sub_sql(e_log_chat_type type, int type_id, int src_charid, int src_accid, const char *mapname, int x, int y, const char* dst_charname, const char* message) {
+/**
+ * Logs a chat message to the SQL backend.
+ *
+ * @param type         Chat type.
+ * @param type_id      Additional ID, dependent on chat type (Guild ID, Party ID, etc). Zero when unused.
+ * @param src_charid   Source character ID.
+ * @param src_accid    Source account ID.
+ * @param mapname      Source location map name
+ * @param x            Source location x coordinate
+ * @param y            Source location y coordinate
+ * @param dst_charname Destination character name. Must not be NULL.
+ * @param message      Message to log.
+ */
+void log_chat_sub_sql(e_log_chat_type type, int type_id, int src_charid, int src_accid, const char *mapname, int x, int y, const char *dst_charname, const char *message)
+{
 	SqlStmt* stmt;
-	
+
+	nullpo_retv(dst_charname);
+	nullpo_retv(message);
 	stmt = SQL->StmtMalloc(logs->mysql_handle);
 	if( SQL_SUCCESS != SQL->StmtPrepare(stmt, LOG_QUERY " INTO `%s` (`time`, `type`, `type_id`, `src_charid`, `src_accountid`, `src_map`, `src_map_x`, `src_map_y`, `dst_charname`, `message`) VALUES (NOW(), '%c', '%d', '%d', '%d', '%s', '%d', '%d', ?, ?)", logs->config.log_chat, logs->chattype2char(type), type_id, src_charid, src_accid, mapname, x, y)
 	 || SQL_SUCCESS != SQL->StmtBindParam(stmt, 0, SQLDT_STRING, (char*)dst_charname, safestrnlen(dst_charname, NAME_LENGTH))
@@ -330,11 +385,29 @@ void log_chat_sub_sql(e_log_chat_type type, int type_id, int src_charid, int src
 	}
 	SQL->StmtFree(stmt);
 }
-void log_chat_sub_txt(e_log_chat_type type, int type_id, int src_charid, int src_accid, const char *mapname, int x, int y, const char* dst_charname, const char* message) {
+
+/**
+ * Logs a chat message to the TXT backend.
+ *
+ * @param type         Chat type.
+ * @param type_id      Additional ID, dependent on chat type (Guild ID, Party ID, etc). Zero when unused.
+ * @param src_charid   Source character ID.
+ * @param src_accid    Source account ID.
+ * @param mapname      Source location map name
+ * @param x            Source location x coordinate
+ * @param y            Source location y coordinate
+ * @param dst_charname Destination character name. Must not be NULL.
+ * @param message      Message to log.
+ */
+void log_chat_sub_txt(e_log_chat_type type, int type_id, int src_charid, int src_accid, const char *mapname, int x, int y, const char *dst_charname, const char *message)
+{
 	char timestring[255];
 	time_t curtime;
 	FILE* logfp;
-	
+
+	nullpo_retv(mapname);
+	nullpo_retv(dst_charname);
+	nullpo_retv(message);
 	if( ( logfp = fopen(logs->config.log_chat, "a") ) == NULL )
 		return;
 	time(&curtime);
@@ -343,17 +416,33 @@ void log_chat_sub_txt(e_log_chat_type type, int type_id, int src_charid, int src
 	fclose(logfp);
 }
 
-/// logs chat
-void log_chat(e_log_chat_type type, int type_id, int src_charid, int src_accid, const char *mapname, int x, int y, const char* dst_charname, const char* message) {
-	if( ( logs->config.chat&type ) == 0 ) {
+/**
+ * Logs a chat message.
+ *
+ * @param type         Chat type.
+ * @param type_id      Additional ID, dependent on chat type (Guild ID, Party ID, etc). Zero when unused.
+ * @param src_charid   Source character ID.
+ * @param src_accid    Source account ID.
+ * @param mapname      Source location map name
+ * @param x            Source location x coordinate
+ * @param y            Source location y coordinate
+ * @param dst_charname Destination character name. May be NULL when unused.
+ * @param message      Message to log.
+ */
+void log_chat(e_log_chat_type type, int type_id, int src_charid, int src_accid, const char *mapname, int x, int y, const char *dst_charname, const char *message)
+{
+	if ((logs->config.chat&type) == 0) {
 		// disabled
 		return;
 	}
 
-	if( logs->config.log_chat_woe_disable && ( map->agit_flag || map->agit2_flag ) ) {
+	if (logs->config.log_chat_woe_disable && (map->agit_flag || map->agit2_flag)) {
 		// no chat logging during woe
 		return;
 	}
+
+	if (dst_charname == NULL)
+		dst_charname = "";
 
 	logs->chat_sub(type,type_id,src_charid,src_accid,mapname,x,y,dst_charname,message);
 }
@@ -361,13 +450,13 @@ void log_chat(e_log_chat_type type, int type_id, int src_charid, int src_accid, 
 void log_sql_init(void) {
 	// log db connection
 	logs->mysql_handle = SQL->Malloc();
-	
+
 	ShowInfo(""CL_WHITE"[SQL]"CL_RESET": Connecting to the Log Database "CL_WHITE"%s"CL_RESET" At "CL_WHITE"%s"CL_RESET"...\n",logs->db_name,logs->db_ip);
 	if ( SQL_ERROR == SQL->Connect(logs->mysql_handle, logs->db_id, logs->db_pw, logs->db_ip, logs->db_port, logs->db_name) )
 		exit(EXIT_FAILURE);
 	ShowStatus(""CL_WHITE"[SQL]"CL_RESET": Successfully '"CL_GREEN"connected"CL_RESET"' to Database '"CL_WHITE"%s"CL_RESET"'.\n", logs->db_name);
-	
-	if( strlen(map->default_codepage) > 0 )
+
+	if (map->default_codepage[0] != '\0')
 		if ( SQL_ERROR == SQL->SetEncoding(logs->mysql_handle, map->default_codepage) )
 			Sql_ShowDebug(logs->mysql_handle);
 }
@@ -387,12 +476,12 @@ void log_set_defaults(void) {
 	logs->config.amount_items_log = 100;
 }
 
-
 int log_config_read(const char* cfgName) {
 	static int count = 0;
 	char line[1024], w1[1024], w2[1024];
 	FILE *fp;
 
+	nullpo_retr(1, cfgName);
 	if( count++ == 0 )
 		log_set_defaults();
 
@@ -452,7 +541,9 @@ int log_config_read(const char* cfgName) {
 				safestrncpy(logs->config.log_chat, w2, sizeof(logs->config.log_chat));
 			//support the import command, just like any other config
 			else if( strcmpi(w1,"import") == 0 )
-				log_config_read(w2);
+				logs->config_read(w2);
+			else if (HPM->parseConf(w1, w2, HPCT_LOG))
+				; // handled by plugins
 			else
 				ShowWarning("Unknown setting '%s' in file %s\n", w1, cfgName);
 		}
@@ -489,6 +580,7 @@ int log_config_read(const char* cfgName) {
 
 	return 0;
 }
+
 void log_config_complete(void) {
 	if( logs->config.sql_logs ) {
 		logs->pick_sub = log_pick_sub_sql;
@@ -500,9 +592,10 @@ void log_config_complete(void) {
 		logs->mvpdrop_sub = log_mvpdrop_sub_sql;
 	}
 }
+
 void log_defaults(void) {
 	logs = &log_s;
-	
+
 	sprintf(logs->db_ip,"127.0.0.1");
 	sprintf(logs->db_id,"ragnarok");
 	sprintf(logs->db_pw,"ragnarok");
@@ -511,7 +604,7 @@ void log_defaults(void) {
 	logs->db_port = 3306;
 	logs->mysql_handle = NULL;
 	/* */
-	
+
 	logs->pick_pc = log_pick_pc;
 	logs->pick_mob = log_pick_mob;
 	logs->zeny = log_zeny;
@@ -520,7 +613,7 @@ void log_defaults(void) {
 	logs->atcommand = log_atcommand;
 	logs->branch = log_branch;
 	logs->mvpdrop = log_mvpdrop;
-	
+
 	/* will be modified in a few seconds once loading is complete. */
 	logs->pick_sub = log_pick_sub_txt;
 	logs->zeny_sub = log_zeny_sub_txt;

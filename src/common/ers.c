@@ -1,6 +1,24 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 /*****************************************************************************\
  *  <H1>Entry Reusage System</H1>                                            *
  *                                                                           *
@@ -44,13 +62,13 @@
 
 #include "ers.h"
 
+#include "common/cbasetypes.h"
+#include "common/memmgr.h" // CREATE, RECREATE, aMalloc, aFree
+#include "common/nullpo.h"
+#include "common/showmsg.h" // ShowMessage, ShowError, ShowFatalError, CL_BOLD, CL_NORMAL
+
 #include <stdlib.h>
 #include <string.h>
-
-#include "../common/cbasetypes.h"
-#include "../common/malloc.h" // CREATE, RECREATE, aMalloc, aFree
-#include "../common/nullpo.h"
-#include "../common/showmsg.h" // ShowMessage, ShowError, ShowFatalError, CL_BOLD, CL_NORMAL
 
 #ifndef DISABLE_ERS
 
@@ -83,19 +101,19 @@ typedef struct ers_cache
 
 	// Free objects count
 	unsigned int Free;
-	
+
 	// Used blocks count
 	unsigned int Used;
-	
+
 	// Objects in-use count
 	unsigned int UsedObjs;
-	
+
 	// Default = ERS_BLOCK_ENTRIES, can be adjusted for performance for individual cache sizes.
 	unsigned int ChunkSize;
-	
+
 	// Misc options, some options are shared from the instance
 	enum ERSOptions Options;
-	
+
 	// Linked list
 	struct ers_cache *Next, *Prev;
 } ers_cache_t;
@@ -103,10 +121,10 @@ typedef struct ers_cache
 struct ers_instance_t {
 	// Interface to ERS
 	struct eri VTable;
-	
+
 	// Name, used for debugging purposes
 	char *Name;
-		
+
 	// Misc options
 	enum ERSOptions Options;
 
@@ -115,7 +133,7 @@ struct ers_instance_t {
 
 	// Count of objects in use, used for detecting memory leaks
 	unsigned int Count;
-	
+
 #ifdef DEBUG
 	/* for data analysis [Ind/Hercules] */
 	unsigned int Peak;
@@ -149,7 +167,7 @@ static ers_cache_t *ers_find_cache(unsigned int size, enum ERSOptions Options) {
 	cache->Max = 0;
 	cache->ChunkSize = ERS_BLOCK_ENTRIES;
 	cache->Options = (Options & ERS_CACHE_OPTIONS);
-	
+
 	if (CacheList == NULL)
 	{
 		CacheList = cache;
@@ -181,7 +199,7 @@ static void ers_free_cache(ers_cache_t *cache, bool remove)
 		CacheList = cache->Next;
 
 	aFree(cache->Blocks);
-	
+
 	aFree(cache);
 }
 
@@ -216,7 +234,7 @@ static void *ers_obj_alloc_entry(ERS *self)
 
 	instance->Count++;
 	instance->Cache->UsedObjs++;
-	
+
 #ifdef DEBUG
 	if( instance->Count > instance->Peak )
 		instance->Peak = instance->Count;
@@ -240,7 +258,7 @@ static void ers_obj_free_entry(ERS *self, void *entry)
 
 	if( instance->Cache->Options & ERS_OPT_CLEAN )
 		memset((unsigned char*)reuse + sizeof(struct ers_list), 0, instance->Cache->ObjectSize - sizeof(struct ers_list));
-	
+
 	reuse->Next = instance->Cache->ReuseList;
 	instance->Cache->ReuseList = reuse;
 	instance->Count--;
@@ -277,27 +295,27 @@ static void ers_obj_destroy(ERS *self)
 
 	if (instance->Next)
 		instance->Next->Prev = instance->Prev;
-	
+
 	if (instance->Prev)
 		instance->Prev->Next = instance->Next;
 	else
 		InstanceList = instance->Next;
-	
+
 	if( instance->Options & ERS_OPT_FREE_NAME )
 		aFree(instance->Name);
-	
+
 	aFree(instance);
 }
 
 void ers_cache_size(ERS *self, unsigned int new_size) {
 	struct ers_instance_t *instance = (struct ers_instance_t *)self;
-	
+
 	nullpo_retv(instance);
-	
+
 	if( !(instance->Cache->Options&ERS_OPT_FLEX_CHUNK) ) {
 		ShowWarning("ers_cache_size: '%s' has adjusted its chunk size to '%d', however ERS_OPT_FLEX_CHUNK is missing!\n",instance->Name,new_size);
 	}
-	
+
 	instance->Cache->ChunkSize = new_size;
 }
 
@@ -308,8 +326,11 @@ ERS *ers_new(uint32 size, char *name, enum ERSOptions options)
 	CREATE(instance,struct ers_instance_t, 1);
 
 	size += sizeof(struct ers_list);
+
+#if ERS_ALIGNED > 1 // If it's aligned to 1-byte boundaries, no need to bother.
 	if (size % ERS_ALIGNED)
 		size += ERS_ALIGNED - size % ERS_ALIGNED;
+#endif
 
 	instance->VTable.alloc = ers_obj_alloc_entry;
 	instance->VTable.free = ers_obj_free_entry;
@@ -321,7 +342,7 @@ ERS *ers_new(uint32 size, char *name, enum ERSOptions options)
 	instance->Options = options;
 
 	instance->Cache = ers_find_cache(size,instance->Options);
-	
+
 	instance->Cache->ReferenceCount++;
 
 	if (InstanceList == NULL) {
@@ -384,7 +405,7 @@ void ers_report(void) {
  **/
 void ers_final(void) {
 	struct ers_instance_t *instance = InstanceList, *next;
-	
+
 	while( instance ) {
 		next = instance->Next;
 		ers_obj_destroy((ERS*)instance);

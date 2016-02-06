@@ -1,20 +1,38 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef MAP_GUILD_H
 #define MAP_GUILD_H
 
-#include "map.h" // EVENT_NAME_LENGTH, TBL_PC
-#include "../common/cbasetypes.h"
-#include "../common/db.h"
-#include "../common/mmo.h"
+#include "map/map.h" // EVENT_NAME_LENGTH
+#include "common/hercules.h"
+#include "common/db.h"
+#include "common/mmo.h"
+
+struct map_session_data;
 
 /**
  * Defines
  **/
-#define GUILD_SEND_XY_INVERVAL	5000 // Interval of sending coordinates and HP
-#define GUILD_PAYEXP_INVERVAL 10000 //Interval (maximum survival time of the cache, in milliseconds)
+#define GUILD_SEND_XY_INVERVAL  5000 // Interval of sending coordinates and HP
+#define GUILD_PAYEXP_INVERVAL   10000 //Interval (maximum survival time of the cache, in milliseconds)
 #define MAX_GUILD_SKILL_REQUIRE 5
 
 /**
@@ -145,7 +163,7 @@ struct guild_interface {
 	void (*retrieveitembound) (int char_id,int aid,int guild_id);
 	/* */
 	int (*payexp_timer) (int tid, int64 tick, int id, intptr_t data);
-	TBL_PC* (*sd_check) (int guild_id, int account_id, int char_id);
+	struct map_session_data *(*sd_check) (int guild_id, int account_id, int char_id);
 	bool (*read_guildskill_tree_db) (char* split[], int columns, int current);
 	bool (*read_castledb) (char* str[], int columns, int current);
 	int (*payexp_timer_sub) (DBKey key, DBData *data, va_list ap);
@@ -163,8 +181,10 @@ struct guild_interface {
 	void (*castle_reconnect_sub) (void *key, void *data, va_list ap);
 };
 
-struct guild_interface *guild;
-
+#ifdef HERCULES_CORE
 void guild_defaults(void);
+#endif // HERCULES_CORE
+
+HPShared struct guild_interface *guild;
 
 #endif /* MAP_GUILD_H */

@@ -1,7 +1,22 @@
 #!/usr/bin/perl
 
-# Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-# See the LICENSE file
+# This file is part of Hercules.
+# http://herc.ws - http://github.com/HerculesWS/Hercules
+#
+# Copyright (C) 2013-2015  Hercules Dev Team
+#
+# Hercules is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 use strict;
 use warnings;
@@ -21,10 +36,11 @@ sub trim($) {
 
 sub parse($$) {
 	my ($p, $d) = @_;
+
 	$p =~ s/^.*?\)\((.*)\).*$/$1/; # Clean up extra parentheses )(around the arglist)
 
 	# Retrieve return type
-	unless ($d =~ /^(.+)\(\*\s*[a-zA-Z0-9_]+_interface::([^\)]+)\s*\)\(.*\)$/) {
+	unless ($d =~ /^(.+)\(\*\s*[a-zA-Z0-9_]+_interface::([^\)]+)\s*\)\s*\(.*\)$/) {
 		print "Error: unable to parse '$d'\n";
 		return {};
 	}
@@ -217,15 +233,24 @@ sub parse($$) {
 			$rtinit = ' = BL_NUL';
 		} elsif ($x =~ /^enum\s+homun_type$/) { # Known enum homun_type
 			$rtinit = ' = HT_INVALID';
+		} elsif ($x =~ /^enum\s+channel_operation_status$/) { # Known enum channel_operation_status
+			$rtinit = ' = HCS_STATUS_FAIL';
 		} elsif ($x =~ /^enum\s+bg_queue_types$/) { # Known enum bg_queue_types
 			$rtinit = ' = BGQT_INVALID';
-		} elsif ($x =~ /^struct\s+.*$/ or $x eq 'DBData') { # Structs
+		} elsif ($x =~ /^(?:enum\s+)?DBOptions$/) { # Known enum DBOptions
+			$rtinit = ' = DB_OPT_BASE';
+		} elsif ($x eq 'DBComparator' or $x eq 'DBHasher' or $x eq 'DBReleaser') { # DB function pointers
+			$rtinit = ' = NULL';
+		} elsif ($x =~ /^struct\s+.*$/ or $x eq 'DBData' or $x eq 'DBKey') { # Structs and unions
 			$rtinit = '';
 			$rtmemset = 1;
+		} elsif ($x =~ /^float|double$/) { # Floating point variables
+			$rtinit = ' = 0.';
 		} elsif ($x =~ /^(?:(?:un)?signed\s+)?(?:char|int|long|short)$/
 		      or $x =~ /^(?:long|short)\s+(?:int|long)$/
 		      or $x =~ /^u?int(?:8|16|32|64)$/
 		      or $x eq 'defType'
+		      or $x eq 'size_t'
 		) { # Numeric variables
 			$rtinit = ' = 0';
 		} else { # Anything else
@@ -250,48 +275,88 @@ sub parse($$) {
 my %key2original;
 my @files = grep { -f } glob 'doxyoutput/xml/*interface*.xml';
 my %ifs;
-my @keys;
+my %keys = (
+	login => [ ],
+	char => [ ],
+	map => [ ],
+	all => [ ],
+);
+my %fileguards = ( );
 foreach my $file (@files) { # Loop through the xml files
 
 	my $xml = new XML::Simple;
-	my $data = $xml->XMLin($file);
+	my $data = $xml->XMLin($file, ForceArray => 1);
 
-	my $loc = $data->{compounddef}->{location};
-	next unless $loc->{file} =~ /src\/map\//; # We only handle mapserver for the time being
-
-	my $key = $data->{compounddef}->{compoundname};
+	my $filekey = (keys %{ $data->{compounddef} })[0];
+	my $loc = $data->{compounddef}->{$filekey}->{location}->[0];
+	next unless $loc->{file} =~ /src\/(map|char|login|common)\//;
+	next if $loc->{file} =~ /\/HPM.*\.h/; # Don't allow hooking into the HPM itself
+	my $servertype = $1;
+	my $key = $data->{compounddef}->{$filekey}->{compoundname}->[0];
 	my $original = $key;
+	my @servertypes = ();
+	my $servermask = 'SERVER_TYPE_NONE';
+	if ($servertype ne "common") {
+		push @servertypes, $1;
+		$servermask = 'SERVER_TYPE_' . uc($1);
+	} elsif ($key eq "mapindex_interface") {
+		push @servertypes, ("map", "char"); # Currently not used by the login server
+		$servermask = 'SERVER_TYPE_MAP|SERVER_TYPE_CHAR';
+	} else {
+		push @servertypes, ("map", "char", "login");
+		$servermask = 'SERVER_TYPE_ALL';
+	}
+	my @filepath = split(/[\/\\]/, $loc->{file});
+	my $foldername = uc($filepath[-2]);
+	my $filename = uc($filepath[-1]); $filename =~ s/-/_/g; $filename =~ s/\.[^.]*$//;
+	my $guardname = "${foldername}_${filename}_H";
 
 	# Some known interfaces with different names
 	if ($key =~ /battleground/) {
 		$key = "bg";
 	} elsif ($key =~ /guild_storage/) {
 		$key = "gstorage";
-	} elsif ($key =~ /homunculus/) {
+	} elsif ($key eq "homunculus_interface") {
 		$key = "homun";
-	} elsif ($key =~ /irc_bot/) {
+	} elsif ($key eq "irc_bot_interface") {
 		$key = "ircbot";
-	} elsif ($key =~ /log_interface/) {
+	} elsif ($key eq "log_interface") {
 		$key = "logs";
-	} elsif ($key =~ /pc_groups_interface/) {
+	} elsif ($key eq "pc_groups_interface") {
 		$key = "pcg";
+	} elsif ($key eq "pcre_interface") {
+		$key = "libpcre";
+	} elsif ($key eq "char_interface") {
+		$key = "chr";
+	} elsif ($key eq "db_interface") {
+		$key = "DB";
+	} elsif ($key eq "malloc_interface") {
+		$key = "iMalloc";
+	} elsif ($key eq "socket_interface") {
+		$key = "sockt";
+	} elsif ($key eq "sql_interface") {
+		$key = "SQL";
+	} elsif ($key eq "stringbuf_interface") {
+		$key = "StrBuf";
+	} elsif ($key eq "console_input_interface") {
+		# TODO
+		next;
 	} else {
 		$key =~ s/_interface//;
 	}
 
-	foreach my $v ($data->{compounddef}->{sectiondef}) { # Loop through the sections
+	my $sectiondef = $data->{compounddef}->{$filekey}->{sectiondef};
+	foreach my $v (@$sectiondef) { # Loop through the sections
 		my $memberdef = $v->{memberdef};
-		foreach my $fk (sort { # Sort the members in declaration order according to what the xml says
-					my $astart = $memberdef->{$a}->{location}->{bodystart} || $memberdef->{$a}->{location}->{line};
-					my $bstart = $memberdef->{$b}->{location}->{bodystart} || $memberdef->{$b}->{location}->{line};
+		foreach my $f (sort { # Sort the members in declaration order according to what the xml says
+					my $astart = $a->{location}->[0]->{bodystart} || $a->{location}->[0]->{line};
+					my $bstart = $b->{location}->[0]->{bodystart} || $b->{location}->[0]->{line};
 					$astart <=> $bstart
-				} keys %$memberdef) { # Loop through the members
-			my $f = $memberdef->{$fk};
-
-			my $t = $f->{argsstring};
+				} @$memberdef) { # Loop through the members
+			my $t = $f->{argsstring}->[0];
 			next unless ref $t ne 'HASH' and $t =~ /^[^\[]/; # If it's not a string, or if it starts with an array subscript, we can skip it
 
-			my $if = parse($t, $f->{definition});
+			my $if = parse($t, $f->{definition}->[0]);
 			next unless scalar keys %$if; # If it returns an empty hash reference, an error must've occurred
 
 			# Skip variadic functions, we only allow hooks on their arglist equivalents.
@@ -370,182 +435,313 @@ foreach my $file (@files) { # Loop through the xml files
 			push(@{ $ifs{$key} }, $if);
 		}
 	}
-	push(@keys, $key) if $key2original{$key};
+	foreach $servertype (@servertypes) {
+		push(@{ $keys{$servertype} }, $key) if $key2original{$key};
+	}
+	push(@{ $keys{all} }, $key) if $key2original{$key};
+	$fileguards{$key} = {
+		guard => $guardname,
+		type => $servermask,
+	};
 }
 
-# Some interfaces use different names
-my %exportsymbols = map {
-	$_ => &{ sub ($) {
-		return 'battlegrounds' if $_ =~ /^bg$/;
-		return 'pc_groups' if $_ =~ /^pcg$/;
-		return $_;
-	}}($_);
-} @keys;
+my $year = (localtime)[5] + 1900;
+foreach my $servertype (keys %keys) {
+	my $keysref = $keys{$servertype};
+	# Some interfaces use different names
+	my %exportsymbols = map {
+		$_ => &{ sub ($) {
+			return 'battlegrounds' if $_ =~ /^bg$/;
+			return 'pc_groups' if $_ =~ /^pcg$/;
+			return $_;
+		}}($_);
+	} @$keysref;
 
-my ($maxlen, $idx) = (0, 0);
-my $fname;
-$fname = "../../src/plugins/HPMHooking/HPMHooking.HookingPoints.inc";
-open(FH, ">", $fname)
-	or die "cannot open > $fname: $!";
+	my ($maxlen, $idx) = (0, 0);
+	my $fname;
 
-print FH <<"EOF";
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-//
-// NOTE: This file was auto-generated and should never be manually edited,
-//       as it will get overwritten.
+	if ($servertype eq 'all') {
+		$fname = "../../src/common/HPMSymbols.inc.h";
+		open(FH, ">", $fname)
+			or die "cannot open > $fname: $!";
+
+		print FH <<"EOF";
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2015-$year  Hercules Dev Team
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * NOTE: This file was auto-generated and should never be manually edited,
+ *       as it will get overwritten.
+ */
+
+#if !defined(HERCULES_CORE)
+EOF
+
+		foreach my $key (@$keysref) {
+			print FH <<"EOF";
+#ifdef $fileguards{$key}->{guard} /* $key */
+struct $key2original{$key} *$key;
+#endif // $fileguards{$key}->{guard}
+EOF
+		}
+
+		print FH <<"EOF";
+#endif // ! HERCULES_CORE
+
+HPExport const char *HPM_shared_symbols(int server_type)
+{
+EOF
+
+		foreach my $key (@$keysref) {
+			print FH <<"EOF";
+#ifdef $fileguards{$key}->{guard} /* $key */
+if ((server_type&($fileguards{$key}->{type})) && !HPM_SYMBOL("$exportsymbols{$key}", $key)) return "$exportsymbols{$key}";
+#endif // $fileguards{$key}->{guard}
+EOF
+		}
+
+		print FH <<"EOF";
+	return NULL;
+}
+EOF
+		close FH;
+		next;
+	}
+
+	$fname = "../../src/plugins/HPMHooking/HPMHooking_${servertype}.HookingPoints.inc";
+	open(FH, ">", $fname)
+		or die "cannot open > $fname: $!";
+
+	print FH <<"EOF";
+/**
+ * This file is part of Hercules.
+ *
+ * Copyright (C) 2013-$year  Hercules Dev Team
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * NOTE: This file was auto-generated and should never be manually edited,
+ *       as it will get overwritten.
+ */
 
 struct HookingPointData HookingPoints[] = {
 EOF
 
-foreach my $key (@keys) {
-	print FH "/* ".$key." */\n";
-	foreach my $if (@{ $ifs{$key} }) {
+	foreach my $key (@$keysref) {
+		print FH "/* ".$key." */\n";
+		foreach my $if (@{ $ifs{$key} }) {
 
-		print FH <<"EOF";
+			print FH <<"EOF";
 	{ HP_POP($key\->$if->{name}, $if->{hname}) },
 EOF
 
-		$idx += 2;
-		$maxlen = length($key."->".$if->{name}) if( length($key."->".$if->{name}) > $maxlen )
+			$idx += 2;
+			$maxlen = length($key."->".$if->{name}) if( length($key."->".$if->{name}) > $maxlen );
+		}
 	}
-}
-print FH <<"EOF";
+	print FH <<"EOF";
 };
 
 int HookingPointsLenMax = $maxlen;
 EOF
-close FH;
+	close FH;
 
-$fname = "../../src/plugins/HPMHooking/HPMHooking.sources.inc";
-open(FH, ">", $fname)
-	or die "cannot open > $fname: $!";
-
-print FH <<"EOF";
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-//
-// NOTE: This file was auto-generated and should never be manually edited,
-//       as it will get overwritten.
-
-EOF
-foreach my $key (@keys) {
+	$fname = "../../src/plugins/HPMHooking/HPMHooking_${servertype}.sources.inc";
+	open(FH, ">", $fname)
+		or die "cannot open > $fname: $!";
 
 	print FH <<"EOF";
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2013-$year  Hercules Dev Team
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * NOTE: This file was auto-generated and should never be manually edited,
+ *       as it will get overwritten.
+ */
+
+EOF
+	foreach my $key (@$keysref) {
+
+		print FH <<"EOF";
 memcpy(&HPMHooks.source.$key, $key, sizeof(struct $key2original{$key}));
 EOF
-}
-close FH;
+	}
+	close FH;
 
-$fname = "../../src/plugins/HPMHooking/HPMHooking.GetSymbol.inc";
-open(FH, ">", $fname)
-	or die "cannot open > $fname: $!";
-
-print FH <<"EOF";
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-//
-// NOTE: This file was auto-generated and should never be manually edited,
-//       as it will get overwritten.
-
-EOF
-foreach my $key (@keys) {
+	$fname = "../../src/plugins/HPMHooking/HPMHooking_${servertype}.HPMHooksCore.inc";
+	open(FH, ">", $fname)
+		or die "cannot open > $fname: $!";
 
 	print FH <<"EOF";
-if( !($key = GET_SYMBOL("$exportsymbols{$key}") ) ) return false;
-EOF
-}
-close FH;
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2013-$year  Hercules Dev Team
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-$fname = "../../src/plugins/HPMHooking/HPMHooking.HPMHooksCore.inc";
-open(FH, ">", $fname)
-	or die "cannot open > $fname: $!";
-
-print FH <<"EOF";
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-//
-// NOTE: This file was auto-generated and should never be manually edited,
-//       as it will get overwritten.
+/*
+ * NOTE: This file was auto-generated and should never be manually edited,
+ *       as it will get overwritten.
+ */
 
 struct {
 EOF
 
-foreach my $key (@keys) {
-	foreach my $if (@{ $ifs{$key} }) {
+	foreach my $key (@$keysref) {
+		foreach my $if (@{ $ifs{$key} }) {
 
-		print FH <<"EOF";
+			print FH <<"EOF";
 	struct HPMHookPoint *$if->{hname}_pre;
 	struct HPMHookPoint *$if->{hname}_post;
 EOF
+		}
 	}
-}
-print FH <<"EOF";
+	print FH <<"EOF";
 } list;
 
 struct {
 EOF
 
-foreach my $key (@keys) {
-	foreach my $if (@{ $ifs{$key} }) {
+	foreach my $key (@$keysref) {
+		foreach my $if (@{ $ifs{$key} }) {
 
-		print FH <<"EOF";
+			print FH <<"EOF";
 	int $if->{hname}_pre;
 	int $if->{hname}_post;
 EOF
+		}
 	}
-}
-print FH <<"EOF";
+	print FH <<"EOF";
 } count;
 
 struct {
 EOF
 
-foreach my $key (@keys) {
+	foreach my $key (@$keysref) {
 
-	print FH <<"EOF";
+		print FH <<"EOF";
 	struct $key2original{$key} $key;
 EOF
-}
-
-print FH <<"EOF";
-} source;
-EOF
-close FH;
-
-$fname = "../../src/plugins/HPMHooking/HPMHooking.Hooks.inc";
-open(FH, ">", $fname)
-	or die "cannot open > $fname: $!";
-
-print FH <<"EOF";
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-//
-// NOTE: This file was auto-generated and should never be manually edited,
-//       as it will get overwritten.
-
-EOF
-foreach my $key (@keys) {
+	}
 
 	print FH <<"EOF";
+} source;
+EOF
+	close FH;
+
+	$fname = "../../src/plugins/HPMHooking/HPMHooking_${servertype}.Hooks.inc";
+	open(FH, ">", $fname)
+		or die "cannot open > $fname: $!";
+
+	print FH <<"EOF";
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2013-$year  Hercules Dev Team
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*
+ * NOTE: This file was auto-generated and should never be manually edited,
+ *       as it will get overwritten.
+ */
+
+EOF
+	foreach my $key (@$keysref) {
+
+		print FH <<"EOF";
 /* $key */
 EOF
 
-	foreach my $if (@{ $ifs{$key} }) {
-		my ($initialization, $beforeblock3, $beforeblock2, $afterblock3, $afterblock2, $retval) = ('', '', '', '', '', '');
+		foreach my $if (@{ $ifs{$key} }) {
+			my ($initialization, $beforeblock3, $beforeblock2, $afterblock3, $afterblock2, $retval) = ('', '', '', '', '', '');
 
-		unless ($if->{type} eq 'void') {
-			$initialization  = "\n\t$if->{type} retVal___$if->{typeinit};";
-			$initialization .= "\n\tmemset(&retVal___, '\\0', sizeof($if->{type}));" if $if->{memset};
-		}
+			unless ($if->{type} eq 'void') {
+				$initialization  = "\n\t$if->{type} retVal___$if->{typeinit};";
+				$initialization .= "\n\tmemset(&retVal___, '\\0', sizeof($if->{type}));" if $if->{memset};
+			}
 
-		$beforeblock3 .= "\n\t\t\t$_" foreach (@{ $if->{before} });
-		$afterblock3 .= "\n\t\t\t$_" foreach (@{ $if->{after} });
-		$beforeblock2 .= "\n\t\t$_" foreach (@{ $if->{before} });
-		$afterblock2 .= "\n\t\t$_" foreach (@{ $if->{after} });
-		$retval = ' retVal___' unless $if->{type} eq 'void';
+			$beforeblock3 .= "\n\t\t\t$_" foreach (@{ $if->{before} });
+			$afterblock3 .= "\n\t\t\t$_" foreach (@{ $if->{after} });
+			$beforeblock2 .= "\n\t\t$_" foreach (@{ $if->{before} });
+			$afterblock2 .= "\n\t\t$_" foreach (@{ $if->{after} });
+			$retval = ' retVal___' unless $if->{type} eq 'void';
 
-		print FH <<"EOF";
+			print FH <<"EOF";
 $if->{handlerdef} {$if->{notes}
 	int hIndex = 0;${initialization}
 	if( HPMHooks.count.$if->{hname}_pre ) {
@@ -573,8 +769,8 @@ $if->{handlerdef} {$if->{notes}
 	return$retval;
 }
 EOF
+		}
 	}
+
+	close FH;
 }
-
-close FH;
-

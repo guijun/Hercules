@@ -1,29 +1,50 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Base Author: shennetsind @ http://hercules.ws
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2013-2015  Hercules Dev Team
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
+/**
+ * Base Author: shennetsind @ http://herc.ws
+ */
 #define HERCULES_CORE
 
 #include "irc-bot.h"
+
+#include "map/channel.h"
+#include "map/map.h"
+#include "map/pc.h"
+#include "common/cbasetypes.h"
+#include "common/memmgr.h"
+#include "common/nullpo.h"
+#include "common/random.h"
+#include "common/showmsg.h"
+#include "common/socket.h"
+#include "common/strlib.h"
+#include "common/timer.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "clif.h"
-#include "map.h"
-#include "pc.h"
-#include "../common/cbasetypes.h"
-#include "../common/malloc.h"
-#include "../common/random.h"
-#include "../common/showmsg.h"
-#include "../common/socket.h"
-#include "../common/strlib.h"
-#include "../common/timer.h"
-
 //#define IRCBOT_DEBUG
 
 struct irc_bot_interface irc_bot_s;
+struct irc_bot_interface *ircbot;
 
 char send_string[IRC_MESSAGE_LENGTH];
 
@@ -35,15 +56,15 @@ int irc_connect_timer(int tid, int64 tick, int id, intptr_t data) {
 	struct hSockOpt opt;
 	if( ircbot->isOn || ++ircbot->fails >= 3 )
 		return 0;
-	
+
 	opt.silent = 1;
 	opt.setTimeo = 0;
-	
+
 	ircbot->last_try = timer->gettick();
 
-	if( ( ircbot->fd = make_connection(ircbot->ip,hChSys.irc_server_port,&opt) ) > 0 ){
-		session[ircbot->fd]->func_parse = ircbot->parse;
-		session[ircbot->fd]->flag.server = 1;
+	if ((ircbot->fd = sockt->make_connection(ircbot->ip, channel->config->irc_server_port, &opt)) > 0) {
+		sockt->session[ircbot->fd]->func_parse = ircbot->parse;
+		sockt->session[ircbot->fd]->flag.server = 1;
 		timer->add(timer->gettick() + 3000, ircbot->identify_timer, 0, 0);
 		ircbot->isOn = true;
 	}
@@ -57,14 +78,14 @@ int irc_connect_timer(int tid, int64 tick, int id, intptr_t data) {
 int irc_identify_timer(int tid, int64 tick, int id, intptr_t data) {
 	if( !ircbot->isOn )
 		return 0;
-	
-	sprintf(send_string, "USER HerculesWS%d 8 * : Hercules IRC Bridge",rand()%777);
+
+	sprintf(send_string, "USER HerculesWS%d 8 * : Hercules IRC Bridge",rnd()%777);
 	ircbot->send(send_string);
-	sprintf(send_string, "NICK %s", hChSys.irc_nick);
+	sprintf(send_string, "NICK %s", channel->config->irc_nick);
 	ircbot->send(send_string);
 
 	timer->add(timer->gettick() + 3000, ircbot->join_timer, 0, 0);
-	
+
 	return 0;
 }
 
@@ -75,16 +96,16 @@ int irc_identify_timer(int tid, int64 tick, int id, intptr_t data) {
 int irc_join_timer(int tid, int64 tick, int id, intptr_t data) {
 	if( !ircbot->isOn )
 		return 0;
-	
-	if( hChSys.irc_nick_pw[0] != '\0' ) {
-		sprintf(send_string, "PRIVMSG NICKSERV : IDENTIFY %s", hChSys.irc_nick_pw);
+
+	if (channel->config->irc_nick_pw[0] != '\0') {
+		sprintf(send_string, "PRIVMSG NICKSERV : IDENTIFY %s", channel->config->irc_nick_pw);
 		ircbot->send(send_string);
-		if( hChSys.irc_use_ghost ) {
-			sprintf(send_string, "PRIVMSG NICKSERV : GHOST %s %s", hChSys.irc_nick, hChSys.irc_nick_pw);
+		if (channel->config->irc_use_ghost) {
+			sprintf(send_string, "PRIVMSG NICKSERV : GHOST %s %s", channel->config->irc_nick, channel->config->irc_nick_pw);
 		}
 	}
-	
-	sprintf(send_string, "JOIN %s", hChSys.irc_channel);
+
+	sprintf(send_string, "JOIN %s", channel->config->irc_channel);
 	ircbot->send(send_string);
 	ircbot->isIn = true;
 
@@ -99,6 +120,7 @@ int irc_join_timer(int tid, int64 tick, int id, intptr_t data) {
  */
 struct irc_func* irc_func_search(char* function_name) {
 	int i;
+	nullpo_retr(NULL, function_name);
 	for(i = 0; i < ircbot->funcs.size; i++) {
 		if( strcmpi(ircbot->funcs.list[i]->name, function_name) == 0 ) {
 			return ircbot->funcs.list[i];
@@ -114,30 +136,30 @@ struct irc_func* irc_func_search(char* function_name) {
 int irc_parse(int fd) {
 	char *parse_string = NULL, *str_safe = NULL;
 
-	if (session[fd]->flag.eof) {
-		do_close(fd);
+	if (sockt->session[fd]->flag.eof) {
+		sockt->close(fd);
 		ircbot->fd = 0;
 		ircbot->isOn = false;
 		ircbot->isIn = false;
 		ircbot->fails = 0;
-		ircbot->ip = host2ip(hChSys.irc_server);
+		ircbot->ip = sockt->host2ip(channel->config->irc_server);
 		timer->add(timer->gettick() + 120000, ircbot->connect_timer, 0, 0);
-      	return 0;
+		return 0;
 	}
-	
+
 	if( !RFIFOREST(fd) )
 		return 0;
-	
+
 	parse_string = (char*)RFIFOP(fd,0);
 	parse_string[ RFIFOREST(fd) - 1 ] = '\0';
-	
+
 	parse_string = strtok_r(parse_string,"\r\n",&str_safe);
-	
+
 	while (parse_string != NULL) {
 		ircbot->parse_sub(fd,parse_string);
 		parse_string = strtok_r(NULL,"\r\n",&str_safe);
 	}
-	
+
 	RFIFOSKIP(fd, RFIFOREST(fd));
 	RFIFOFLUSH(fd);
 	return 0;
@@ -155,9 +177,14 @@ int irc_parse(int fd) {
  */
 void irc_parse_source(char *source, char *nick, char *ident, char *host) {
 	int i, pos = 0;
-	size_t len = strlen(source);
+	size_t len;
 	unsigned char stage = 0;
-	
+
+	nullpo_retv(source);
+	len = strlen(source);
+	nullpo_retv(nick);
+	nullpo_retv(ident);
+	nullpo_retv(host);
 	for(i = 0; i < len; i++) {
 		if( stage == 0 && source[i] == '!' ) {
 			safestrncpy(nick, &source[0], min(i + 1, IRC_NICK_LENGTH));
@@ -181,29 +208,29 @@ void irc_parse_sub(int fd, char *str) {
 	char source[180], command[60], buf1[IRC_MESSAGE_LENGTH], buf2[IRC_MESSAGE_LENGTH];
 	char *target = buf1, *message = buf2;
 	struct irc_func *func;
-	
+
+	nullpo_retv(str);
 	source[0] = command[0] = buf1[0] = buf2[0] = '\0';
-	
+
 	if( str[0] == ':' )
 		str++;
-	
+
 	if (sscanf(str, "%179s %59s %499s :%499[^\r\n]", source, command, buf1, buf2) == 3 && buf1[0] == ':') {
 		// source command :message (i.e. QUIT)
 		message = buf1+1;
 		target = buf2;
 	}
-		
+
 	if( command[0] == '\0' )
 		return;
-		
-	if( !(func = ircbot->func_search(command)) && !(func = ircbot->func_search(source)) ) {
+
+	if ((func = ircbot->func_search(command)) == NULL && (func = ircbot->func_search(source)) == NULL) {
 #ifdef IRCBOT_DEBUG
 		ShowWarning("Unknown command received %s from %s\n",command,source);
 #endif // IRCBOT_DEBUG
 		return;
 	}
 	func->func(fd,command,source,target,message);
-	
 }
 
 /**
@@ -211,7 +238,9 @@ void irc_parse_sub(int fd, char *str) {
  * @param str Command to send
  */
 void irc_send(char *str) {
-	size_t len = strlen(str) + 2;
+	size_t len;
+	nullpo_retv(str);
+	len = strlen(str) + 2;
 	if (len > IRC_MESSAGE_LENGTH-3)
 		len = IRC_MESSAGE_LENGTH-3;
 	WFIFOHEAD(ircbot->fd, len);
@@ -224,7 +253,8 @@ void irc_send(char *str) {
  * @see irc_parse_sub
  */
 void irc_pong(int fd, char *cmd, char *source, char *target, char *msg) {
-	sprintf(send_string, "PONG %s", cmd);
+	nullpo_retv(cmd);
+	snprintf(send_string, IRC_MESSAGE_LENGTH, "PONG %s", cmd);
 	ircbot->send(send_string);
 }
 
@@ -237,20 +267,21 @@ void irc_privmsg_ctcp(int fd, char *cmd, char *source, char *target, char *msg) 
 
 	source_nick[0] = source_ident[0] = source_host[0] = '\0';
 
+	nullpo_retv(source);
 	if( source[0] != '\0' )
 		ircbot->parse_source(source,source_nick,source_ident,source_host);
 
 	if( strcmpi(cmd,"ACTION") == 0 ) {
 		if( ircbot->channel ) {
 			snprintf(send_string, 150, "[ #%s ] * IRC.%s %s *",ircbot->channel->name,source_nick,msg);
-			clif->chsys_msg2(ircbot->channel,send_string);
+			clif->channel_msg2(ircbot->channel,send_string);
 		}
 	} else if( strcmpi(cmd,"ERRMSG") == 0 ) {
 		// Ignore it
 	} else if( strcmpi(cmd,"FINGER") == 0 ) {
 		// Ignore it
 	} else if( strcmpi(cmd,"PING") == 0 ) {
-		sprintf(send_string, "NOTICE %s :\001PING %s\001",source_nick,msg);
+		snprintf(send_string, IRC_MESSAGE_LENGTH, "NOTICE %s :\001PING %s\001",source_nick,msg);
 		ircbot->send(send_string);
 	} else if( strcmpi(cmd,"TIME") == 0 ) {
 		time_t time_server;  // variable for number of seconds (used with time() function)
@@ -264,10 +295,10 @@ void irc_privmsg_ctcp(int fd, char *cmd, char *source, char *target, char *msg) 
 		// like sprintf, but only for date/time (Sunday, November 02 2003 15:12:52)
 		strftime(temp, sizeof(temp)-1, msg_txt(230), datetime); // Server time (normal time): %A, %B %d %Y %X.
 
-		sprintf(send_string, "NOTICE %s :\001TIME %s\001",source_nick,temp);
+		snprintf(send_string, IRC_MESSAGE_LENGTH, "NOTICE %s :\001TIME %s\001",source_nick,temp);
 		ircbot->send(send_string);
 	} else if( strcmpi(cmd,"VERSION") == 0 ) {
-		sprintf(send_string, "NOTICE %s :\001VERSION Hercules.ws IRC Bridge\001",source_nick);
+		snprintf(send_string, IRC_MESSAGE_LENGTH, "NOTICE %s :\001VERSION Hercules.ws IRC Bridge\001",source_nick);
 		ircbot->send(send_string);
 #ifdef IRCBOT_DEBUG
 	} else {
@@ -281,7 +312,10 @@ void irc_privmsg_ctcp(int fd, char *cmd, char *source, char *target, char *msg) 
  * @see irc_parse_sub
  */
 void irc_privmsg(int fd, char *cmd, char *source, char *target, char *msg) {
-	if( msg && *msg == '\001' && strlen(msg) > 2 && msg[strlen(msg)-1] == '\001' ) {
+	size_t len = msg ? strlen(msg) : 0;
+	nullpo_retv(source);
+	nullpo_retv(target);
+	if (msg && *msg == '\001' && len > 2 && msg[len - 1] == '\001') {
 		// CTCP
 		char command[IRC_MESSAGE_LENGTH], message[IRC_MESSAGE_LENGTH];
 		command[0] = message[0] = '\0';
@@ -289,22 +323,22 @@ void irc_privmsg(int fd, char *cmd, char *source, char *target, char *msg) {
 
 		irc_privmsg_ctcp(fd, command, source, target, message);
 #ifdef IRCBOT_DEBUG
-	} else if( strcmpi(target,hChSys.irc_nick) == 0 ) {
+	} else if (strcmpi(target, channel->config->irc_nick) == 0) {
 		ShowDebug("irc_privmsg: Received message from %s: '%s'\n", source ? source : "(null)", msg);
 #endif // IRCBOT_DEBUG
-	} else if( msg && strcmpi(target,hChSys.irc_channel) == 0 ) {
+	} else if (msg && strcmpi(target, channel->config->irc_channel) == 0) {
 		char source_nick[IRC_NICK_LENGTH], source_ident[IRC_IDENT_LENGTH], source_host[IRC_HOST_LENGTH];
 
 		source_nick[0] = source_ident[0] = source_host[0] = '\0';
 
 		if( source[0] != '\0' )
 			ircbot->parse_source(source,source_nick,source_ident,source_host);
-				
+
 		if( ircbot->channel ) {
 			size_t padding_len = strlen(ircbot->channel->name) + strlen(source_nick) + 13;
 			while (1) {
 				snprintf(send_string, 150, "[ #%s ] IRC.%s : %s",ircbot->channel->name,source_nick,msg);
-				clif->chsys_msg2(ircbot->channel,send_string);
+				clif->channel_msg2(ircbot->channel,send_string);
 				//break; // Uncomment this line to truncate long messages instead of posting them as multiple lines
 				if (strlen(msg) <= 149 - padding_len)
 					break;
@@ -322,6 +356,7 @@ void irc_privmsg(int fd, char *cmd, char *source, char *target, char *msg) {
 void irc_userjoin(int fd, char *cmd, char *source, char *target, char *msg) {
 	char source_nick[IRC_NICK_LENGTH], source_ident[IRC_IDENT_LENGTH], source_host[IRC_HOST_LENGTH];
 
+	nullpo_retv(source);
 	source_nick[0] = source_ident[0] = source_host[0] = '\0';
 
 	if( source[0] != '\0' )
@@ -329,7 +364,7 @@ void irc_userjoin(int fd, char *cmd, char *source, char *target, char *msg) {
 
 	if( ircbot->channel ) {
 		snprintf(send_string, 150, "[ #%s ] User IRC.%s joined the channel.",ircbot->channel->name,source_nick);
-		clif->chsys_msg2(ircbot->channel,send_string);
+		clif->channel_msg2(ircbot->channel,send_string);
 	}
 }
 
@@ -341,6 +376,7 @@ void irc_userjoin(int fd, char *cmd, char *source, char *target, char *msg) {
 void irc_userleave(int fd, char *cmd, char *source, char *target, char *msg) {
 	char source_nick[IRC_NICK_LENGTH], source_ident[IRC_IDENT_LENGTH], source_host[IRC_HOST_LENGTH];
 
+	nullpo_retv(source);
 	source_nick[0] = source_ident[0] = source_host[0] = '\0';
 
 	if( source[0] != '\0' )
@@ -351,7 +387,7 @@ void irc_userleave(int fd, char *cmd, char *source, char *target, char *msg) {
 			snprintf(send_string, 150, "[ #%s ] User IRC.%s left the channel. [Quit: %s]",ircbot->channel->name,source_nick,msg);
 		else
 			snprintf(send_string, 150, "[ #%s ] User IRC.%s left the channel. [%s]",ircbot->channel->name,source_nick,msg);
-		clif->chsys_msg2(ircbot->channel,send_string);
+		clif->channel_msg2(ircbot->channel,send_string);
 	}
 }
 
@@ -363,6 +399,7 @@ void irc_userleave(int fd, char *cmd, char *source, char *target, char *msg) {
 void irc_usernick(int fd, char *cmd, char *source, char *target, char *msg) {
 	char source_nick[IRC_NICK_LENGTH], source_ident[IRC_IDENT_LENGTH], source_host[IRC_HOST_LENGTH];
 
+	nullpo_retv(source);
 	source_nick[0] = source_ident[0] = source_host[0] = '\0';
 
 	if( source[0] != '\0' )
@@ -370,7 +407,7 @@ void irc_usernick(int fd, char *cmd, char *source, char *target, char *msg) {
 
 	if( ircbot->channel ) {
 		snprintf(send_string, 150, "[ #%s ] User IRC.%s is now known as IRC.%s",ircbot->channel->name,source_nick,msg);
-		clif->chsys_msg2(ircbot->channel,send_string);
+		clif->channel_msg2(ircbot->channel,send_string);
 	}
 }
 
@@ -379,10 +416,17 @@ void irc_usernick(int fd, char *cmd, char *source, char *target, char *msg) {
  * @param name Sender's name
  * @param msg  Message text
  */
-void irc_relay(char *name, const char *msg) {
-	if( !ircbot->isIn )
+void irc_relay(const char *name, const char *msg)
+{
+	if (!ircbot->isIn)
 		return;
-	sprintf(send_string,"PRIVMSG %s :[ %s ] : %s",hChSys.irc_channel,name,msg);
+
+	nullpo_retv(msg);
+	if (name)
+		sprintf(send_string,"PRIVMSG %s :[ %s ] : %s", channel->config->irc_channel, name, msg);
+	else
+		sprintf(send_string,"PRIVMSG %s :%s", channel->config->irc_channel, msg);
+
 	ircbot->send(send_string);
 }
 
@@ -405,34 +449,34 @@ void irc_bot_init(bool minimal) {
 	if (minimal)
 		return;
 
-	if( !hChSys.irc )
+	if (!channel->config->irc)
 		return;
 
-	if (!(ircbot->ip = host2ip(hChSys.irc_server))) {
-		ShowError("Unable to resolve '%s' (irc server), disabling irc channel...\n", hChSys.irc_server);
-		hChSys.irc = false;
+	if (!(ircbot->ip = sockt->host2ip(channel->config->irc_server))) {
+		ShowError("Unable to resolve '%s' (irc server), disabling irc channel...\n", channel->config->irc_server);
+		channel->config->irc = false;
 		return;
 	}
-	
+
 	ircbot->funcs.size = ARRAYLENGTH(irc_func_base);
 
 	CREATE(ircbot->funcs.list,struct irc_func*,ircbot->funcs.size);
-	
+
 	for( i = 0; i < ircbot->funcs.size; i++ ) {
-		
+
 		CREATE(function, struct irc_func, 1);
-		
+
 		safestrncpy(function->name, irc_func_base[i].name, sizeof(function->name));
 		function->func = irc_func_base[i].func;
-		
+
 		ircbot->funcs.list[i] = function;
 	}
-	
+
 	ircbot->fails = 0;
 	ircbot->fd = 0;
 	ircbot->isIn = false;
 	ircbot->isOn = false;
-	
+
 	timer->add_func_list(ircbot->connect_timer, "irc_connect_timer");
 	timer->add(timer->gettick() + 7000, ircbot->connect_timer, 0, 0);
 }
@@ -442,14 +486,14 @@ void irc_bot_init(bool minimal) {
  */
 void irc_bot_final(void) {
 	int i;
-	
-	if( !hChSys.irc )
+
+	if (!channel->config->irc)
 		return;
 	if( ircbot->isOn ) {
 		ircbot->send("QUIT :Hercules is shutting down");
-		do_close(ircbot->fd);
+		sockt->close(ircbot->fd);
 	}
-	
+
 	for( i = 0; i < ircbot->funcs.size; i++ ) {
 		aFree(ircbot->funcs.list[i]);
 	}
@@ -461,25 +505,25 @@ void irc_bot_final(void) {
  */
 void ircbot_defaults(void) {
 	ircbot = &irc_bot_s;
-	
+
 	ircbot->channel = NULL;
-	
+
 	ircbot->init = irc_bot_init;
 	ircbot->final = irc_bot_final;
-	
+
 	ircbot->parse = irc_parse;
 	ircbot->parse_sub = irc_parse_sub;
 	ircbot->parse_source = irc_parse_source;
-	
+
 	ircbot->func_search = irc_func_search;
-	
+
 	ircbot->connect_timer = irc_connect_timer;
 	ircbot->identify_timer = irc_identify_timer;
 	ircbot->join_timer = irc_join_timer;
-	
+
 	ircbot->send = irc_send;
 	ircbot->relay = irc_relay;
-	
+
 	ircbot->pong = irc_pong;
 	ircbot->privmsg = irc_privmsg;
 

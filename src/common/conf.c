@@ -1,18 +1,34 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #define HERCULES_CORE
 
 #include "conf.h"
 
-#include "../../3rdparty/libconfig/libconfig.h"
+#include "common/showmsg.h" // ShowError
 
-#include "../common/showmsg.h" // ShowError
+#include <libconfig/libconfig.h>
 
 /* interface source */
 struct libconfig_interface libconfig_s;
-
+struct libconfig_interface *libconfig;
 
 int conf_read_file(config_t *config, const char *config_filename) {
 	libconfig->init(config);
@@ -34,10 +50,10 @@ void config_setting_copy_simple(config_setting_t *parent, const config_setting_t
 	}
 	else {
 		config_setting_t *set;
-		
+
 		if( libconfig->setting_get_member(parent, config_setting_name(src)) != NULL )
 			return;
-		
+
 		if ((set = libconfig->setting_add(parent, config_setting_name(src), config_setting_type(src))) == NULL)
 			return;
 
@@ -83,14 +99,14 @@ void config_setting_copy_aggregate(config_setting_t *parent, const config_settin
 
 	if( libconfig->setting_get_member(parent, config_setting_name(src)) != NULL )
 		return;
-	
+
 	newAgg = libconfig->setting_add(parent, config_setting_name(src), config_setting_type(src));
 
 	if (newAgg == NULL)
 		return;
 
 	n = config_setting_length(src);
-	
+
 	for (i = 0; i < n; i++) {
 		if (config_setting_is_group(src)) {
 			libconfig->setting_copy_simple(newAgg, libconfig->setting_get_elem(src, i));
@@ -101,7 +117,6 @@ void config_setting_copy_aggregate(config_setting_t *parent, const config_settin
 }
 
 int config_setting_copy(config_setting_t *parent, const config_setting_t *src) {
-	
 	if (!config_setting_is_group(parent) && !config_setting_is_list(parent))
 		return CONFIG_FALSE;
 
@@ -115,7 +130,7 @@ int config_setting_copy(config_setting_t *parent, const config_setting_t *src) {
 
 void libconfig_defaults(void) {
 	libconfig = &libconfig_s;
-	
+
 	libconfig->read = config_read;
 	libconfig->write = config_write;
 	/* */
@@ -146,6 +161,7 @@ void libconfig_defaults(void) {
 	/* */
 	libconfig->setting_set_int = config_setting_set_int;
 	libconfig->setting_set_int64 = config_setting_set_int64;
+	libconfig->setting_set_float = config_setting_set_float;
 	libconfig->setting_set_bool = config_setting_set_bool;
 	libconfig->setting_set_string = config_setting_set_string;
 	/* */

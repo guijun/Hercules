@@ -1,32 +1,49 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  Euphy
+//= Copyright (C)  Kisuka
+//= Copyright (C)  L0ne_W0lf
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 // BattleGround System - Flavius
-//===== By: ==================================================
-//= L0ne_W0lf
-//===== Current Version: =====================================
-//= 1.5
-//===== Description: =========================================
-//= [Official Conversion]
+//================= Description ===========================================
 //= Flavius Battleground.
 //= - Winning Team: 9 badges
 //= - Losing Team: 3 badge
-//===== Additional Comments: =================================
-//= 1.0 First Version.
-//= 1.1 Fixed pink crystal spawning as blue. [L0ne_W0lf]
-//= 1.2 Updated 'waitingroom' to support required zeny/lvl. [Kisuka]
-//= 1.3 Removed MaxLvl check in waitingrooms. Replaced setwall with setcell.
-//= 1.4 Label standardization. [Euphy]
-//= 1.5 Added GM management function. [Euphy]
-//============================================================
+//================= Current Version =======================================
+//= 1.5
+//=========================================================================
 
-// Waiting Room NPCs
-//============================================================
+//== Waiting Room NPCs =====================================
 bat_room,86,227,4	script	Lieutenant Ator	4_M_KY_KNT,{
 	end;
 OnInit:
 	waitingroom "Battle Station",11,"start#bat_b01::OnReadyCheck",1,0,80;
 	end;
 OnEnterBG:
-	set $@FlaviusBG1_id1, waitingroom2bg("bat_b01",10,290,"start#bat_b01::OnGuillaumeQuit","");
+	$@FlaviusBG1_id1 = waitingroom2bg("bat_b01",10,290,"start#bat_b01::OnGuillaumeQuit","");
 	end;
 }
 
@@ -36,7 +53,7 @@ OnInit:
 	waitingroom "Battle Station",11,"start#bat_b01::OnReadyCheck",1,0,80;
 	end;
 OnEnterBG:
-	set $@FlaviusBG1_id2, waitingroom2bg("bat_b01",390,10,"start#bat_b01::OnCroixQuit","");
+	$@FlaviusBG1_id2 = waitingroom2bg("bat_b01",390,10,"start#bat_b01::OnCroixQuit","");
 	end;
 }
 
@@ -58,19 +75,17 @@ OnStop:
 OnTimer1000:
 	stopnpctimer;
 	initnpctimer;
-	set .@chk_bat_a01,getmapusers("bat_b01");
+	.@chk_bat_a01 = getmapusers("bat_b01");
 	if (.@chk_bat_a01 < 1) {
-		set $@FlaviusBG1, 0;
-		if( $@FlaviusBG1_id1 ) { bg_destroy $@FlaviusBG1_id1; set $@FlaviusBG1_id1, 0; }
-		if( $@FlaviusBG1_id2 ) { bg_destroy $@FlaviusBG1_id2; set $@FlaviusBG1_id2, 0; }
+		$@FlaviusBG1 = 0;
+		if( $@FlaviusBG1_id1 ) { bg_destroy $@FlaviusBG1_id1; $@FlaviusBG1_id1 = 0; }
+		if( $@FlaviusBG1_id2 ) { bg_destroy $@FlaviusBG1_id2; $@FlaviusBG1_id2 = 0; }
 		donpcevent "start#bat_b01::OnReadyCheck";
 	}
 	end;
 }
 
-
-// Flavius Battleground Engine
-//============================================================
+//== Flavius Battleground Engine ===========================
 bat_b01,15,15,3	script	start#bat_b01	CLEAR_NPC,{
 OnInit:
 	mapwarp "bat_b01","bat_room",154,150;
@@ -79,18 +94,18 @@ OnInit:
 OnReadyCheck:
 	if( $@FlaviusBG1 )
 		end;
-	set .@Guillaume, getwaitingroomstate(0,"Lieutenant Ator");
-	set .@Croix, getwaitingroomstate(0,"Lieutenant Thelokus");
+	.@Guillaume = getwaitingroomstate(0,"Lieutenant Ator");
+	.@Croix = getwaitingroomstate(0,"Lieutenant Thelokus");
 	if( !.@Guillaume && !.@Croix ) {
 		donpcevent "#bat_b01_timer::OnStop";
 		end;
 	}
 	if( .@Guillaume < 10 || .@Croix < 10 )
 		end;
-	set $@FlaviusBG1, 1;
-	set $@FlaviusBG1_Victory, 0;
-	set $@Croix_ScoreBG1, 0;
-	set $@Guill_ScoreBG1, 0;
+	$@FlaviusBG1 = 1;
+	$@FlaviusBG1_Victory = 0;
+	$@Croix_ScoreBG1 = 0;
+	$@Guill_ScoreBG1 = 0;
 	bg_updatescore "bat_b01",$@Guill_ScoreBG1,$@Croix_ScoreBG1;
 
 	donpcevent "Lieutenant Ator::OnEnterBG";
@@ -160,14 +175,14 @@ OnMyMobDead:
 	if (mobcount("bat_b01","OBJ#bat_b01_a::OnMyMobDead") < 1) {
 		mapannounce "bat_b01", "Guillaume's Crystal has been destroyed.",bc_map,"0xFFCE00";
 		if ($@Croix_ScoreBG1 > 0) {
-			set $@FlaviusBG1_Victory,2;
-			set $@Croix_ScoreBG1,$@Croix_ScoreBG1+1;
+			$@FlaviusBG1_Victory = 2;
+			++$@Croix_ScoreBG1;
 			enablenpc "Guillaume Vintenar#b01_a";
 			enablenpc "Croix Vintenar#b01_b";
 			donpcevent "time#bat_b01::OnStop";
 		}
 		else {
-			set $@Croix_ScoreBG1,1;
+			$@Croix_ScoreBG1 = 1;
 			donpcevent "time#bat_b01::OnEnable";
 			donpcevent "start#bat_b01::OnReset";
 		}
@@ -193,14 +208,14 @@ OnMyMobDead:
 	if (mobcount("bat_b01","OBJ#bat_b01_b::OnMyMobDead") < 1) {
 		mapannounce "bat_b01", "Croix's Crystal has been destroyed.",bc_map,"0xFFCE00";
 		if ($@Guill_ScoreBG1 > 0) {
-			set $@FlaviusBG1_Victory,1;
-			set $@Guill_ScoreBG1,$@Guill_ScoreBG1+1;
+			$@FlaviusBG1_Victory = 1;
+			++$@Guill_ScoreBG1;
 			enablenpc "Guillaume Vintenar#b01_a";
 			enablenpc "Croix Vintenar#b01_b";
 			donpcevent "time#bat_b01::OnStop";
 		}
 		else {
-			set $@Guill_ScoreBG1,1;
+			$@Guill_ScoreBG1 = 1;
 			donpcevent "time#bat_b01::OnEnable";
 			donpcevent "start#bat_b01::OnReset";
 		}
@@ -375,16 +390,16 @@ OnTouch:
 	end;
 }
 
-bat_b01,87,76,0	script	A_CODE#bat_b01	-1,5,5,{
+bat_b01,87,76,0	script	A_CODE#bat_b01	FAKE_NPC,5,5,{
 OnTouch:
-	if (checkquest(2070) < 0)
+	if (!questprogress(2070))
 		setquest 2070;
 	end;
 }
 
-bat_b01,312,224,0	script	B_CODE#bat_b01	-1,5,5,{
+bat_b01,312,224,0	script	B_CODE#bat_b01	FAKE_NPC,5,5,{
 OnTouch:
-	if (checkquest(2070) < 0)
+	if (!questprogress(2070))
 		setquest 2070;
 	end;
 }
@@ -392,15 +407,15 @@ OnTouch:
 bat_b01,10,294,3	script	Guillaume Vintenar#b01_a	4_M_RASWORD,{
 	if ($@FlaviusBG1_id1 == getcharid(4)) {
 		if ($@FlaviusBG1_Victory == 1) {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 8) {
 				mes "[Axl Rose]";
 				mes "Blessed Guillaume!";
 				mes "Let's enjoy our glorious victory!";
 				mes ""+strcharinfo(0)+", it's a sign reflecting victory.";
 				close2;
-				getitem 7829,9; //BF_Badge2
+				getitem BF_Badge2,9;
 			}
 			else {
 				mes "[Axl Rose]";
@@ -408,19 +423,19 @@ bat_b01,10,294,3	script	Guillaume Vintenar#b01_a	4_M_RASWORD,{
 				mes "Let's enjoy our glorious victory!";
 				mes ""+strcharinfo(0)+", it's a sign reflecting victory.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 		else {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 2) {
 				mes "[Axl Rose]";
 				mes "You lost, but you're dedicated to this battle.";
 				mes "This is a reward for your great dedication by Guillaume Marollo!";
 				mes "Just take this defeat as a lesson, next time you will definitely win.";
 				close2;
-				getitem 7829,3; //BF_Badge2
+				getitem BF_Badge2,3;
 			}
 			else {
 				mes "[Axl Rose]";
@@ -428,7 +443,7 @@ bat_b01,10,294,3	script	Guillaume Vintenar#b01_a	4_M_RASWORD,{
 				mes "This is a reward for your great dedication by Guillaume Marollo!";
 				mes "Just take this defeat as a lesson, next time you will definitely win.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 	}
@@ -444,15 +459,15 @@ OnInit:
 bat_b01,389,14,3	script	Croix Vintenar#b01_b	4_M_RASWORD,{
 	if ($@FlaviusBG1_id2 == getcharid(4)) {
 		if ($@FlaviusBG1_Victory == 2) {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 8) {
 				mes "[Swandery]";
 				mes "Blessed Croix!";
 				mes "Let's enjoy our glorious victory!";
 				mes ""+strcharinfo(0)+", it's a sign reflecting victory.";
 				close2;
-				getitem 7829,9; //BF_Badge2
+				getitem BF_Badge2,9;
 			}
 			else {
 				mes "[Swandery]";
@@ -460,19 +475,19 @@ bat_b01,389,14,3	script	Croix Vintenar#b01_b	4_M_RASWORD,{
 				mes "Let's enjoy our glorious victory!";
 				mes ""+strcharinfo(0)+", it's a sign reflecting victory.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 		else {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 2) {
 				mes "[Swandery]";
 				mes "Oh, "+strcharinfo(0)+". Don't be sad.";
 				mes "Even though we didn't win, we did our best.";
 				mes "This is a Royal gift from Croix, and please don't forget this battle. We will win the next one.";
 				close2;
-				getitem 7829,3; //BF_Badge2
+				getitem BF_Badge2,3;
 			}
 			else {
 				mes "[Swandery]";
@@ -480,7 +495,7 @@ bat_b01,389,14,3	script	Croix Vintenar#b01_b	4_M_RASWORD,{
 				mes "Even though we didn't win, we did our best.";
 				mes "This is a Royal gift from Croix, and please don't forget this battle. We will win the next one.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 	}
@@ -574,18 +589,18 @@ bat_b01,336,139,3	script	Croix Camp#flag30	1_FLAG_EAGLE,{ end; }
 bat_b01,389,16,3	script	Croix Camp#flag31	1_FLAG_EAGLE,{ end; }
 
 bat_b01,10,294,3	script	Vintenar#bat_b01_aover	4_M_KY_HEAD,{
-	set .@A_B_gap,$@Guill_ScoreBG1 - $@Croix_ScoreBG1;
+	.@A_B_gap = $@Guill_ScoreBG1 - $@Croix_ScoreBG1;
 	if ($@FlaviusBG1_id1 == getcharid(4)) {
 		if (.@A_B_gap > 0) {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 8) {
 				mes "[Axl Rose]";
 				mes "Blessed Guillaume!";
 				mes "Let's enjoy our glorious victory!";
 				mes ""+strcharinfo(0)+", it's a sign reflecting victory.";
 				close2;
-				getitem 7829,9; //BF_Badge2
+				getitem BF_Badge2,9;
 			}
 			else {
 				mes "[Axl Rose]";
@@ -593,19 +608,19 @@ bat_b01,10,294,3	script	Vintenar#bat_b01_aover	4_M_KY_HEAD,{
 				mes "Let's enjoy our glorious victory!";
 				mes ""+strcharinfo(0)+", it's a sign reflecting victory.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 		else if (.@A_B_gap == 0) {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 2) {
 				mes "[Axl Rose]";
 				mes "You lost, but you're dedicated to this battle.";
 				mes "This is a reward for your great dedication by Guillaume Marollo!";
 				mes "Just take this defeat as a lesson, next time you will definitely win.";
 				close2;
-				getitem 7829,3; //BF_Badge2
+				getitem BF_Badge2,3;
 			}
 			else {
 				mes "[Axl Rose]";
@@ -613,19 +628,19 @@ bat_b01,10,294,3	script	Vintenar#bat_b01_aover	4_M_KY_HEAD,{
 				mes "This is a reward for your great dedication by Guillaume Marollo!";
 				mes "Just take this defeat as a lesson, next time you will definitely win.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 		else {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 2) {
 				mes "[Axl Rose]";
 				mes "You lost, but you're dedicated to this battle.";
 				mes "This is a reward for your great dedication by Guillaume Marollo!";
 				mes "Just take this defeat as a lesson, next time you will definitely win.";
 				close2;
-				getitem 7829,3; //BF_Badge2
+				getitem BF_Badge2,3;
 			}
 			else {
 				mes "[Axl Rose]";
@@ -633,7 +648,7 @@ bat_b01,10,294,3	script	Vintenar#bat_b01_aover	4_M_KY_HEAD,{
 				mes "This is a reward for your great dedication by Guillaume Marollo!";
 				mes "Just take this defeat as a lesson, next time you will definitely win.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 	}
@@ -652,18 +667,18 @@ OnInit:
 }
 
 bat_b01,389,14,3	script	Vintenar#bat_b01_bover	4_M_CRU_HEAD,{
-	set .@A_B_gap,$@Guill_ScoreBG1 - $@Croix_ScoreBG1;
+	.@A_B_gap = $@Guill_ScoreBG1 - $@Croix_ScoreBG1;
 	if ($@FlaviusBG1_id2 == getcharid(4)) {
 		if (.@A_B_gap > 0) {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 2) {
 				mes "[Swandery]";
 				mes "Oh, "+strcharinfo(0)+". Don't be sad.";
 				mes "Even though we didn't win, we did our best.";
 				mes "This is a Royal gift from Croix, and please don't forget this battle. We will win the next one.";
 				close2;
-				getitem 7829,3; //BF_Badge2
+				getitem BF_Badge2,3;
 			}
 			else {
 				mes "[Swandery]";
@@ -671,19 +686,19 @@ bat_b01,389,14,3	script	Vintenar#bat_b01_bover	4_M_CRU_HEAD,{
 				mes "Even though we didn't win, we did our best.";
 				mes "This is a Royal gift from Croix, and please don't forget this battle. We will win the next one.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 		else if (.@A_B_gap == 0) {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 2) {
 				mes "[Swandery]";
 				mes "Oh, "+strcharinfo(0)+". Don't be sad.";
 				mes "Even though we didn't win, we did our best.";
 				mes "This is a Royal gift from Croix, and please don't forget this battle. We will win the next one.";
 				close2;
-				getitem 7829,3; //BF_Badge2
+				getitem BF_Badge2,3;
 			}
 			else {
 				mes "[Swandery]";
@@ -691,19 +706,19 @@ bat_b01,389,14,3	script	Vintenar#bat_b01_bover	4_M_CRU_HEAD,{
 				mes "Even though we didn't win, we did our best.";
 				mes "This is a Royal gift from Croix, and please don't forget this battle. We will win the next one.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 		else {
-			set .@your_medal,countitem(7829);
-			set .@medal_gap,500 - .@your_medal;
+			.@your_medal = countitem(BF_Badge2);
+			.@medal_gap = 500 - .@your_medal;
 			if (.@medal_gap > 8) {
 				mes "[Swandery]";
 				mes "Blessed Croix!";
 				mes "Let's enjoy our glorious victory!";
 				mes ""+strcharinfo(0)+", it's a sign reflecting victory.";
 				close2;
-				getitem 7829,9; //BF_Badge2
+				getitem BF_Badge2,9;
 			}
 			else {
 				mes "[Swandery]";
@@ -711,7 +726,7 @@ bat_b01,389,14,3	script	Vintenar#bat_b01_bover	4_M_CRU_HEAD,{
 				mes "Let's enjoy our glorious victory!";
 				mes ""+strcharinfo(0)+", it's a sign reflecting victory.";
 				close2;
-				getitem 7829,.@medal_gap; //BF_Badge2
+				getitem BF_Badge2,.@medal_gap;
 			}
 		}
 	}
@@ -730,7 +745,7 @@ OnInit:
 }
 
 bat_b01,1,10,3	script	Release all#b01	4_DOG01,{
-	set .@i, callfunc("F_GM_NPC",1854,0);
+	.@i = callfunc("F_GM_NPC",1854,0);
 	if (.@i == -1) {
 		mes "Cancelled.";
 		close;

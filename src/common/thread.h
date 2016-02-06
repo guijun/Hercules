@@ -1,10 +1,27 @@
-// Copyright (c) rAthena Project (www.rathena.org) - Licensed under GNU GPL
-// For more information, see LICENCE in the main folder
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  rAthena Project (www.rathena.org)
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef COMMON_THREAD_H
 #define COMMON_THREAD_H
 
-#include "../common/cbasetypes.h"
+#include "common/cbasetypes.h"
 
 typedef struct rAthread rAthread;
 typedef void* (*rAthreadProc)(void*);
@@ -16,6 +33,7 @@ typedef enum RATHREAD_PRIO {
 } RATHREAD_PRIO;
 
 
+#ifdef HERCULES_CORE
 /**
  * Creates a new Thread
  *
@@ -104,15 +122,13 @@ RATHREAD_PRIO rathread_prio_get(rAthread *handle);
  * Tells the OS scheduler to yield the execution of the calling thread
  *
  * @note: this will not "pause" the thread,
- *			it just allows the OS to spent the remaining time
- *			of the slice to another thread.
+ *        it just allows the OS to spend the remaining time
+ *        of the slice to another thread.
  */
 void rathread_yield(void);
 
-
-
 void rathread_init(void);
 void rathread_final(void);
-
+#endif // HERCULES_CORE
 
 #endif /* COMMON_THREAD_H */

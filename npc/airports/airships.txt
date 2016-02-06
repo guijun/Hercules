@@ -1,19 +1,38 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  Athena Dev Teams
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= The Airship System Script
-//===== By: ==================================================
-//= Hercules Dev Team
-//===== Description: =========================================
+//================= Description ===========================================
 //= The Airship System used in the official servers.
-//===== Additional Comments: =================================
-//= Official NPCs.
-//============================================================
+//=========================================================================
 
-//============================================================
-//= Domestic Airship Route
-//= ... -> Juno -> Einbroch -> Lighthalzen -> Einbroch
-//= -> Juno -> Hugel -> ...
-//============================================================
-
+//=== Domestic Airship Route ===============================
+// ... -> Juno -> Einbroch -> Lighthalzen -> Einbroch ->
+// -> Juno -> Hugel -> ...
 airplane,243,73,0	script	#AirshipWarp-1	WARPNPC,1,1,{
 	end;
 
@@ -39,7 +58,7 @@ OnTouch:
 
 airplane,243,29,0	duplicate(#AirshipWarp-1)	#AirshipWarp-2	WARPNPC,1,1
 
-airplane,1,1,0	script	Domestic_Airship	-1,{
+airplane,1,1,0	script	Domestic_Airship	FAKE_NPC,{
 	end;
 OnInit:
 	initnpctimer;
@@ -51,7 +70,7 @@ OnTimer50000:
 	mapannounce "airplane","We will arrive in Einbroch shortly.",bc_map,"0x00ff00";
 	end;
 OnTimer60000:
-	set $@airplanelocation,1;
+	$@airplanelocation = 1;
 	donpcevent "#AirshipWarp-1::OnUnhide";
 	donpcevent "#AirshipWarp-2::OnUnhide";
 	mapannounce "airplane","Welcome to Einbroch. Have a safe trip.",bc_map,"0x00ff00";
@@ -71,7 +90,7 @@ OnTimer130000:
 	mapannounce "airplane","We will arrive in Lighthalzen shortly.",bc_map,"0x70dbdb";
 	end;
 OnTimer140000:
-	set $@airplanelocation,2;
+	$@airplanelocation = 2;
 	donpcevent "#AirshipWarp-1::OnUnhide";
 	donpcevent "#AirshipWarp-2::OnUnhide";
 	mapannounce "airplane","Welcome to Lighthalzen. Have a safe trip.",bc_map,"0x70dbdb";
@@ -91,7 +110,7 @@ OnTimer210000:
 	mapannounce "airplane","We will arrive in Einbroch shortly.",bc_map,"0x00FF00";
 	end;
 OnTimer220000:
-	set $@airplanelocation,1;
+	$@airplanelocation = 1;
 	donpcevent "#AirshipWarp-1::OnUnhide";
 	donpcevent "#AirshipWarp-2::OnUnhide";
 	mapannounce "airplane","Welcome to Einbroch. Have a safe trip.",bc_map,"0x00ff00";
@@ -111,7 +130,7 @@ OnTimer290000:
 	mapannounce "airplane","We will arrive in Juno shortly.",bc_map,"0xff8200";
 	end;
 OnTimer300000:
-	set $@airplanelocation,0;
+	$@airplanelocation = 0;
 	donpcevent "#AirshipWarp-1::OnUnhide";
 	donpcevent "#AirshipWarp-2::OnUnhide";
 	mapannounce "airplane","Welcome to Juno. Have a safe trip.",bc_map,"0xff8200";
@@ -131,7 +150,7 @@ OnTimer370000:
 	mapannounce "airplane","We will arrive in Hugel shortly.",bc_map,"0xca4bf3";
 	end;
 OnTimer380000:
-	set $@airplanelocation,3;
+	$@airplanelocation = 3;
 	donpcevent "#AirshipWarp-1::OnUnhide";
 	donpcevent "#AirshipWarp-2::OnUnhide";
 	mapannounce "airplane","Welcome to Hugel. Have a safe trip.",bc_map,"0xca4bf3";
@@ -151,7 +170,7 @@ OnTimer450000:
 	mapannounce "airplane","We will arrive in Juno shortly.",bc_map,"0xff8200";
 	end;
 OnTimer460000:
-	set $@airplanelocation,0;
+	$@airplanelocation = 0;
 	donpcevent "#AirshipWarp-1::OnUnhide";
 	donpcevent "#AirshipWarp-2::OnUnhide";
 	mapannounce "airplane","Welcome to Juno. Have a safe trip.",bc_map,"0xff8200";
@@ -383,7 +402,7 @@ airplane,221,158,2	script	Pilot#airplane	4_M_EIN_SOLDIER,{
 		mes "......";
 		mes "No one ever really";
 		mes "comes into this room.";
-		mes "And the captain IS a reindeer.^FFFFFF ^000000 I could just strip to my boxers.";
+		mes "And the captain IS a reindeer. I could just strip to my boxers.";
 		next;
 		emotion e_omg;
 		mes "[Pilot]";
@@ -476,7 +495,7 @@ airplane,50,66,5	script	Apple Merchant#airplane	4_M_04,{
 		next;
 		while (1) {
 			input .@input;
-			set .@pay, .@input * 15;
+			.@pay = .@input * 15;
 			if (.@input == 0) {
 				mes "[Fruitz]";
 				mes "Thanks for stopping";
@@ -522,7 +541,7 @@ airplane,50,66,5	script	Apple Merchant#airplane	4_M_04,{
 			mes "purchase fewer Apples.";
 			close;
 		}
-		else if (checkweight(512,.@input) == 0) {
+		else if (checkweight(Apple,.@input) == 0) {
 			mes "[Fruitz]";
 			mes "Hmmm, I don't think";
 			mes "you've got enough room in";
@@ -532,7 +551,7 @@ airplane,50,66,5	script	Apple Merchant#airplane	4_M_04,{
 		}
 		else {
 			Zeny -= .@pay;
-			getitem 512,.@input; //Apple
+			getitem Apple,.@input;
 			mes "[Fruitz]";
 			mes "Thanks for stopping by";
 			mes "my shop. I hope you enjoy";
@@ -548,7 +567,7 @@ airplane,50,66,5	script	Apple Merchant#airplane	4_M_04,{
 		next;
 		switch (select("Yes:No")) {
 		case 1:
-			if (countitem(512) < 3 || countitem(713) < 1) {
+			if (countitem(Apple) < 3 || countitem(Empty_Bottle) < 1) {
 				mes "[Fruitz]";
 				mes "I'm sorry, but you don't";
 				mes "have enough materials to";
@@ -567,9 +586,9 @@ airplane,50,66,5	script	Apple Merchant#airplane	4_M_04,{
 				mes "*Grind grind*";
 				mes "*Clang...!*^000000";
 				next;
-				delitem 512,3; //Apple
-				delitem 713,1; //Empty_Bottle
-				getitem 531,1; //Apple_Juice
+				delitem Apple,3;
+				delitem Empty_Bottle,1;
+				getitem Apple_Juice,1;
 				mes "[Fruitz]";
 				mes "There you go~";
 				mes "I hope you enjoy!";
@@ -643,19 +662,16 @@ airplane,50,66,5	script	Apple Merchant#airplane	4_M_04,{
 	}
 }
 
-//============================================================
-//= International Airship Route
-//= ... -> Izlude -> Juno -> Rachel -> ...
-//============================================================
-
+//== International Airship Route ===========================
+// ... -> Izlude -> Juno -> Rachel -> ...
 airplane_01,243,73,0	script	#AirshipWarp-3	WARPNPC,1,1,{
 	end;
-	
+
 OnTouch:
 	switch ($@airplanelocation2) {
 	case 0: warp "ra_fild12",292,204; end;
 	case 1:
-		if(checkre(0))
+		if (RENEWAL)
 			warp "izlude",200,73;
 		else
 			warp "izlude",200,56;
@@ -668,7 +684,7 @@ OnHide:
 	specialeffect EF_BASH;
 	disablenpc strnpcinfo(0);
 	end;
-	
+
 OnUnhide:
 	enablenpc strnpcinfo(0);
 	specialeffect EF_SUMMONSLAVE;
@@ -677,7 +693,7 @@ OnUnhide:
 
 airplane_01,243,29,0	duplicate(#AirshipWarp-3)	#AirshipWarp-4	WARPNPC,1,1
 
-airplane_01,1,1,0	script	International_Airship	-1,{
+airplane_01,1,1,0	script	International_Airship	FAKE_NPC,{
 	end;
 OnInit:
 OnEnable:
@@ -690,7 +706,7 @@ OnTimer50000:
 	mapannounce "airplane_01","We will arrive in Izlude shortly.",bc_map,"0x00ff00";
 	end;
 OnTimer60000:
-	set $@airplanelocation2,1;
+	$@airplanelocation2 = 1;
 	donpcevent "#AirshipWarp-3::OnUnhide";
 	donpcevent "#AirshipWarp-4::OnUnhide";
 	mapannounce "airplane_01","Welcome to Izlude. Have a safe trip.",bc_map,"0x00ff00";
@@ -710,7 +726,7 @@ OnTimer130000:
 	mapannounce "airplane_01","We will arrive in Juno shortly.",bc_map,"0x70dbdb";
 	end;
 OnTimer140000:
-	set $@airplanelocation2,2;
+	$@airplanelocation2 = 2;
 	donpcevent "#AirshipWarp-3::OnUnhide";
 	donpcevent "#AirshipWarp-4::OnUnhide";
 	mapannounce "airplane_01","Welcome to Juno. Have a safe trip.",bc_map,"0x70dbdb";
@@ -730,7 +746,7 @@ OnTimer210000:
 	mapannounce "airplane_01","We will arrive in Rachel shortly.",bc_map,"0xFF8200";
 	end;
 OnTimer220000:
-	set $@airplanelocation2,0;
+	$@airplanelocation2 = 0;
 	donpcevent "#AirshipWarp-3::OnUnhide";
 	donpcevent "#AirshipWarp-4::OnUnhide";
 	mapannounce "airplane_01","Welcome to Rachel. Have a safe trip.",bc_map,"0xFF8200";
@@ -743,13 +759,13 @@ OnTimer240000:
 	donpcevent "#AirshipWarp-4::OnHide";
 	mapannounce "airplane_01","The Airship is now taking off. Our next destination is Izlude.",bc_map,"0x00ff00";
 	stopnpctimer;
-	set .moninv, .moninv + 1;
+	++.moninv;
 	if (.moninv == 7) {
 		if (rand(1,3) == 3) {
 			donpcevent "Airship#airplane02::OnEnable";
 			end;
 		}
-		set .moninv, 0;
+		.moninv = 0;
 	}
 	initnpctimer;
 	end;
@@ -814,7 +830,7 @@ airplane_01,250,58,2	script	Airship Staff#airplane01	1_F_02,{
 }
 
 airplane_01,50,66,5	script	Apple Merchant#air01	4_M_04,{
-	if (checkweight(1201,1) == 0) {
+	if (checkweight(Knife,1) == 0) {
 		mes "- Wait a minute !! -";
 		mes "- Currently you're carrying -";
 		mes "- too many items with you. -";
@@ -840,7 +856,7 @@ airplane_01,50,66,5	script	Apple Merchant#air01	4_M_04,{
 		next;
 		while (1) {
 			input .@input;
-			set .@pay, .@input * 15;
+			.@pay = .@input * 15;
 			if (.@input == 0) {
 				mes "[Meltz]";
 				mes "Thanks for stopping";
@@ -885,7 +901,7 @@ airplane_01,50,66,5	script	Apple Merchant#air01	4_M_04,{
 			mes "purchase less Apples.";
 			close;
 		}
-		else if (checkweight(512,.@input) == 0) {
+		else if (checkweight(Apple,.@input) == 0) {
 			mes "[Meltz]";
 			mes "Hmm, I don't think you've";
 			mes "got enough room to carry";
@@ -896,7 +912,7 @@ airplane_01,50,66,5	script	Apple Merchant#air01	4_M_04,{
 		}
 		else {
 			Zeny -= .@pay;
-			getitem 512,.@input; //Apple
+			getitem Apple,.@input;
 			mes "[Meltz]";
 			mes "Thanks for stopping by";
 			mes "my shop. I hope you enjoy";
@@ -912,7 +928,7 @@ airplane_01,50,66,5	script	Apple Merchant#air01	4_M_04,{
 		next;
 		switch (select("Yes:No")) {
 		case 1:
-			if (countitem(512) < 3 || countitem(713) < 1) {
+			if (countitem(Apple) < 3 || countitem(Empty_Bottle) < 1) {
 				mes "[Meltz]";
 				mes "I'm sorry, but you don't";
 				mes "have enough materials to";
@@ -929,9 +945,9 @@ airplane_01,50,66,5	script	Apple Merchant#air01	4_M_04,{
 				mes "*Grind* *Grind*";
 				mes "*Clang...!*^000000";
 				next;
-				delitem 512,3; //Apple
-				delitem 713,1; //Empty_Bottle
-				getitem 531,1; //Apple_Juice
+				delitem Apple,3;
+				delitem Empty_Bottle,1;
+				getitem Apple_Juice,1;
 				mes "[Meltz]";
 				mes "There you go~";
 				mes "Please come again.";
@@ -1054,9 +1070,7 @@ airplane_01,71,31,2	script	Swordsman Shimizu#air_01	1_M_MOC_LORD,{
 	close;
 }
 
-//============================================================
-//= Typing Challenge
-//============================================================
+//=== Typing Challenge =====================================
 airplane_01,32,61,4	script	Nils#ein	1_M_03,1,1,{
 	mes "[Nils]";
 	mes "Welcome to the";
@@ -1129,26 +1143,26 @@ airplane_01,32,61,4	script	Nils#ein	1_M_03,1,1,{
 					1740,
 					1440,
 					1450;
-		set .@wordtest, rand(7);
+		.@wordtest = rand(7);
 		next;
 		mes "[Nils]";
 		mes .@line1_1$[.@wordtest];
 		mes .@line1_2$[.@wordtest];
 		mes .@line1_3$[.@wordtest];
-		set .@start_time, gettime(3)*60*60 + gettime(2)*60 + gettime(1);
+		.@start_time = gettime(GETTIME_HOUR)*60*60 + gettime(GETTIME_MINUTE)*60 + gettime(GETTIME_SECOND);
 		next;
 		input .@save1$;
-		set .@end_time, gettime(3)*60*60 + gettime(2)*60 + gettime(1);
-		set .@total_time, .@end_time - .@start_time;
+		.@end_time = gettime(GETTIME_HOUR)*60*60 + gettime(GETTIME_MINUTE)*60 + gettime(GETTIME_SECOND);
+		.@total_time = .@end_time - .@start_time;
 		mes "[Nils]";
 		mes .@line2_1$[.@wordtest];
 		mes .@line2_2$[.@wordtest];
-		set .@start_time, gettime(3)*60*60 + gettime(2)*60 + gettime(1);
+		.@start_time = gettime(GETTIME_HOUR)*60*60 + gettime(GETTIME_MINUTE)*60 + gettime(GETTIME_SECOND);
 		next;
 		input .@save2$;
-		set .@end_time, gettime(3)*60*60 + gettime(2)*60 + gettime(1);
-		set .@total_time, .@total_time + (.@start_time - .@end_time);
-		set .@tasoo, (.@letters[.@wordtest] / .@total_time) * 6;
+		.@end_time = gettime(GETTIME_HOUR)*60*60 + gettime(GETTIME_MINUTE)*60 + gettime(GETTIME_SECOND);
+		.@total_time = .@total_time + (.@start_time - .@end_time);
+		.@tasoo = (.@letters[.@wordtest] / .@total_time) * 6;
 		if ((.@save1$ == .@word1$[.@wordtest]) && (.@save2$ == .@word2$[.@wordtest])) {
 			mes "[Nils]";
 			mes "Your record is ^ff0000" + .@total_time + " seconds^000000 and";
@@ -1171,8 +1185,8 @@ airplane_01,32,61,4	script	Nils#ein	1_M_03,1,1,{
 				mes "However, ^ff0000" + strcharinfo(0) + "^000000,";
 				mes "you made the new top record";
 				mes "this time. Congratulations!";
-				set $050320_minus1_typing$, strcharinfo(0);
-				set $050320_ein_typing, .@tasoo;
+				$050320_minus1_typing$ = strcharinfo(0);
+				$050320_ein_typing = .@tasoo;
 				close;
 			}
 			else {
@@ -1229,9 +1243,7 @@ airplane_01,32,61,4	script	Nils#ein	1_M_03,1,1,{
 	}
 }
 
-//============================================================
-//= Apple Gambling
-//============================================================
+//== Apple Gambling ========================================
 airplane_01,33,68,4	script	Clarice	1_F_MERCHANT_02,{
 	mes "[Clarice]";
 	mes "Hi, I'm Clarice~";
@@ -1345,7 +1357,7 @@ function	script	applegamble	{
 			next;
 			continue;
 		}
-		if (countitem(512) <.@amount) {
+		if (countitem(Apple) <.@amount) {
 			mes "I'm sorry, but you";
 			mes "don't seem to have";
 			mes "enough Apples for this";
@@ -1363,11 +1375,11 @@ function	script	applegamble	{
 	}
 	mes "^3355FF*Rolling and rumbling*^000000";
 	next;
-	set .@giveapple, .@amount*2;
-	set .@table1, rand(1,6);
-	set .@table2, rand(1,6);
-	set .@tablesub, .@table1 + .@table2;
-	set .@tabletotal, .@tablesub;
+	.@giveapple = .@amount*2;
+	.@table1 = rand(1,6);
+	.@table2 = rand(1,6);
+	.@tablesub = .@table1 + .@table2;
+	.@tabletotal = .@tablesub;
 	mes "["+getarg(0)+"]";
 	mes "I got a ^0000FF" + .@table1 + "^000000 and a ^0000FF" + .@table2 + "^000000.";
 	mes "That's a total of ^0000FF" + .@tablesub + "^000000.";
@@ -1375,15 +1387,15 @@ function	script	applegamble	{
 	next;
 	select("Cast Dice.");
 	mes "^3355FF*Rolling and rumbling*^000000";
-	set .@player1, rand(1,6);
-	set .@player2, rand(1,6);
-	set .@playersub, .@player1 + .@player2;
+	.@player1 = rand(1,6);
+	.@player2 = rand(1,6);
+	.@playersub = .@player1 + .@player2;
 	if (.@playersub > 9 && .@amount > 39) {
-		set .@player1, rand(1,6);
-		set .@player2, rand(1,6);
-		set .@playersub, .@player1 + .@player2;
+		.@player1 = rand(1,6);
+		.@player2 = rand(1,6);
+		.@playersub = .@player1 + .@player2;
 	}
-	set .@playertotal, .@playersub;
+	.@playertotal = .@playersub;
 	next;
 	mes "["+getarg(0)+"]";
 	mes "^FF0000" + strcharinfo(0) + "^000000, you have ^FF0000" + .@player1 + "^000000 and ^FF0000" + .@player2 + "^000000. The total is ^FF0000" + .@playersub + "^000000 .";
@@ -1400,8 +1412,8 @@ function	script	applegamble	{
 	switch (select("Cast dice.:Cancel.")) {
 	case 1:
 		mes "^3355FF*Rolling and rumbling*^000000";
-		set .@player3, rand(1,6);
-		set .@playertotal, .@playertotal + .@player3;
+		.@player3 = rand(1,6);
+		.@playertotal += .@player3;
 		next;
 		mes "["+getarg(0)+"]";
 		if (.@playertotal > 12) {
@@ -1416,7 +1428,7 @@ function	script	applegamble	{
 			if (.@tablesub > 8) {
 				mes "^FF0000" + strcharinfo(0) + "^000000, you got ^FF0000" + .@player3 + "^000000 and the total is now ^FF0000" + .@playertotal + "^000000. I don't want to take any risk, let's end this game in a draw. Let's play again some other time~";
 				close2;
-				getitem 512,.@amount; //Apple
+				getitem Apple,.@amount;
 				end;
 			}
 		}
@@ -1433,7 +1445,7 @@ function	script	applegamble	{
 			if (.@tablesub > 8) {
 				mes "I see, you don't want to take risk of losing this game. Neither do I, let's end this game in a draw. Let's play again some other time~";
 				close2;
-				getitem 512,.@amount; //Apple
+				getitem Apple,.@amount;
 				end;
 			}
 			mes "Alright.";
@@ -1450,26 +1462,26 @@ function	script	applegamble	{
 	}
 	next;
 	mes "^3355FF*Rolling and rumbling*^000000";
-	set .@table3, rand(1,6);
-	set .@tabletotal, .@tabletotal + .@table3;
+	.@table3 = rand(1,6);
+	.@tabletotal += .@table3;
 	next;
 	mes "["+getarg(0)+"]";
 	if (.@tabletotal > 12) {
 		mes "I got ^0000FF" + .@table3 + "^000000 and the total is now ^0000FF" + .@tabletotal + "^000000. I lost this game since my total exceeded 12. Let me give you my apples. Congratulations, that was a great game.";
 		close2;
-		getitem 512,.@giveapple; //Apple
+		getitem Apple,.@giveapple;
 		end;
 	}
 	else if (.@playertotal > .@tabletotal) {
 		mes "I got ^0000FF" + .@table3 + "^000000 and the total is now ^0000FF" + .@tabletotal + "^000000. With total ^FF0000" + .@playertotal + "^000000 you won this game, ^FF0000" + strcharinfo(0) + "^000000. Let me give you my apples. It was a great game and I hope we will play again some other time.";
 		close2;
-		getitem 512,.@giveapple; //Apple
+		getitem Apple,.@giveapple;
 		end;
 	}
 	else if (.@playertotal == .@tabletotal) {
 		mes "I got ^0000FF" + .@table3 + "^000000 and the total is now ^0000FF" + .@tabletotal + "^000000. With total ^FF0000" + .@playertotal + "^000000 this game came out even, ^FF0000" + strcharinfo(0) + "^000000. Let me give you your apple back. It was a great game and I hope we will play again some other time.";
 		close2;
-		getitem 512,.@amount; //Apple
+		getitem Apple,.@amount;
 		end;
 	}
 	else if (.@playertotal < .@tabletotal) {

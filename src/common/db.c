@@ -1,7 +1,25 @@
-/*****************************************************************************\
- *  Copyright (c) Athena Dev Teams - Licensed under GNU GPL
- *  For more information, see LICENCE in the main folder
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
  *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/*****************************************************************************\
  *  This file is separated in five sections:
  *  (1) Private typedefs, enums, structures, defines and global variables
  *  (2) Private functions
@@ -72,14 +90,17 @@
 
 #include "db.h"
 
+#include "common/ers.h"
+#include "common/memmgr.h"
+#include "common/mmo.h"
+#include "common/showmsg.h"
+#include "common/strlib.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../common/ers.h"
-#include "../common/malloc.h"
-#include "../common/mmo.h"
-#include "../common/showmsg.h"
-#include "../common/strlib.h"
+struct db_interface DB_s;
+struct db_interface *DB;
 
 /*****************************************************************************\
  *  (1) Private typedefs, enums, structures, defines and global variables of *
@@ -332,7 +353,7 @@ static struct db_stats {
 };
 #define DB_COUNTSTAT(token) do { if ((stats.token) != UINT32_MAX) ++(stats.token); } while(0)
 #else /* !defined(DB_ENABLE_STATS) */
-#define DB_COUNTSTAT(token)
+#define DB_COUNTSTAT(token) (void)0
 #endif /* !defined(DB_ENABLE_STATS) */
 
 /* [Ind/Hercules] */
@@ -495,7 +516,6 @@ static void db_rebalance_erase(DBNode *node, DBNode **root)
 	DBNode *y = node;
 	DBNode *x = NULL;
 	DBNode *x_parent = NULL;
-	DBNode *w;
 
 	DB_COUNTSTAT(db_rebalance_erase);
 	// Select where to change the tree
@@ -563,6 +583,7 @@ static void db_rebalance_erase(DBNode *node, DBNode **root)
 	// Restore the RED-BLACK properties
 	if (y->color != RED) {
 		while (x != *root && (x == NULL || x->color == BLACK)) {
+			DBNode *w;
 			if (x == x_parent->left) {
 				w = x_parent->right;
 				if (w->color == RED) {
@@ -577,7 +598,7 @@ static void db_rebalance_erase(DBNode *node, DBNode **root)
 					x = x_parent;
 					x_parent = x_parent->parent;
 				} else {
-					if (w->right == NULL ||	w->right->color == BLACK) {
+					if (w->right == NULL || w->right->color == BLACK) {
 						if (w->left) w->left->color = BLACK;
 						w->color = RED;
 						db_rotate_right(w, root);
@@ -1229,7 +1250,7 @@ static void db_release_both(DBKey key, DBData data, DBRelease which)
 DBData* dbit_obj_first(DBIterator* self, DBKey* out_key)
 {
 	DBIterator_impl* it = (DBIterator_impl*)self;
-	
+
 	DB_COUNTSTAT(dbit_first);
 	// position before the first entry
 	it->ht_index = -1;
@@ -1251,7 +1272,7 @@ DBData* dbit_obj_first(DBIterator* self, DBKey* out_key)
 DBData* dbit_obj_last(DBIterator* self, DBKey* out_key)
 {
 	DBIterator_impl* it = (DBIterator_impl*)self;
-	
+
 	DB_COUNTSTAT(dbit_last);
 	// position after the last entry
 	it->ht_index = HASH_SIZE;
@@ -1373,7 +1394,6 @@ DBData* dbit_obj_prev(DBIterator* self, DBKey* out_key)
 			node = &fake;
 		}
 
-		
 		while( node )
 		{// next node
 			if( node->left )
@@ -1525,7 +1545,6 @@ static bool db_obj_exists(DBMap* self, DBKey key)
 {
 	DBMap_impl* db = (DBMap_impl*)self;
 	DBNode *node;
-	int c;
 	bool found = false;
 
 	DB_COUNTSTAT(db_exists);
@@ -1547,7 +1566,7 @@ static bool db_obj_exists(DBMap* self, DBKey key)
 	db_free_lock(db);
 	node = db->ht[db->hash(key, db->maxlen)%HASH_SIZE];
 	while (node) {
-		c = db->cmp(key, node->key, db->maxlen);
+		int c = db->cmp(key, node->key, db->maxlen);
 		if (c == 0) {
 			if (!(node->deleted)) {
 				db->cache = node;
@@ -1576,7 +1595,6 @@ static DBData* db_obj_get(DBMap* self, DBKey key)
 {
 	DBMap_impl* db = (DBMap_impl*)self;
 	DBNode *node;
-	int c;
 	DBData *data = NULL;
 
 	DB_COUNTSTAT(db_get);
@@ -1599,7 +1617,7 @@ static DBData* db_obj_get(DBMap* self, DBKey key)
 	db_free_lock(db);
 	node = db->ht[db->hash(key, db->maxlen)%HASH_SIZE];
 	while (node) {
-		c = db->cmp(key, node->key, db->maxlen);
+		int c = db->cmp(key, node->key, db->maxlen);
 		if (c == 0) {
 			if (!(node->deleted)) {
 				data = &node->data;
@@ -1660,17 +1678,17 @@ static unsigned int db_obj_vgetall(DBMap* self, DBData **buf, unsigned int max, 
 				}
 				va_end(argscopy);
 			}
-			
+
 			if (node->left) {
 				node = node->left;
 				continue;
 			}
-			
+
 			if (node->right) {
 				node = node->right;
 				continue;
 			}
-			
+
 			while (node) {
 				parent = node->parent;
 				if (parent && parent->right && parent->left == node) {
@@ -1857,7 +1875,7 @@ static DBData* db_obj_ensure(DBMap* self, DBKey key, DBCreateData create, ...)
  * @see #db_malloc_dbn(void)
  * @see DBMap#put
  * FIXME: If this method fails shouldn't it return another value?
- *		 Other functions rely on this to know if they were able to put something [Panikon]
+ *        Other functions rely on this to know if they were able to put something [Panikon]
  */
 static int db_obj_put(DBMap* self, DBKey key, DBData data, DBData *out_data)
 {
@@ -1969,7 +1987,7 @@ static int db_obj_remove(DBMap* self, DBKey key, DBData *out_data)
 	DBMap_impl* db = (DBMap_impl*)self;
 	DBNode *node;
 	unsigned int hash;
-	int c = 0, retval = 0;
+	int retval = 0;
 
 	DB_COUNTSTAT(db_remove);
 	if (db == NULL) return 0; // nullpo candidate
@@ -1979,7 +1997,7 @@ static int db_obj_remove(DBMap* self, DBKey key, DBData *out_data)
 				db->alloc_file, db->alloc_line);
 		return 0; // nullpo candidate
 	}
-	if (!(db->options&DB_OPT_ALLOW_NULL_KEY) && db_is_key_null(db->type, key))	{
+	if (!(db->options&DB_OPT_ALLOW_NULL_KEY) && db_is_key_null(db->type, key)) {
 		ShowError("db_remove: Attempted to use non-allowed NULL key for db allocated at %s:%d\n",db->alloc_file, db->alloc_line);
 		return 0; // nullpo candidate
 	}
@@ -1987,7 +2005,7 @@ static int db_obj_remove(DBMap* self, DBKey key, DBData *out_data)
 	db_free_lock(db);
 	hash = db->hash(key, db->maxlen)%HASH_SIZE;
 	for(node = db->ht[hash]; node; ){
-		c = db->cmp(key, node->key, db->maxlen);
+		int c = db->cmp(key, node->key, db->maxlen);
 		if (c == 0) {
 			if (!(node->deleted)) {
 				if (db->cache == node)
@@ -2643,7 +2661,7 @@ DBKey db_str2key(const char *key)
 DBKey db_i642key(int64 key)
 {
 	DBKey ret;
-	
+
 	DB_COUNTSTAT(db_i642key);
 	ret.i64 = key;
 	return ret;
@@ -2658,7 +2676,7 @@ DBKey db_i642key(int64 key)
 DBKey db_ui642key(uint64 key)
 {
 	DBKey ret;
-	
+
 	DB_COUNTSTAT(db_ui642key);
 	ret.ui64 = key;
 	return ret;

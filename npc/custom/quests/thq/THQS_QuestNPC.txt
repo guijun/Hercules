@@ -44,7 +44,7 @@ N_PayZeny:
 	set On_Quest, 0;
 	Zeny -= 2500;
 	//add time delay penalty. You can get another quest after 2 - 3 hours. [Lupus]
-	set #THQ_DELAY, (gettime(7)*12*31*24+gettime(6)*31*24+gettime(5)*24+gettime(3)+rand(2,3));
+	set #THQ_DELAY, (gettime(GETTIME_YEAR)*12*31*24+gettime(GETTIME_MONTH)*31*24+gettime(GETTIME_DAYOFMONTH)*24+gettime(GETTIME_HOUR)+rand(2,3));
 	mes "[Guy]";
 	mes "Its sad to see someone give a quest up...";
 	mes "Shame on you.";
@@ -59,19 +59,19 @@ N_ZenyFail:
 N_NewQuest:
 	if (Event_THQS == 0) goto N_Signup;
 	//checking if time penalty is over [Lupus]
-	if (#THQ_DELAY > (gettime(7)*12*31*24 + gettime(6)*31*24 + gettime(5)*24 + gettime(3)) ) goto L_NoQuestsForYet;
+	if (#THQ_DELAY > (gettime(GETTIME_YEAR)*12*31*24 + gettime(GETTIME_MONTH)*31*24 + gettime(GETTIME_DAYOFMONTH)*24 + gettime(GETTIME_HOUR)) ) goto L_NoQuestsForYet;
 	mes "[Guy]";
 	mes "Ahh welcome fellow Treasure Hunter.";
 	mes "You currently have ^FF0000"+#Treasure_Token+"^000000 treasure tokens!!!";
 	mes "Would you like me to asign you a Quest?";
 	next;
 	menu "Yes I would like a Quest Please.",-,"Sorry Guy no time today.",N_NoTime;
-	
+
 	mes "[Guy]";
 	mes "Ok lets see what quest we can give you today.";
 	mes "The quest names in ^FF0000This Colour^000000 mean that they are more challanging then the rest, but have better rewards.";
 	next;
-	set #THQ_DELAY,(gettime(7)*12*31*24+gettime(6)*31*24+gettime(5)*24+gettime(3) + 1); //you can get another quest after 1 hour [Lupus]
+	set #THQ_DELAY,(gettime(GETTIME_YEAR)*12*31*24+gettime(GETTIME_MONTH)*31*24+gettime(GETTIME_DAYOFMONTH)*24+gettime(GETTIME_HOUR) + 1); //you can get another quest after 1 hour [Lupus]
 	emotion 21;
 	if(@treasure_job==0) set @treasure_job,rand(1,10); //doesn't allow cheaters to pick any quest they want
 	if(@treasure_job==2) goto N_JobList2;
@@ -100,7 +100,7 @@ N_Signup:
 L_NoQuestsForYet:
 	mes "[Guy]";
 	mes "I'm afraid there aren't any Quests for you yet.";
-	mes "Call in "+ (#THQ_DELAY - (gettime(7)*12*31*24+gettime(6)*31*24+gettime(5)*24+gettime(3)) )+" hours later.";
+	mes "Call in "+ (#THQ_DELAY - (gettime(GETTIME_YEAR)*12*31*24+gettime(GETTIME_MONTH)*31*24+gettime(GETTIME_DAYOFMONTH)*24+gettime(GETTIME_HOUR)) )+" hours later.";
 	emotion 17;
 	close;
 
@@ -134,7 +134,7 @@ N_MasterBow:
 	mes "This is just a package delivery run, no big deal or anything.";
 	mes " ";
 	mes "Take this to an archer in the Archer Village outside of Payon.";
-	getitem 1072,1; //Delivery_Box
+	getitem Delivery_Message,1; //Delivery_Box
 	set one_qset,2;
 	goto L_QuestGiven;
 
@@ -173,7 +173,7 @@ N_JobList2:
 	mes " ";
 	mes "A strange man came in here yesterday and asked me to deliver this ^FF0000Strange Letter^000000 to some woman in Morroc. Knowing us we do not ask questions so you must take care of this delivery.";
 	mes "The Woman is in located in Morroc and her name is Erika.";
-	getitem 1072,1; //Delivery_Message
+	getitem Delivery_Message,1;
 	set two_qset, 1;
 	goto L_QuestGiven;
 
@@ -183,7 +183,7 @@ N_JurJeramiah:
 	mes "Standard delivery quest.";
 	mes " ";
 	mes "Jeramiah ordered a Special Jur from our weapon shop.Your Job is to deliver it to him in the Assasin Temple.";
-	getitem 1998,1; //Jeramiah's_Jur
+	getitem 1998,1;
 	set two_qset,2;
 	goto L_QuestGiven;
 
@@ -225,7 +225,7 @@ N_Delivery1:
 	mes "Standard drop off quest.";
 	mes " ";
 	mes "In this quest you need to deliver a mystery box to someone names ^FF0000Flank at the bridge between Aldebaran and Juno^000000.";
-	getitem 1082,1; //Delivery_Box_
+	getitem Merchant_Box_2,1; //Delivery_Box_
 	set three_qset,2;
 	goto L_QuestGiven;
 
@@ -271,7 +271,7 @@ N_MWizard:
 	mes "Proto-type of a Staff must be delivered to Zed the Wizard.";
 	mes " ";
 	mes "Zed the Wizard has requested to try out a new un-named proto-type staff. It will be your job to deliver this to him. Zed tend to stay within the general area of Juno.";
-	getitem 1999,1; //Zed's_Staff
+	getitem 1999,1;
 	set four_qset,2;
 	goto L_QuestGiven;
 
@@ -322,7 +322,7 @@ N_Thinkfirst:
 	mes "This sounds like another one of those ditzy girl quests...";
 	mes " ";
 	mes "Dazzy the local blond around Geffen has asked for you to deliver her these flowers. I don't know why someone would send flowers to herself...";
-	getitem 744,1; //Bouquet
+	getitem Bunch_Of_Flowers,1; //Bouquet
 	set five_qset,3;
 	goto L_QuestGiven;
 
@@ -346,7 +346,7 @@ N_JobList6:
 	mes "How ironic.";
 	mes " ";
 	mes "Deliver this Box to the Thiefs guild.";
-	getitem 1083,1; //Delivery_Box__
+	getitem Merchant_Box_3,1; //Delivery_Box__
 	set six_qset,1;
 	goto L_QuestGiven;
 
@@ -365,7 +365,7 @@ N_Delivery2:
 	mes "Well most of what we do is run packages, this is no different from other's.";
 	mes " ";
 	mes "Take this box, DO NOT OPEN IT! To a little girl in Lutie named Chirach she should be around santa.";
-	getitem 1083,1; //Delivery_Box__
+	getitem Merchant_Box_3,1; //Delivery_Box__
 	set six_qset,3;
 	goto L_QuestGiven;
 
@@ -398,7 +398,7 @@ N_Delivery3:
 	mes "So many packages so little time.";
 	mes " ";
 	mes "Take this box to a man in Alberta named Charles.";
-	getitem 1082,1; //Delivery_Box_
+	getitem Merchant_Box_2,1; //Delivery_Box_
 	set seven_qset,2;
 	goto L_QuestGiven;
 
@@ -440,7 +440,7 @@ N_Delivery4:
 	mes "Well yah box delivering is in high demand,lots of lazy people.";
 	mes " ";
 	mes "Take this package to a man in Morroc named Klye.";
-	getitem 1081,1; //Delivery_Box
+	getitem Merchant_Box_1,1; //Delivery_Box
 	set eight_qset,2;
 	goto L_QuestGiven;
 
@@ -473,7 +473,7 @@ N_JobList9:
 	mes "Oh god please get this out of here fast.";
 	mes " ";
 	mes "Oh man smells like someone died in here.Take this to the Magic School in Geffen and hurry,ahh the smell its burning my eye's!!!";
-	getitem 1082,1; //Delivery_Box_
+	getitem Merchant_Box_2,1; //Delivery_Box_
 	set nine_qset,1;
 	goto L_QuestGiven;
 
@@ -519,7 +519,7 @@ N_JobList10:
 	mes "Package to Morroc";
 	mes " ";
 	mes "There is nothing writen on this box but a notice to deliver it to a man Kreg.";
-	getitem 1082,1; //Delivery_Box_
+	getitem Merchant_Box_2,1; //Delivery_Box_
 	set ten_qset,1;
 	goto L_QuestGiven;
 

@@ -1,12 +1,30 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Base Author: shennetsind @ http://hercules.ws
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2013-2015  Hercules Dev Team
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-
+/**
+ * Base Author: shennetsind @ http://herc.ws
+ */
 #ifndef MAP_IRC_BOT_H
 #define MAP_IRC_BOT_H
 
-#include "../common/cbasetypes.h"
+#include "common/hercules.h"
 
 #define IRC_NICK_LENGTH 40
 #define IRC_IDENT_LENGTH 40
@@ -14,7 +32,7 @@
 #define IRC_FUNC_LENGTH 30
 #define IRC_MESSAGE_LENGTH 500
 
-struct hChSysCh;
+struct channel_data;
 
 struct irc_func {
 	char name[IRC_FUNC_LENGTH];
@@ -29,7 +47,7 @@ struct irc_bot_interface {
 	uint32 ip;
 	unsigned short port;
 	/* */
-	struct hChSysCh *channel;
+	struct channel_data *channel;
 	/* */
 	struct {
 		struct irc_func **list;
@@ -50,7 +68,7 @@ struct irc_bot_interface {
 	int (*join_timer) (int tid, int64 tick, int id, intptr_t data);
 	/* */
 	void (*send)(char *str);
-	void (*relay) (char *name, const char *msg);
+	void (*relay) (const char *name, const char *msg);
 	/* */
 	void (*pong) (int fd, char *cmd, char *source, char *target, char *msg);
 	void (*privmsg) (int fd, char *cmd, char *source, char *target, char *msg);
@@ -59,8 +77,10 @@ struct irc_bot_interface {
 	void (*usernick) (int fd, char *cmd, char *source, char *target, char *msg);
 };
 
-struct irc_bot_interface *ircbot;
-
+#ifdef HERCULES_CORE
 void ircbot_defaults(void);
+#endif // HERCULES_CORE
+
+HPShared struct irc_bot_interface *ircbot;
 
 #endif /* MAP_IRC_BOT_H */

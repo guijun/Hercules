@@ -1,16 +1,48 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  L0ne_W0lf
+//= Copyright (C)  Gepard
+//= Copyright (C)  $ephiroth
+//= Copyright (C)  SinSloth
+//= Copyright (C)  KarLaeda
+//= Copyright (C)  Lupus
+//= Copyright (C)  Toms
+//= Copyright (C)  Silent
+//= Copyright (C)  Musashiden
+//= Copyright (C)  MasterOfMuppets
+//= Copyright (C)  Alan
+//= Copyright (C)  Au{R}oN
+//= Copyright (C)  erKURITA
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= Lighthalzen City
-//===== By: ==================================================
-//=  erKURITA, Au{R}oN (Translated by Alan), $ephiroth
-//===== Current Version: =====================================
+//================= Description ===========================================
+//= Lighthalzen NPCs
+//================= Current Version =======================================
 //= 2.2
-//===== Description: =========================================
-//= Lighthalzen NPCs (Temporal names for now) [erKURITA]
-//===== Additional Comments: ==================================
-//= 2.0 Added missing Lab Staff#amano08 NPC. (bugreport:4319) [Gepard]
-//= 2.1 Commented out Duplicate NPCs. (bugreport:4555)
-//= 2.2 Added missing NPC found in AEGIS files. [L0ne_W0lf]
-//=============================================================
+//=========================================================================
 
 lighthalzen,198,285,5	script	Jiwon#zen5	4_F_LGTGIRL,{
 	mes "[Jiwon]";
@@ -301,7 +333,7 @@ lighthalzen,230,182,4	script	Klaubis#zen3	4_M_LGTGRAND,{
 		mes "many people stay in their";
 		mes "hometowns. Even if you do";
 		mes "leave, though, you can always";
-		mes "come back. It wouldn't be your^FFFFFF ^000000 hometown if you couldn't, right?";
+		mes "come back. It wouldn't be your hometown if you couldn't, right?";
 		close;
 	case 2:
 		mes "[Klaubis]";
@@ -429,7 +461,7 @@ lighthalzen,132,103,5	script	Sefith#li_01	4_M_JOB_KNIGHT2,{
 	mes "Good looks. Intelligence.";
 	mes "Excellent manners. A strong,";
 	mes "manly chin and overpowering,";
-	mes "piercing eyes. Perfectly balanced^FFFFFF ^000000 passion and charimsma. All the";
+	mes "piercing eyes. Perfectly balanced passion and charimsma. All the";
 	mes "good things that ladies want.";
 	next;
 	mes "[Sefith]";
@@ -564,7 +596,7 @@ lighthalzen,182,102,3	script	Lucius#zen5	4_M_LGTGRAND,{
 				close;
 			}
 			Zeny -= .@input;
-			set $donatedzeny,$donatedzeny + .@input;
+			$donatedzeny += .@input;
 			mes "[Lucius]";
 			mes "So far, I've received";
 			mes "a total of " + $donatedzeny + " zeny in";
@@ -580,9 +612,9 @@ lighthalzen,182,102,3	script	Lucius#zen5	4_M_LGTGRAND,{
 				mes "this small gift as a token of";
 				mes "my gratitude, adventurer. Bless";
 				mes "you, youngster and take care.";
-				set $donatedzeny,0;
-				getitem 603,1; //Old_Blue_Box
-				getitem 12016,1; //Speed_Up_Potion
+				$donatedzeny = 0;
+				getitem Old_Blue_Box,1;
+				getitem Speed_Up_Potion,1;
 			}
 			close;
 		}
@@ -1052,8 +1084,8 @@ OnTouch:
 			mes "[Beggar]";
 			mes "What you can see and";
 			mes "understand might not match";
-			mes "with reality. Like the stars that^FFFFFF ^000000 are always there, but not visible";
-			mes "during the day, we'll always have^FFFFFF ^000000 hope, even if we can't see it.";
+			mes "with reality. Like the stars that are always there, but not visible";
+			mes "during the day, we'll always have hope, even if we can't see it.";
 			next;
 			mes "[" + strcharinfo(0) + "]";
 			emotion e_dots,1;
@@ -1081,7 +1113,7 @@ OnTouch:
 			mes "sort of don't. Let me explain";
 			mes "it this way. I take life day by";
 			mes "day, with each day covering its";
-			mes "own spectrum with miracle on^FFFFFF ^000000 one end and tragedy on the other.";
+			mes "own spectrum with miracle on one end and tragedy on the other.";
 			next;
 			mes "[Beggar]";
 			mes "So each day has the capacity";
@@ -1101,7 +1133,7 @@ OnTouch:
 			next;
 			mes "[Beggar]";
 			mes "Stand up when you're down";
-			mes "and live your life with passion.^FFFFFF ^000000 The capacity for miracles will";
+			mes "and live your life with passion. The capacity for miracles will";
 			mes "always be there and know that";
 			mes "you can be someone else's";
 			mes "miracle. Isn't that wonderful?";
@@ -1142,14 +1174,14 @@ OnTouch:
 			mes "isn't so productive. More of";
 			mes "a frustration that you can let";
 			mes "go. Someone cut you off on the";
-			mes "freeway or a friend innocently^FFFFFF ^000000 forgot your birthday? No biggie.";
+			mes "freeway or a friend innocently forgot your birthday? No biggie.";
 			next;
 			mes "[Beggar]";
 			mes "Don't let this kind of";
 			mes "anger get to you or you'll";
 			mes "look like a loser. Think of";
 			mes "the big picture and if you're";
-			mes "still upset, vent appropriately.^FFFFFF ^000000 Be honest without hurting anyone.";
+			mes "still upset, vent appropriately. Be honest without hurting anyone.";
 			next;
 			mes "[Beggar]";
 			mes "The second kind of anger";
@@ -1172,7 +1204,7 @@ OnTouch:
 			mes "righteous anger, say to protect";
 			mes "someone dear to you, will make";
 			mes "you a hero. Fighting with anger";
-			mes "born of frustration will make you^FFFFFF ^000000 a bully. Know the difference.";
+			mes "born of frustration will make you a bully. Know the difference.";
 			next;
 			mes "[" + strcharinfo(0) + "]";
 			emotion e_dots,1;
@@ -1351,7 +1383,7 @@ lhz_in01,139,40,7	script	Enoz#oz	1_M_INNKEEPER,{
 	mes "[Enoz]";
 	mes "So, the novel I ordered from";
 	mes "the Rune-Midgarts Kingdom";
-	mes "just recently arrived. It's real^FFFFFF ^000000 good, by the guy who wrote";
+	mes "just recently arrived. It's real good, by the guy who wrote";
 	mes "''Roda Frog Adventure''";
 	mes "years ago. Remember?";
 	next;
@@ -1973,8 +2005,7 @@ lhz_in01,25,141,4	script	Regenschirm Guard	4_M_LGTGUARD,{
 }
 
 
-// Lighthalzen Bank Area ------------------------------------------------------
-
+//== Lighthalzen Bank Area =================================
 lhz_in02,34,41,1	script	Arthur#zen16	4_M_DIEMAN,{
 	mes "[Arthur]";
 	mes "The chairs here are";
@@ -2038,8 +2069,7 @@ lhz_in02,21,38,7	script	Bank Clerk#1::BankClerk	4_M_04,{
 lhz_in02,21,25,7	duplicate(BankClerk)	Bank Clerk#2	4_M_04
 lhz_in02,34,22,1	duplicate(BankClerk)	Bank Clerk#3	4_M_SAGE_C
 
-// Lightalzen Prison Area -------------------------------------------------------------
-
+//== Lightalzen Prison Area ================================
 lhz_in02,145,177,0	script	Togii#07	4_M_DIEMAN,{
 	mes "[Togii]";
 	mes "Oooh yeah...";
@@ -2170,8 +2200,7 @@ lhz_in02,147,222,3	script	Officer Guo#06::off_guo	4_M_03,{
 
 lhz_in02,142,222,6	duplicate(off_guo)	Suspect#6	4_M_LGTPOOR
 
-// New -----------------------------------------------------------------------
-
+//== New ===================================================
 lhz_in01,14,28,3	script	Banquet Staff	4_M_MANAGER,{
 	mes "[Banquet Staff]";
 	mes "This Banquet Hall is used";
@@ -2560,7 +2589,7 @@ lighthalzen,107,107,3	script	Kosit#zen1	4_M_LGTMAN,{
 	mes "these rules is because of all";
 	mes "the unruly gangsters that can";
 	mes "sometimes get into the city.";
-	mes "I mean, it's relatively peaceful^FFFFFF ^000000 and all. But these rules...";
+	mes "I mean, it's relatively peaceful and all. But these rules...";
 	next;
 	mes "[Kosit]";
 	mes "It's good to be safe,";
@@ -2637,7 +2666,7 @@ lighthalzen,364,282,3	script	Bodger#zen5	4_M_LGTPOOR,{
 	mes "I hear that the people";
 	mes "who live Uptown eat totally";
 	mes "delicious, gourmet food eight";
-	mes "times a day! Hopefully it's just^FFFFFF ^000000 an exaggeration. 'Cuz if it";
+	mes "times a day! Hopefully it's just an exaggeration. 'Cuz if it";
 	mes "wasn't, I'd be so mad...";
 	close;
 }
@@ -2954,7 +2983,7 @@ lhz_in01,139,48,7	script	Leimi#mimir	1_F_MERCHANT_01,{
 			mes "[Leimi]";
 			mes "Oh, you're an Assassin!";
 			mes "Oh, you boys are soooo cute!";
-			mes "And so cool and so mysterious^FFFFFF ^000000 all at the same time! I love you!";
+			mes "And so cool and so mysterious all at the same time! I love you!";
 		}
 		else {
 			next;
@@ -2969,7 +2998,7 @@ lhz_in01,139,48,7	script	Leimi#mimir	1_F_MERCHANT_01,{
 	close;
 }
 
-lhz_in01,138,47,0	script	#mimir_camera	-1,2,2,{
+lhz_in01,138,47,0	script	#mimir_camera	FAKE_NPC,2,2,{
 OnTouch:
 	if (BaseJob == Job_Assassin) {
 		if (Sex) {
@@ -3178,40 +3207,6 @@ lhz_in01,221,131,7	script	Scientist#li_01	4_LGTSCIENCE,{
 	}
 }
 
-// Lighthalzen Mushroom.
+//== Lighthalzen Mushroom ==================================
 // Don't really understand why it's there, but it's funny regardless.
 lhz_in01,157,54,0,0	monster	Red Mushroom	1085,1,120000,100000,0
-
-//=========================
-// Older Comments
-//=========================
-//= 0.1 Placed temporal names, why there weren't on the SVN before? [erKURITA]
-//= 0.2 Implemented some crap NPCs [MasterOfMuppets]
-//= 0.3 Another load of NPCs. Scripted by Kargha [MasterOfMuppets]
-//= 0.4 More Town NPCs. [Musashiden]
-//= 0.5 Added a BIG load of Lighthalzen NPCs. [musashiden]
-//= 0.6 Fixed some typos+Coordinates. [Musashiden]
-//= 0.7 Implemented some more crap NPCs and the second entrance to biolabs [MasterOfMuppets]
-//= 0.8 Removed Duplicates [Silent]
-//= 0.9 Removed Duplicates [Toms]
-//= 1.0 Added a missing feature to the donation NPC [MasterOfMuppets]
-//= 1.0a added constants to emotions, minor optimization [Lupus]
-//= 1.0b npcid fix [KarLaeda]
-//= 1.1 Added new NPC by $ephiroth and merged other NPCs
-//=	from npc\other\lighthalzen_???.txt [Lupus]
-//= 1.2 Moved some NPCs to Lighthalzen quests. [SinSloth]
-//= 1.3	Moved some other NPCs for quests purposes. [SinSloth]
-//= 1.4 Corrected NPC names to fall within proper resctrictions. [L0ne_W0lf]
-//= 1.5 Fixed bad NPC header data to comply with rev. 11603. [L0ne_W0lf]
-//= 1.6 Massive NPC clean up, includes corrected dialogs and [L0ne_W0lf]
-//=	added missing dialogs, fixed indentation, corrected some NPC
-//=	facing positions, NPC names are more unique now. Removed
-//=	whitespace (empty lines after header and before end curly)
-//=	reduced usage of the command "goto", grammatical corrections.
-//=	Added additional missing NPCs.
-//= 1.7 Removed Auciton Staff as the offical auction file has been added. [L0ne_W0lf]
-//=	Corrected Lucius so he checks the donation variable. (bugreport:1103) [L0ne_W0lf]
-//= 1.7a Another fix to Lucius. (bugreport:1118) [L0ne_W0lf]
-//= 1.7b Another fix to Lucius (trivial). (bugreport:1125)
-//= 1.8 Replaced effect numerics with constants. [L0ne_W0lf]
-//= 1.9 Added Cool Corp. Event Staff, who oringialy resided in the DTS_warper script file. [L0ne_W0lf]

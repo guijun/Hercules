@@ -1,17 +1,33 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef MAP_NPC_H
 #define MAP_NPC_H
 
-#include "map.h" // struct block_list
-#include "status.h" // struct status_change
-#include "unit.h" // struct unit_data
-#include "../common/cbasetypes.h"
-#include "../common/db.h"
+#include "map/map.h" // struct block_list
+#include "map/status.h" // struct status_change
+#include "map/unit.h" // struct unit_data
+#include "common/hercules.h"
+#include "common/db.h"
 
-struct HPluginData;
+struct hplugin_data_store;
 struct view_data;
 
 enum npc_parse_options {
@@ -61,7 +77,8 @@ struct npc_data {
 	int touching_id;
 	int64 next_walktime;
 	uint8 dir;
-	
+	uint8 area_size;
+
 	unsigned size : 2;
 
 	struct status_data status;
@@ -69,7 +86,7 @@ struct npc_data {
 	unsigned short stat_point;
 
 	struct npc_parse *chatdb;
-	char* path;/* path dir */
+	const char *path; ///< Source path reference
 	enum npc_subtype subtype;
 	int src_id;
 	union {
@@ -101,17 +118,17 @@ struct npc_data {
 			char killer_name[NAME_LENGTH];
 		} tomb;
 	} u;
-	/* HPData Support for npc_data */
-	struct HPluginData **hdata;
-	unsigned int hdatac;
+	struct hplugin_data_store *hdata; ///< HPM Plugin Data Store
 };
 
 
 #define START_NPC_NUM 110000000
 
 enum actor_classes {
+	FAKE_NPC = -1,
 	WARP_CLASS = 45,
 	HIDDEN_WARP_CLASS = 139,
+	MOB_TOMB = 565,
 	WARP_DEBUG_CLASS = 722,
 	FLAG_CLASS = 722,
 	INVISIBLE_CLASS = 32767,
@@ -120,12 +137,8 @@ enum actor_classes {
 // Old NPC range
 #define MAX_NPC_CLASS 1000
 // New NPC range
-#define MAX_NPC_CLASS2_START 10000
-#define MAX_NPC_CLASS2_END 10110
-
-//Checks if a given id is a valid npc id. [Skotlex]
-//Since new npcs are added all the time, the max valid value is the one before the first mob (Scorpion = 1001)
-#define npcdb_checkid(id) ( ( (id) >= 46 && (id) <= 125) || (id) == HIDDEN_WARP_CLASS || ( (id) > 400 && (id) < MAX_NPC_CLASS ) || (id) == INVISIBLE_CLASS || ( (id) > MAX_NPC_CLASS2_START && (id) < MAX_NPC_CLASS2_END ) )
+#define MAX_NPC_CLASS2_START 10001
+#define MAX_NPC_CLASS2_END 10178
 
 //Script NPC events.
 enum npce_event {
@@ -181,6 +194,7 @@ struct npc_interface {
 	bool (*isnear) (struct block_list *bl);
 	int (*ontouch_event) (struct map_session_data *sd, struct npc_data *nd);
 	int (*ontouch2_event) (struct map_session_data *sd, struct npc_data *nd);
+	int (*onuntouch_event) (struct map_session_data *sd, struct npc_data *nd);
 	int (*enable_sub) (struct block_list *bl, va_list ap);
 	int (*enable) (const char *name, int flag);
 	struct npc_data* (*name2id) (const char *name);
@@ -205,6 +219,7 @@ struct npc_interface {
 	int (*touch_areanpc_sub) (struct block_list *bl, va_list ap);
 	int (*touchnext_areanpc) (struct map_session_data *sd, bool leavemap);
 	int (*touch_areanpc) (struct map_session_data *sd, int16 m, int16 x, int16 y);
+	int (*untouch_areanpc) (struct map_session_data *sd, int16 m, int16 x, int16 y);
 	int (*touch_areanpc2) (struct mob_data *md);
 	int (*check_areanpc) (int flag, int16 m, int16 x, int16 y, int16 range);
 	struct npc_data* (*checknear) (struct map_session_data *sd, struct block_list *bl);
@@ -228,16 +243,25 @@ struct npc_interface {
 	void (*clearsrcfile) (void);
 	void (*addsrcfile) (const char *name);
 	void (*delsrcfile) (const char *name);
+	const char *(*retainpathreference) (const char *filepath);
+	void (*releasepathreference) (const char *filepath);
 	void (*parsename) (struct npc_data *nd, const char *name, const char *start, const char *buffer, const char *filepath);
 	int (*parseview) (const char *w4, const char *start, const char *buffer, const char *filepath);
 	bool (*viewisid) (const char *viewid);
+	struct npc_data *(*create_npc) (enum npc_subtype subtype, int m, int x, int y, uint8 dir, int16 class_);
 	struct npc_data* (*add_warp) (char *name, short from_mapid, short from_x, short from_y, short xs, short ys, unsigned short to_mapindex, short to_x, short to_y);
-	const char* (*parse_warp) (char *w1, char *w2, char *w3, char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
-	const char* (*parse_shop) (char *w1, char *w2, char *w3, char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
+	const char *(*parse_warp) (const char *w1, const char *w2, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
+	const char *(*parse_shop) (const char *w1, const char *w2, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
+	const char *(*parse_unknown_object) (const char *w1, const char *w2, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
 	void (*convertlabel_db) (struct npc_label_list *label_list, const char *filepath);
 	const char* (*skip_script) (const char *start, const char *buffer, const char *filepath, int *retval);
-	const char* (*parse_script) (char *w1, char *w2, char *w3, char *w4, const char *start, const char *buffer, const char *filepath, int options, int *retval);
-	const char* (*parse_duplicate) (char* w1, char* w2, char* w3, char* w4, const char* start, const char* buffer, const char* filepath, int options, int *retval);
+	const char *(*parse_script) (const char *w1, const char *w2, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int options, int *retval);
+	void (*add_to_location) (struct npc_data *nd);
+	bool (*duplicate_script_sub) (struct npc_data *nd, const struct npc_data *snd, int xs, int ys, int options);
+	bool (*duplicate_shop_sub) (struct npc_data *nd, const struct npc_data *snd, int xs, int ys, int options);
+	bool (*duplicate_warp_sub) (struct npc_data *nd, const struct npc_data *snd, int xs, int ys, int options);
+	bool (*duplicate_sub) (struct npc_data *nd, const struct npc_data *snd, int xs, int ys, int options);
+	const char *(*parse_duplicate) (const char *w1, const char *w2, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int options, int *retval);
 	int (*duplicate4instance) (struct npc_data *snd, int16 m);
 	void (*setcells) (struct npc_data *nd);
 	int (*unsetcells_sub) (struct block_list *bl, va_list ap);
@@ -246,10 +270,11 @@ struct npc_interface {
 	void (*setdisplayname) (struct npc_data *nd, const char *newname);
 	void (*setclass) (struct npc_data *nd, short class_);
 	int (*do_atcmd_event) (struct map_session_data *sd, const char *command, const char *message, const char *eventname);
-	const char* (*parse_function) (char *w1, char *w2, char *w3, char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
+	const char *(*parse_function) (const char *w1, const char *w2, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
 	void (*parse_mob2) (struct spawn_data *mobspawn);
-	const char* (*parse_mob) (char *w1, char *w2, char *w3, char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
-	const char* (*parse_mapflag) (char *w1, char *w2, char *w3, char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
+	const char *(*parse_mob) (const char *w1, const char *w2, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
+	const char *(*parse_mapflag) (const char *w1, const char *w2, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
+	void (*parse_unknown_mapflag) (const char *name, const char *w3, const char *w4, const char *start, const char *buffer, const char *filepath, int *retval);
 	int (*parsesrcfile) (const char *filepath, bool runOnInit);
 	int (*script_event) (struct map_session_data *sd, enum npce_event type);
 	void (*read_event_script) (void);
@@ -270,21 +295,25 @@ struct npc_interface {
 	void (*market_tosql) (struct npc_data *nd, unsigned short index);
 	void (*market_delfromsql) (struct npc_data *nd, unsigned short index);
 	void (*market_delfromsql_sub) (const char *npcname, unsigned short index);
+	bool (*db_checkid) (const int id);
 	/**
 	 * For the Secure NPC Timeout option (check config/Secure.h) [RR]
 	 **/
 	int (*secure_timeout_timer) (int tid, int64 tick, int id, intptr_t data);
 };
 
-struct npc_interface *npc;
-
+#ifdef HERCULES_CORE
 void npc_defaults(void);
+#endif // HERCULES_CORE
 
+HPShared struct npc_interface *npc;
 
 /* comes from npc_chat.c */
-#ifdef PCRE_SUPPORT
-#include "../../3rdparty/pcre/include/pcre.h"
-/* Structure containing all info associated with a single pattern block */
+#include <pcre/include/pcre.h>
+
+/**
+ * Structure containing all info associated with a single pattern block
+ */
 struct pcrematch_entry {
 	struct pcrematch_entry* next;
 	char* pattern;
@@ -293,7 +322,9 @@ struct pcrematch_entry {
 	char* label;
 };
 
-/* A set of patterns that can be activated and deactived with a single command */
+/**
+ * A set of patterns that can be activated and deactived with a single command
+ */
 struct pcrematch_set {
 	struct pcrematch_set* prev;
 	struct pcrematch_set* next;
@@ -301,7 +332,7 @@ struct pcrematch_set {
 	int setid;
 };
 
-/*
+/**
  * Entire data structure hung off a NPC
  */
 struct npc_parse {
@@ -321,8 +352,6 @@ struct npc_chat_interface {
 	void (*finalize_pcrematch_entry) (struct pcrematch_entry* e);
 };
 
-struct npc_chat_interface *npc_chat;
-
 /**
  * pcre interface (libpcre)
  * so that plugins may share and take advantage of the core's pcre
@@ -339,12 +368,14 @@ struct pcre_interface {
 	int (*get_substring) (const char *subject, int *ovector, int stringcount, int stringnumber, const char **stringptr);
 };
 
-struct pcre_interface *libpcre;
-
 /**
  * Also defaults libpcre
  **/
+#ifdef HERCULES_CORE
 void npc_chat_defaults(void);
-#endif
+#endif // HERCULES_CORE
+
+HPShared struct npc_chat_interface *npc_chat;
+HPShared struct pcre_interface *libpcre;
 
 #endif /* MAP_NPC_H */

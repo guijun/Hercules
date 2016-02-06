@@ -1,22 +1,42 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  Joseph
+//= Copyright (C)  Euphy
+//= Copyright (C)  Masao
+//= Copyright (C)  L0ne_W0lf
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= Eden Group Quests - Mission [56 - 70]
-//===== By: ==================================================
-//= L0ne_W0lf
-//===== Current Version: =====================================
-//= 1.5
-//===== Description: =========================================
+//================= Description ===========================================
 //= Repetable Quests for Players between Baselevel 56 - 70.
-//===== Additional Comments: =================================
-//= 1.0 First Version.
-//= 1.1 Some little optimization here and there. [Masao]
-//= 1.2 Added checkquest confirmation for -1. [Euphy]
-//= 1.3 Fixed Puppet Master's Agony Quest (12217 -> 3259). [Joseph]
-//= 1.4 Fixed invalid check (Magic Wand Quest). [Joseph]
-//= 1.5 Optimized, based on code by Zopokx. [Euphy]
-//============================================================
+//================= Current Version =======================================
+//= 1.5
+//=========================================================================
 
 moc_para01,42,38,3	script	Mission [56 - 70]	4_BOARD3,{
-	if (countitem(6219) < 1) {
+	if (countitem(Para_Team_Mark) < 1) {
 		mes "To get these missions, I need to Join the Eden Group first. I must find Secretary Lime Evenor and become a member.";
 		close;
 	}
@@ -51,7 +71,7 @@ moc_para01,42,38,3	script	Mission [56 - 70]	4_BOARD3,{
 	end;
 
 L_Quest:
-	if (checkquest(getarg(0)) == -1) {
+	if (!questprogress(getarg(0))) {
 		callsub L_Details, getarg(0);
 		next;
 		mes "Would you like to accept this mission?";
@@ -70,11 +90,11 @@ L_Quest:
 	}
 	if (getargcount() > 5) {
 		if (countitem(getarg(5)) < getarg(6))
-			set .@items,1; //incomplete
+			.@items = 1; //incomplete
 		else
-			set .@items,2; //complete
+			.@items = 2; //complete
 	}
-	if (checkquest(getarg(0)) < 2 && (countitem(getarg(3)) < getarg(4) || .@items == 1)) {
+	if (questprogress(getarg(0)) != 2 && (countitem(getarg(3)) < getarg(4) || .@items == 1)) {
 		mes "You have an on-going mission. Would you like to check the details?";
 		next;
 		if(select("Check the details.:Cancel.") == 1)
@@ -96,7 +116,7 @@ L_Quest:
 	end;
 
 L_HuntingQuest:
-	if (checkquest(getarg(0)) == -1) {
+	if (!questprogress(getarg(0))) {
 		callsub L_Details, getarg(0);
 		next;
 		mes "Would you like to accept this mission?";
@@ -115,17 +135,17 @@ L_HuntingQuest:
 	}
 	if (getargcount() > 3) {
 		if (countitem(getarg(3)) < getarg(4))
-			set .@items,1; //incomplete
+			.@items = 1; //incomplete
 		else
-			set .@items,2; //complete
+			.@items = 2; //complete
 	}
-	if (checkquest(getarg(0),HUNTING) < 2 || .@items == 1) {
+	if (questprogress(getarg(0),HUNTING) != 2 || .@items == 1) {
 		mes "You have an on-going mission. Would you like to check the details?";
 		next;
 		if(select("Check the details.:Cancel.") == 1)
 			callsub L_Details, getarg(0);
 		close;
-	} else if (checkquest(getarg(0),HUNTING) == 2) {
+	} else if (questprogress(getarg(0),HUNTING) == 2) {
 		mes "I have done pretty well for the mission. Should I report it now?";
 		next;
 		if(select("Report the mission.:Do not report it yet.") == 1) {

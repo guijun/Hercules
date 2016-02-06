@@ -18,7 +18,7 @@
 //    0x80 - Skill ignores target's def cards
 // 07 splash/effect range (-1 for screen-wide)
 // 08 MaxLv
-// 09 Number of hits (when positive, damage is increased by hits, 
+// 09 Number of hits (when positive, damage is increased by hits,
 //    negative values just show number of hits without increasing total damage)
 // 10 Cast interrupted when hit?
 // 11 defense-reduction rate during cast.
@@ -45,6 +45,7 @@
 // 15 Blowcount (amount of tiles skill knockbacks)
 // 16 Name
 // 17 Description
+
 1,0,0,0,0,0,0,9,0,no,0,0,0,none,0,		NV_BASIC,Basic Skill
 2,0,0,0,0,0,0,10,0,no,0,0,0,weapon,0,		SM_SWORD,Sword Mastery
 3,0,0,0,0,0,0,10,0,no,0,0,0,weapon,0,		SM_TWOHAND,Two-Handed Sword Mastery
@@ -124,7 +125,7 @@
 77,5,6,1,6,0x28,0,10,1,yes,0,0,0,magic,0,	PR_TURNUNDEAD,Turn Undead
 78,9,6,1,0,0x1,0,1,0,yes,0,0,0,magic,0,		PR_LEXAETERNA,Lex Aeterna
 79,9,8,2,6,0,0,10,1:2:3:4:5:6:7:8:9:10,yes,0,0,0,magic,0,	PR_MAGNUS,Magnus Exorcismus
-80,9,8,2,3,0x20,1:1:1:1:1:2:2:2:2:2:2,10,3:4:5:6:7:8:9:10:11:12:12,yes,0,0x80,5,magic,0,	WZ_FIREPILLAR,Fire Pillar
+80,9,8,2,3,0x20,1:1:1:1:1:2:2:2:2:2:2,10,-3:-4:-5:-6:-7:-8:-9:-10:-11:-12:-12,yes,0,0x80,5,magic,0,	WZ_FIREPILLAR,Fire Pillar
 81,0,6,4,3,0,3,10,1,yes,0,0,0,magic,5,		WZ_SIGHTRASHER,Sightrasher
 83,9,8,2,3,0,3:3:3:3:3:3:3:3:3:3:14,10,1:1:2:2:3:3:4:4:5:5:15,yes,0,0,0,magic,0,	WZ_METEOR,Meteor Storm
 84,9,8,1,4,0,0,10,3:4:5:6:7:8:9:10:11:12,yes,0,0,0,magic,2:3:3:4:4:5:5:6:6:7,	WZ_JUPITEL,Jupitel Thunder
@@ -527,7 +528,7 @@
 481,0,0,0,0,0,0,5,0,no,0,0,0,none,0,		HP_MANARECHARGE,Mana Recharge
 482,0,6,4,0,0x1,0,5,1,no,0,0,0,magic,0,		PF_DOUBLECASTING,Double Casting
 483,16,6,2,0,0x1,1:2:3:4:5,1,1,no,0,0,0,none,0,	HW_GANBANTEIN,Ganbantein
-484,9,6,2,2,0x91,0,5,1,yes,0,0,0,misc,0,		HW_GRAVITATION,Gravitation Field
+484,18,6,2,2,0x91,0,5,1,yes,0,0,0,misc,0,		HW_GRAVITATION,Gravitation Field
 485,-2,6,1,-1,0x8,0,10,1,no,0,0,0,weapon,0,	WS_CARTTERMINATION,Cart Termination
 486,0,6,4,0,0x1,0,5,1,no,0,0,0,weapon,0,		WS_OVERTHRUSTMAX,Maximum Power Thrust
 487,0,6,4,0,0x1,0,5,1,no,0,0,0,none,0,		CG_LONGINGFREEDOM,Longing for Freedom
@@ -578,7 +579,7 @@
 532,0,6,4,0,0x1,0,10,1,yes,0,0,0,magic,0,	NJ_BUNSINJYUTSU,Mirror Image
 533,0,0,0,0,0,0,10,0,no,0,0,0,none,0,		NJ_NINPOU,Spirit of the Blade
 534,9,8,1,3,0,0,10,1:2:3:4:5:6:7:8:9:10,yes,0,0,0,magic,0,	NJ_KOUENKA,Crimson Fire Petal
-535,0,8,4,3,0,0,10,1,yes,0,0,0,magic,1,		NJ_KAENSIN,Crimson Fire Formation
+535,0,8,4,3,0,0,10,1,yes,0,0,0,magic,0,		NJ_KAENSIN,Crimson Fire Formation
 536,9,8,1,3,0x2,2,5,3,yes,0,0,0,magic,0,		NJ_BAKUENRYU,Raging Fire Dragon
 537,9,8,1,1,0,0,10,3:4:5:6:7:8:9:10:11:12,yes,0,0,0,magic,0,	NJ_HYOUSENSOU,Spear of Ice
 538,9,6,2,1,0x1,0,10,1,yes,0,0,0,magic,0,	NJ_SUITON,Hidden Water
@@ -590,7 +591,7 @@
 544,-5,6,1,0,0x40,0,10,1,no,0,0,0,weapon,0,	NJ_ISSEN,Final Strike
 
 // Additional NPC Skills (Episode 11.3)
-653,0,8,4,0,0x6,5:7:9:11:13:5:7:9:11:13,10,1,no,0,0x2,0,magic,0,	NPC_EARTHQUAKE,Earthquake
+653,0,8,4,0,0x26,5:7:9:11:13:5:7:9:11:13,10,1,no,0,0x2002,0,weapon,0,	NPC_EARTHQUAKE,Earthquake
 654,9,6,1,3,0,5,10,1,no,0,0x2,14,weapon,0,	NPC_FIREBREATH,Fire Breath
 655,9,6,1,1,0,5,10,1,no,0,0x2,14,weapon,0,	NPC_ICEBREATH,Ice Breath
 656,9,6,1,4,0,5,10,1,no,0,0x2,14,weapon,0,	NPC_THUNDERBREATH,Thunder Breath
@@ -726,11 +727,11 @@
 2038,11,8,1,6,0x2,3,5,-3,yes,0,0,0,magic,0,	AB_JUDEX,Judex
 2039,0,6,4,0,0x1,0,1,1,yes,0,0,0,magic,0,	AB_ANCILLA,Ancilla
 2040,11,8,1,6,0,0,10,-10,yes,0,0,0,magic,0,	AB_ADORAMUS,Adoramus
-2041,0,6,4,6,0x3,3:7:15,3,1,yes,0,0,0,magic,0,	AB_CLEMENTIA,Crementia
-2042,0,6,4,6,0x3,3:7:15,3,1,yes,0,0,0,magic,0,	AB_CANTO,Canto Candidus
+2041,0,6,4,0,0x3,3:7:15,3,1,yes,0,0,0,magic,0,	AB_CLEMENTIA,Crementia
+2042,0,6,4,0,0x3,3:7:15,3,1,yes,0,0,0,magic,0,	AB_CANTO,Canto Candidus
 2043,0,6,4,6,0x3,3:7:15,3,1,yes,0,0,0,magic,0,	AB_CHEAL,Coluceo Heal
 2044,11,6,2,6,0x1,0,5,1,yes,0,0,1,magic,0,	AB_EPICLESIS,Epiclesis
-2045,0,6,4,6,0x3,15,10,1,yes,0,0,0,magic,0,	AB_PRAEFATIO,Praefatio
+2045,0,6,4,0,0x3,15,10,1,yes,0,0,0,magic,0,	AB_PRAEFATIO,Praefatio
 2046,0,6,4,6,0x3,15,10,1,yes,0,0,0,magic,0,	AB_ORATIO,Oratio
 2047,0,6,4,6,0x3,15,4,1,yes,0,0,0,magic,0,	AB_LAUDAAGNUS,Lauda Agnus
 2048,0,6,4,6,0x3,15,4,1,yes,0,0,0,magic,0,	AB_LAUDARAMUS,Lauda Ramus
@@ -760,7 +761,7 @@
 2211,11,8,1,3,0x2,3,5,-7,yes,0,0,0,magic,3,	WL_CRIMSONROCK,Crimson Rock
 2212,11,6,1,3,0,0,5,1,yes,0,0,0,magic,0,	WL_HELLINFERNO,Hell Inferno
 2213,11,8,2,0,0,0,5,-20,yes,0,0,0,magic,2,	WL_COMET,Comet
-2214,11,6,1,0,0,3,5,1,yes,0,0,0,magic,0,	WL_CHAINLIGHTNING,Chain Lightning 
+2214,11,6,1,0,0,3,5,1,yes,0,0,0,magic,0,	WL_CHAINLIGHTNING,Chain Lightning
 2215,11,6,1,4,0,0,5,1,no,0,0,0,magic,0,		WL_CHAINLIGHTNING_ATK,Chain Lightning Attack
 2216,3,8,2,2,0,0,5,-6:-7:-8:-9:-10,yes,0,0,0,magic,0,	WL_EARTHSTRAIN,Earth Strain
 2217,11,6,1,0,0,0,5,1,yes,0,0,0,magic,0,	WL_TETRAVORTEX,Tetra Vortex
@@ -771,7 +772,7 @@
 2222,0,6,4,3,0x1,0,5,1,yes,0,0,0,magic,0,	WL_SUMMONFB,Summon Fire Ball
 2223,0,6,4,4,0x1,0,5,1,yes,0,0,0,magic,0,	WL_SUMMONBL,Summon Lightning Ball
 2224,0,6,4,1,0x1,0,5,1,yes,0,0,0,magic,0,	WL_SUMMONWB,Summon Water Ball
-2225,11,6,1,3,0,0,5,1,no,0,0,1,magic,0,		WL_SUMMON_ATK_FIRE,Summon Attack Fire 
+2225,11,6,1,3,0,0,5,1,no,0,0,1,magic,0,		WL_SUMMON_ATK_FIRE,Summon Attack Fire
 2226,11,6,1,4,0,0,5,1,no,0,0,1,magic,0,		WL_SUMMON_ATK_WIND,Summon Attack Wind
 2227,11,6,1,1,0,0,5,1,no,0,0,1,magic,0,		WL_SUMMON_ATK_WATER,Summon Attack Water
 2228,11,6,1,2,0,0,5,1,no,0,0,1,magic,0,		WL_SUMMON_ATK_GROUND,Summon Attack Earth
@@ -1023,7 +1024,7 @@
 //2541,0,0,0,0,0,0,??,0,no,0,0,0,none,0,	NPC_UGLYDANCE,Ugly Dance 2
 //2542,0,0,0,0,0,0,??,0,no,0,0,0,none,0,	ALL_TETANY,Tetany
 //2543,0,0,0,0,0,0,??,0,no,0,0,0,none,0,	ALL_RAY_OF_PROTECTION,Ray of Protection
-//2544,0,0,0,0,0,0,??,0,no,0,0,0,none,0,		MC_CARTDECORATE,Decorate Cart
+2544,0,6,4,0,0x1,0,1,1,no,0,0x1,0,none,0,		MC_CARTDECORATE,Change Cart 2
 //2545,0,0,1,0,0,0,99,0,0,none,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0	//GM_ITEM_ATKMAX#Maximum Attack#
 //2546,0,0,1,0,0,0,99,0,0,none,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0	//GM_ITEM_ATKMIN#Minimal Attack#
 //2547,0,0,1,0,0,0,99,0,0,none,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0	//GM_ITEM_MATKMAX#Maximum Magic Attack#
@@ -1064,7 +1065,7 @@
 3006,7:8:9:10:11,6,2,0,0x2,2,5,0,no,0,0,0,weapon,0,	KO_BAKURETSU,Bakuretsu Kunai
 3007,0,6,4,-1,0x42,4:4:4:4:5,5,0,no,0,0,0,misc,0,	KO_HAPPOKUNAI,Happo Kunai
 3008,9,8,2,0,0x12,2,10,-10,no,0,0,0,misc,0,	KO_MUCHANAGE,Mucha Nage
-3009,9:10:11:12:13,8,2,-1,0x2,3,5,2,no,0,0,0,weapon,0,	KO_HUUMARANKA,Huuma Shuriken Ranka 
+3009,9:10:11:12:13,8,2,-1,0x2,3,5,-5,no,0,0,0,weapon,0,	KO_HUUMARANKA,Huuma Shuriken Ranka
 3010,3,6,4,0,0x42,0,5,1,no,0,0x80,0,weapon,0,	KO_MAKIBISHI,Makibishi
 3011,0,6,4,0,0x1,0,5,0,yes,0,0,0,none,0,	KO_MEIKYOUSISUI,Meikyo Shisui
 3012,0,6,4,0,0x1,0,5,0,no,0,0,1,none,3:4:5:6:7,		KO_ZANZOU,Zanzou
@@ -1073,7 +1074,7 @@
 3015,0,6,4,3,0x1,0,1,1,no,0,0,0,none,0,		KO_KAHU_ENTEN,Kahu Enten
 3016,0,6,4,1,0x1,0,1,1,no,0,0,0,none,0,		KO_HYOUHU_HUBUKI,Hyouhu Hubuki
 3017,0,6,4,4,0x1,0,1,1,no,0,0,0,none,0,		KO_KAZEHU_SEIRAN,Kazehu Seiran
-3018,0,6,4,2,0x1,0,1,1,no,0,0,0,none,0,		KO_DOHU_KOUKAI,Dohu Koukai	
+3018,0,6,4,2,0x1,0,1,1,no,0,0,0,none,0,		KO_DOHU_KOUKAI,Dohu Koukai
 3019,11,6,1,0,0,0,5,0,no,0,0,0,magic,0,	KO_KAIHOU,Technique Kaihou
 3020,7,6,2,0,0,0,1,3,yes,0,0,0,magic,0,		KO_ZENKAI,Zenkai
 3021,5:6:7:8:9,6,16,0,0x1,0,5,1,no,0,0,0,none,0,	KO_GENWAKU,Genwaku

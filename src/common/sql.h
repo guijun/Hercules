@@ -1,13 +1,29 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef COMMON_SQL_H
 #define COMMON_SQL_H
 
-#include <stdarg.h>// va_list
+#include "common/hercules.h"
 
-#include "../common/cbasetypes.h"
+#include <stdarg.h>// va_list
 
 // Return codes
 #define SQL_ERROR (-1)
@@ -142,8 +158,6 @@ struct sql_interface {
 	/// Allocates and initializes a new Sql handle.
 	struct Sql *(*Malloc) (void);
 
-
-
 	///////////////////////////////////////////////////////////////////////////////
 	// Prepared Statements
 	///////////////////////////////////////////////////////////////////////////////
@@ -157,7 +171,6 @@ struct sql_interface {
 	// 1) SELECT col FROM table WHERE id=?
 	// 2) INSERT INTO table(col1,col2) VALUES(?,?)
 
-
 	/*=====================================
 	SQL Statement interface [Susu]
 	*-------------------------------------*/
@@ -168,8 +181,6 @@ struct sql_interface {
 	///
 	/// @return SqlStmt handle or NULL if an error occurred
 	struct SqlStmt* (*StmtMalloc)(Sql* sql);
-
-
 
 	/// Prepares the statement.
 	/// Any previous result is freed and all parameter bindings are removed.
@@ -185,8 +196,6 @@ struct sql_interface {
 	/// @return SQL_SUCCESS or SQL_ERROR
 	int (*StmtPrepareV)(SqlStmt* self, const char* query, va_list args);
 
-
-
 	/// Prepares the statement.
 	/// Any previous result is freed and all parameter bindings are removed.
 	/// The query is used directly.
@@ -194,14 +203,10 @@ struct sql_interface {
 	/// @return SQL_SUCCESS or SQL_ERROR
 	int (*StmtPrepareStr)(SqlStmt* self, const char* query);
 
-
-
 	/// Returns the number of parameters in the prepared statement.
 	///
 	/// @return Number or parameters
 	size_t (*StmtNumParams)(SqlStmt* self);
-
-
 
 	/// Binds a parameter to a buffer.
 	/// The buffer data will be used when the statement is executed.
@@ -210,29 +215,21 @@ struct sql_interface {
 	/// @return SQL_SUCCESS or SQL_ERROR
 	int (*StmtBindParam)(SqlStmt* self, size_t idx, SqlDataType buffer_type, void* buffer, size_t buffer_len);
 
-
-
 	/// Executes the prepared statement.
 	/// Any previous result is freed and all column bindings are removed.
 	///
 	/// @return SQL_SUCCESS or SQL_ERROR
 	int (*StmtExecute)(SqlStmt* self);
 
-
-
 	/// Returns the number of the AUTO_INCREMENT column of the last INSERT/UPDATE statement.
 	///
 	/// @return Value of the auto-increment column
 	uint64 (*StmtLastInsertId)(SqlStmt* self);
 
-
-
 	/// Returns the number of columns in each row of the result.
 	///
 	/// @return Number of columns
 	size_t (*StmtNumColumns)(SqlStmt* self);
-
-
 
 	/// Binds the result of a column to a buffer.
 	/// The buffer will be filled with data when the next row is fetched.
@@ -242,22 +239,16 @@ struct sql_interface {
 	/// @return SQL_SUCCESS or SQL_ERROR
 	int (*StmtBindColumn)(SqlStmt* self, size_t idx, SqlDataType buffer_type, void* buffer, size_t buffer_len, uint32* out_length, int8* out_is_null);
 
-
-
 	/// Returns the number of rows in the result.
 	///
 	/// @return Number of rows
 	uint64 (*StmtNumRows)(SqlStmt* self);
-
-
 
 	/// Fetches the next row.
 	/// All column bindings will be filled with data.
 	///
 	/// @return SQL_SUCCESS, SQL_ERROR or SQL_NO_DATA
 	int (*StmtNextRow)(SqlStmt* self);
-
-
 
 	/// Frees the result of the statement execution.
 	void (*StmtFreeResult)(SqlStmt* self);
@@ -267,28 +258,30 @@ struct sql_interface {
 
 	void (*StmtShowDebug_)(SqlStmt* self, const char* debug_file, const unsigned long debug_line);
 
-} sql_s;
+};
 
-struct sql_interface *SQL;
-
+#ifdef HERCULES_CORE
 void sql_defaults(void);
 
+void Sql_Init(void);
+
+void Sql_HerculesUpdateCheck(Sql* self);
+void Sql_HerculesUpdateSkip(Sql* self,const char *filename);
+#endif // HERCULES_CORE
+
+HPShared struct sql_interface *SQL;
+
 #if defined(SQL_REMOVE_SHOWDEBUG)
-#define Sql_ShowDebug(self) (void)0
+#define Sql_ShowDebug(self) (void)(self)
 #else
 #define Sql_ShowDebug(self) (SQL->ShowDebug_((self), __FILE__, __LINE__))
 #endif
 
-void Sql_HerculesUpdateCheck(Sql* self);
-void Sql_HerculesUpdateSkip(Sql* self,const char *filename);
-
 #if defined(SQL_REMOVE_SHOWDEBUG)
-#define SqlStmt_ShowDebug(self) (void)0
+#define SqlStmt_ShowDebug(self) (void)(self)
 #else
 /// Shows debug information (with statement).
 #define SqlStmt_ShowDebug(self) (SQL->StmtShowDebug_((self), __FILE__, __LINE__))
 #endif
-
-void Sql_Init(void);
 
 #endif /* COMMON_SQL_H */

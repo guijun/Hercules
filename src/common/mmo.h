@@ -1,14 +1,28 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #ifndef COMMON_MMO_H
 #define COMMON_MMO_H
 
-#include <time.h>
-
-#include "../common/cbasetypes.h"
-#include "../common/db.h"
+#include "config/core.h"
+#include "common/cbasetypes.h"
 
 // server->client protocol version
 //        0 - pre-?
@@ -49,7 +63,7 @@
 // 20120307 - 2012-03-07aRagexeRE+ - 0x970
 
 #ifndef PACKETVER
-	#define PACKETVER 20131223
+	#define PACKETVER 20141022
 #endif // PACKETVER
 
 //Uncomment the following line if your client is ragexeRE instead of ragexe (required because of conflicting packets in ragexe vs ragexeRE).
@@ -73,24 +87,30 @@
 #define HOTKEY_SAVING
 
 #if PACKETVER < 20090603
-        // (27 = 9 skills x 3 bars)               (0x02b9,191)
-        #define MAX_HOTKEYS 27
+	// (27 = 9 skills x 3 bars)               (0x02b9,191)
+	#define MAX_HOTKEYS 27
 #elif PACKETVER < 20090617
-        // (36 = 9 skills x 4 bars)               (0x07d9,254)
-        #define MAX_HOTKEYS 36
+	// (36 = 9 skills x 4 bars)               (0x07d9,254)
+	#define MAX_HOTKEYS 36
 #else // >= 20090617
-        // (38 = 9 skills x 4 bars & 2 Quickslots)(0x07d9,268)
-        #define MAX_HOTKEYS 38
+	// (38 = 9 skills x 4 bars & 2 Quickslots)(0x07d9,268)
+	#define MAX_HOTKEYS 38
 #endif // 20090603
 #endif // 20070227
 
-/* Feb 1st 2012 */
-#if PACKETVER >= 20120201
-#	define NEW_CARTS
-#	define MAX_CARTS 9
+#if PACKETVER >= 20150805 /* Cart Decoration */
+	#define CART_DECORATION
+	#define MAX_CARTDECORATION_CARTS 3 // Currently there are 3 Carts available in kRO. [Frost]
 #else
-#	define MAX_CARTS 5
+	#define MAX_CARTDECORATION_CARTS 0
 #endif
+#if PACKETVER >= 20120201 /* New Geneticist Carts */
+	#define NEW_CARTS
+	#define MAX_BASE_CARTS 9
+#else
+	#define MAX_BASE_CARTS 5
+#endif
+#define MAX_CARTS (MAX_BASE_CARTS + MAX_CARTDECORATION_CARTS)
 
 #define MAX_INVENTORY 100
 //Max number of characters per account. Note that changing this setting alone is not enough if the client is not hexed to support more characters as well.
@@ -103,7 +123,7 @@
 #define MAX_ZENY 1000000000
 
 //Official Limit: 2.1b ( the var that stores the money doesn't go much higher than this by default )
-#define MAX_BANK_ZENY 2100000000
+#define MAX_BANK_ZENY INT_MAX
 
 #define MAX_LEVEL 175
 #define MAX_FAME 1000000000
@@ -118,15 +138,16 @@
 #define MAX_STORAGE 600
 #define MAX_GUILD_STORAGE 600
 #define MAX_PARTY 12
-#define MAX_GUILD (16+10*6)     // Increased max guild members +6 per 1 extension levels [Lupus]
-#define MAX_GUILDPOSITION 20    // Increased max guild positions to accommodate for all members [Valaris] (removed) [PoW]
+#define BASE_GUILD_SIZE 16               // Base guild members (without GD_EXTENSION)
+#define MAX_GUILD (BASE_GUILD_SIZE+10*6) // Increased max guild members +6 per 1 extension levels [Lupus]
+#define MAX_GUILDPOSITION 20             // Increased max guild positions to accomodate for all members [Valaris] (removed) [PoW]
 #define MAX_GUILDEXPULSION 32
 #define MAX_GUILDALLIANCE 16
-#define MAX_GUILDSKILL 15       // Increased max guild skills because of new skills [Sara-chan]
+#define MAX_GUILDSKILL 15                // Increased max guild skills because of new skills [Sara-chan]
 #define MAX_GUILDLEVEL 50
-#define MAX_GUARDIANS 8         // Local max per castle. [Skotlex]
-#define MAX_QUEST_OBJECTIVES 3  // Max quest objectives for a quest
-#define MAX_START_ITEMS 32      // Max number of items allowed to be given to a char whenever it's created. [mkbu95]
+#define MAX_GUARDIANS 8                  // Local max per castle. [Skotlex]
+#define MAX_QUEST_OBJECTIVES 3           // Max quest objectives for a quest
+#define MAX_START_ITEMS 32               // Max number of items allowed to be given to a char whenever it's created. [mkbu95]
 
 // for produce
 #define MIN_ATTRIBUTE 0
@@ -167,9 +188,6 @@
 // Base Homun skill.
 #define HM_SKILLBASE 8001
 #define MAX_HOMUNSKILL 43
-#define MAX_HOMUNCULUS_CLASS 52 // [orn] Increased to 60 from 16 to allow new Homun-S.
-#define HM_CLASS_BASE 6001
-#define HM_CLASS_MAX (HM_CLASS_BASE+MAX_HOMUNCULUS_CLASS-1)
 
 // Mail System
 #define MAIL_MAX_INBOX 30
@@ -179,17 +197,30 @@
 // Mercenary System
 #define MC_SKILLBASE 8201
 #define MAX_MERCSKILL 40
-#define MAX_MERCENARY_CLASS 61
 
 // Elemental System
 #define MAX_ELEMENTALSKILL 42
 #define EL_SKILLBASE 8401
 #define MAX_ELESKILLTREE 3
-#define MAX_ELEMENTAL_CLASS 12
-#define EL_CLASS_BASE 2114
-#define EL_CLASS_MAX (EL_CLASS_BASE+MAX_ELEMENTAL_CLASS-1)
 
-struct HPluginData;
+// The following system marks a different job ID system used by the map server,
+// which makes a lot more sense than the normal one. [Skotlex]
+// These marks the "level" of the job.
+#define JOBL_2_1 0x100 //256
+#define JOBL_2_2 0x200 //512
+#define JOBL_2 0x300
+#define JOBL_UPPER 0x1000 //4096
+#define JOBL_BABY 0x2000  //8192
+#define JOBL_THIRD 0x4000 //16384
+
+//Packet DB
+#define MIN_PACKET_DB 0x0064 //what's the point of minimum packet id ? [hemagx]
+#define MAX_PACKET_DB 0x0F00
+#define MAX_PACKET_POS 20
+
+#define SCRIPT_VARNAME_LENGTH 32 ///< Maximum length of a script variable
+
+struct hplugin_data_store;
 
 enum item_types {
 	IT_HEALING = 0,
@@ -242,6 +273,7 @@ struct item {
 
 //Equip position constants
 enum equip_pos {
+	EQP_NONE               = 0x000000,
 	EQP_HEAD_LOW           = 0x000001,
 	EQP_HEAD_MID           = 0x000200, //512
 	EQP_HEAD_TOP           = 0x000100, //256
@@ -290,12 +322,53 @@ enum e_mmo_charstatus_opt {
 };
 
 enum e_item_bound_type {
+	IBT_NONE      = 0x0,
 	IBT_MIN       = 0x1,
 	IBT_ACCOUNT   = 0x1,
 	IBT_GUILD     = 0x2,
 	IBT_PARTY     = 0x3,
 	IBT_CHARACTER = 0x4,
 	IBT_MAX       = 0x4,
+};
+
+enum {
+	OPTION_NOTHING      = 0x00000000,
+	OPTION_SIGHT        = 0x00000001,
+	OPTION_HIDE         = 0x00000002,
+	OPTION_CLOAK        = 0x00000004,
+	OPTION_FALCON       = 0x00000010,
+	OPTION_RIDING       = 0x00000020,
+	OPTION_INVISIBLE    = 0x00000040,
+	OPTION_ORCISH       = 0x00000800,
+	OPTION_WEDDING      = 0x00001000,
+	OPTION_RUWACH       = 0x00002000,
+	OPTION_CHASEWALK    = 0x00004000,
+	OPTION_FLYING       = 0x00008000, //Note that clientside Flying and Xmas are 0x8000 for clients prior to 2007.
+	OPTION_XMAS         = 0x00010000,
+	OPTION_TRANSFORM    = 0x00020000,
+	OPTION_SUMMER       = 0x00040000,
+	OPTION_DRAGON1      = 0x00080000,
+	OPTION_WUG          = 0x00100000,
+	OPTION_WUGRIDER     = 0x00200000,
+	OPTION_MADOGEAR     = 0x00400000,
+	OPTION_DRAGON2      = 0x00800000,
+	OPTION_DRAGON3      = 0x01000000,
+	OPTION_DRAGON4      = 0x02000000,
+	OPTION_DRAGON5      = 0x04000000,
+	OPTION_HANBOK       = 0x08000000,
+	OPTION_OKTOBERFEST  = 0x10000000,
+#ifndef NEW_CARTS
+	OPTION_CART1     = 0x00000008,
+	OPTION_CART2     = 0x00000080,
+	OPTION_CART3     = 0x00000100,
+	OPTION_CART4     = 0x00000200,
+	OPTION_CART5     = 0x00000400,
+	/*  compound constant for older carts */
+	OPTION_CART      = OPTION_CART1|OPTION_CART2|OPTION_CART3|OPTION_CART4|OPTION_CART5,
+#endif
+	// compound constants
+	OPTION_DRAGON    = OPTION_DRAGON1|OPTION_DRAGON2|OPTION_DRAGON3|OPTION_DRAGON4|OPTION_DRAGON5,
+	OPTION_COSTUME   = OPTION_WEDDING|OPTION_XMAS|OPTION_SUMMER|OPTION_HANBOK|OPTION_OKTOBERFEST,
 };
 
 struct s_skill {
@@ -376,6 +449,14 @@ struct s_homunculus { //[orn]
 	int int_;
 	int dex;
 	int luk;
+
+	int str_value;
+	int agi_value;
+	int vit_value;
+	int int_value;
+	int dex_value;
+	int luk_value;
+
 	int8 spiritball; //for homun S [lighta]
 };
 
@@ -404,13 +485,15 @@ struct s_friend {
 	char name[NAME_LENGTH];
 };
 
-#ifdef HOTKEY_SAVING
 struct hotkey {
+#ifdef HOTKEY_SAVING
 	unsigned int id;
 	unsigned short lv;
 	unsigned char type; // 0: item, 1: skill
-};
+#else // not HOTKEY_SAVING
+	UNAVAILABLE_STRUCT;
 #endif
+};
 
 struct mmo_charstatus {
 	int char_id;
@@ -430,7 +513,7 @@ struct mmo_charstatus {
 	unsigned int option;
 	short manner; // Defines how many minutes a char will be muted, each negative point is equivalent to a minute.
 	unsigned char karma;
-	short hair,hair_color,clothes_color;
+	short hair,hair_color,clothes_color,body;
 	int party_id,guild_id,pet_id,hom_id,mer_id,ele_id;
 	int fame;
 
@@ -469,10 +552,12 @@ struct mmo_charstatus {
 
 	/* `account_data` modifiers */
 	unsigned short mod_exp,mod_drop,mod_death;
-	
+
 	unsigned char font;
 
 	uint32 uniqueitem_counter;
+
+	unsigned char hotkey_rowshift;
 };
 
 typedef enum mail_status {
@@ -577,7 +662,7 @@ struct guild_skill {
 	int id,lv;
 };
 
-struct hChSysCh;
+struct channel_data;
 struct guild {
 	int guild_id;
 	short guild_lv, connect_member, max_member, average_lv;
@@ -593,18 +678,15 @@ struct guild {
 	struct guild_alliance alliance[MAX_GUILDALLIANCE];
 	struct guild_expulsion expulsion[MAX_GUILDEXPULSION];
 	struct guild_skill skill[MAX_GUILDSKILL];
-	
+
 	/* used on char.c to state what kind of data is being saved/processed */
 	unsigned short save_flag;
-	
+
 	short *instance;
 	unsigned short instances;
-	
-	struct hChSysCh *channel;
-	
-	/* HPM Custom Struct */
-	struct HPluginData **hdata;
-	unsigned int hdatac;
+
+	struct channel_data *channel;
+	struct hplugin_data_store *hdata; ///< HPM Plugin Data Store
 };
 
 struct guild_castle {
@@ -669,6 +751,13 @@ enum { //Change Member Infos
 	GMI_LEVEL,
 };
 
+enum guild_permission { // Guild permissions
+	GPERM_INVITE = 0x01,
+	GPERM_EXPEL = 0x10,
+	GPERM_ALL = GPERM_INVITE|GPERM_EXPEL,
+	GPERM_MASK = GPERM_ALL,
+};
+
 enum {
 	GD_SKILLBASE=10000,
 	GD_APPROVAL=10000,
@@ -688,7 +777,6 @@ enum {
 	GD_DEVELOPMENT=10014,
 	GD_MAX,
 };
-
 
 //These mark the ID of the jobs, as expected by the client. [Skotlex]
 enum {
@@ -917,6 +1005,30 @@ enum e_pc_reg_loading {
 	PRL_ACCL = 0x2,/* local */
 	PRL_ACCG = 0x4,/* global */
 	PRL_ALL  = 0xFF,
+};
+
+/**
+ * Values to be used as operation_type in chrif_char_ask_name
+ */
+enum zh_char_ask_name_type {
+	CHAR_ASK_NAME_BLOCK         = 1, // account block
+	CHAR_ASK_NAME_BAN           = 2, // account ban
+	CHAR_ASK_NAME_UNBLOCK       = 3, // account unblock
+	CHAR_ASK_NAME_UNBAN         = 4, // account unban
+	CHAR_ASK_NAME_CHANGESEX     = 5, // change sex
+	CHAR_ASK_NAME_CHARBAN       = 6, // character ban
+	CHAR_ASK_NAME_CHARUNBAN     = 7, // character unban
+	CHAR_ASK_NAME_CHANGECHARSEX = 8, // change character sex
+};
+
+/**
+ * Values to be used as answer in chrig_char_ask_name_answer
+ */
+enum hz_char_ask_name_answer {
+	CHAR_ASK_NAME_ANS_DONE     = 0, // login-server request done
+	CHAR_ASK_NAME_ANS_NOTFOUND = 1, // player not found
+	CHAR_ASK_NAME_ANS_GMLOW    = 2, // gm level too low
+	CHAR_ASK_NAME_ANS_OFFLINE  = 3, // login-server offline
 };
 
 /* packet size constant for itemlist */

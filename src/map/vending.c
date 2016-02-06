@@ -1,30 +1,47 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #define HERCULES_CORE
 
 #include "vending.h"
 
+#include "map/atcommand.h"
+#include "map/battle.h"
+#include "map/chrif.h"
+#include "map/clif.h"
+#include "map/itemdb.h"
+#include "map/log.h"
+#include "map/map.h"
+#include "map/npc.h"
+#include "map/path.h"
+#include "map/pc.h"
+#include "map/skill.h"
+#include "common/nullpo.h"
+#include "common/strlib.h"
+#include "common/utils.h"
+
 #include <stdio.h>
 #include <string.h>
 
-#include "atcommand.h"
-#include "battle.h"
-#include "chrif.h"
-#include "clif.h"
-#include "itemdb.h"
-#include "log.h"
-#include "map.h"
-#include "npc.h"
-#include "path.h"
-#include "pc.h"
-#include "skill.h"
-#include "../common/nullpo.h"
-#include "../common/strlib.h"
-#include "../common/utils.h"
-
 struct vending_interface vending_s;
+struct vending_interface *vending;
 
 /// Returns an unique vending shop id.
 static inline unsigned int getid(void) {
@@ -38,7 +55,7 @@ void vending_closevending(struct map_session_data* sd) {
 	nullpo_retv(sd);
 
 	if( sd->state.vending ) {
-		sd->state.vending = false;
+		sd->state.vending = 0;
 		clif->closevendingboard(&sd->bl, 0);
 		idb_remove(vending->db, sd->status.char_id);
 	}
@@ -58,7 +75,7 @@ void vending_vendinglistreq(struct map_session_data* sd, unsigned int id) {
 
 	if (!pc_can_give_items(sd) || !pc_can_give_items(vsd)) { //check if both GMs are allowed to trade
 		// GM is not allowed to trade
-		clif->message(sd->fd, msg_txt(246));
+		clif->message(sd->fd, msg_sd(sd,246));
 		return;
 	}
 
@@ -72,7 +89,7 @@ void vending_vendinglistreq(struct map_session_data* sd, unsigned int id) {
  *------------------------------------------*/
 void vending_purchasereq(struct map_session_data* sd, int aid, unsigned int uid, const uint8* data, int count) {
 	int i, j, cursor, w, new_ = 0, blank, vend_list[MAX_VENDING];
-	double z;
+	int64 z;
 	struct s_vending vend[MAX_VENDING]; // against duplicate packets
 	struct map_session_data* vsd = map->id2sd(aid);
 
@@ -99,7 +116,7 @@ void vending_purchasereq(struct map_session_data* sd, int aid, unsigned int uid,
 	memcpy(&vend, &vsd->vending, sizeof(vsd->vending)); // copy vending list
 
 	// some checks
-	z = 0.; // zeny counter
+	z = 0; // zeny counter
 	w = 0;  // weight counter
 	for( i = 0; i < count; i++ ) {
 		short amount = *(uint16*)(data + 4*i + 0);
@@ -119,12 +136,12 @@ void vending_purchasereq(struct map_session_data* sd, int aid, unsigned int uid,
 		else
 			vend_list[i] = j;
 
-		z += ((double)vsd->vending[j].value * (double)amount);
-		if( z > (double)sd->status.zeny || z < 0. || z > (double)MAX_ZENY ) {
+		z += (int64)vsd->vending[j].value * amount;
+		if (z > sd->status.zeny || z < 0 || z > MAX_ZENY) {
 			clif->buyvending(sd, idx, amount, 1); // you don't have enough zeny
 			return;
 		}
-		if( z + (double)vsd->status.zeny > (double)MAX_ZENY && !battle_config.vending_over_max ) {
+		if (z > MAX_ZENY - vsd->status.zeny && !battle_config.vending_over_max) {
 			clif->buyvending(sd, idx, vsd->vending[j].amount, 4); // too much zeny = overflow
 			return;
 
@@ -134,11 +151,11 @@ void vending_purchasereq(struct map_session_data* sd, int aid, unsigned int uid,
 			clif->buyvending(sd, idx, amount, 2); // you can not buy, because overweight
 			return;
 		}
-		
+
 		//Check to see if cart/vend info is in sync.
 		if( vend[j].amount > vsd->status.cart[idx].amount )
 			vend[j].amount = vsd->status.cart[idx].amount;
-		
+
 		// if they try to add packets (example: get twice or more 2 apples if marchand has only 3 apples).
 		// here, we check cumulative amounts
 		if( vend[j].amount < amount ) {
@@ -146,12 +163,12 @@ void vending_purchasereq(struct map_session_data* sd, int aid, unsigned int uid,
 			clif->buyvending(sd, idx, vsd->vending[j].amount, 4); // not enough quantity
 			return;
 		}
-		
+
 		vend[j].amount -= amount;
 
 		switch( pc->checkadditem(sd, vsd->status.cart[idx].nameid, amount) ) {
 			case ADDITEM_EXIST:
-				break;	//We'd add this item to the existing one (in buyers inventory)
+				break; //We'd add this item to the existing one (in buyers inventory)
 			case ADDITEM_NEW:
 				new_++;
 				if (new_ > blank)
@@ -164,7 +181,7 @@ void vending_purchasereq(struct map_session_data* sd, int aid, unsigned int uid,
 
 	pc->payzeny(sd, (int)z, LOG_TYPE_VENDING, vsd);
 	if( battle_config.vending_tax )
-		z -= z * (battle_config.vending_tax/10000.);
+		z -= apply_percentrate64(z, battle_config.vending_tax, 10000);
 	pc->getzeny(vsd, (int)z, LOG_TYPE_VENDING, sd);
 
 	for( i = 0; i < count; i++ ) {
@@ -181,7 +198,7 @@ void vending_purchasereq(struct map_session_data* sd, int aid, unsigned int uid,
 		//print buyer's name
 		if( battle_config.buyer_name ) {
 			char temp[256];
-			sprintf(temp, msg_txt(265), sd->status.name);
+			sprintf(temp, msg_sd(vsd,265), sd->status.name);
 			clif_disp_onlyself(vsd,temp,strlen(temp));
 		}
 	}
@@ -190,7 +207,7 @@ void vending_purchasereq(struct map_session_data* sd, int aid, unsigned int uid,
 	for( i = 0, cursor = 0; i < vsd->vend_num; i++ ) {
 		if( vsd->vending[i].amount == 0 )
 			continue;
-		
+
 		if( cursor != i ) { // speedup
 			vsd->vending[cursor].index = vsd->vending[i].index;
 			vsd->vending[cursor].amount = vsd->vending[i].amount;
@@ -245,7 +262,7 @@ void vending_openvending(struct map_session_data* sd, const char* message, const
 		clif->skill_fail(sd, MC_VENDING, USESKILL_FAIL_LEVEL, 0);
 		return;
 	}
-    
+
 	// filter out invalid items
 	i = 0;
 	for( j = 0; j < count; j++ ) {
@@ -256,13 +273,13 @@ void vending_openvending(struct map_session_data* sd, const char* message, const
 		index -= 2; // offset adjustment (client says that the first cart position is 2)
 
 		if( index < 0 || index >= MAX_CART // invalid position
-		||  pc->cartitem_amount(sd, index, amount) < 0 // invalid item or insufficient quantity
+		 || pc->cartitem_amount(sd, index, amount) < 0 // invalid item or insufficient quantity
 		//NOTE: official server does not do any of the following checks!
-		||  !sd->status.cart[index].identify // unidentified item
-		||  sd->status.cart[index].attribute == 1 // broken item
-		||  sd->status.cart[index].expire_time // It should not be in the cart but just in case
-		||  (sd->status.cart[index].bound && !pc_can_give_bound_items(sd)) // can't trade bound items w/o permission
- 		||  !itemdb_cantrade(&sd->status.cart[index], pc_get_group_level(sd), pc_get_group_level(sd)) ) // untradeable item
+		 || !sd->status.cart[index].identify // unidentified item
+		 || sd->status.cart[index].attribute == 1 // broken item
+		 || sd->status.cart[index].expire_time // It should not be in the cart but just in case
+		 || (sd->status.cart[index].bound && !pc_can_give_bound_items(sd)) // can't trade bound items w/o permission
+		 || !itemdb_cantrade(&sd->status.cart[index], pc_get_group_level(sd), pc_get_group_level(sd)) ) // untradeable item
 			continue;
 
 		sd->vending[i].index = index;
@@ -273,7 +290,7 @@ void vending_openvending(struct map_session_data* sd, const char* message, const
 	}
 
 	if( i != j )
-		clif->message (sd->fd, msg_txt(266)); //"Some of your items cannot be vended and were removed from the shop."
+		clif->message (sd->fd, msg_sd(sd,266)); //"Some of your items cannot be vended and were removed from the shop."
 
 	if( i == 0 ) { // no valid item found
 		clif->skill_fail(sd, MC_VENDING, USESKILL_FAIL_LEVEL, 0); // custom reply packet
@@ -287,7 +304,7 @@ void vending_openvending(struct map_session_data* sd, const char* message, const
 
 	clif->openvending(sd,sd->bl.id,sd->vending);
 	clif->showvendingboard(&sd->bl,message,0);
-	
+
 	idb_put(vending->db, sd->status.char_id, sd);
 }
 
@@ -372,10 +389,10 @@ void init(bool minimal) {
 
 void vending_defaults(void) {
 	vending = &vending_s;
-	
+
 	vending->init = init;
 	vending->final = final;
-	
+
 	vending->close = vending_closevending;
 	vending->open = vending_openvending;
 	vending->list = vending_vendinglistreq;

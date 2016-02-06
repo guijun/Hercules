@@ -1,23 +1,41 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Base Author: Haru @ http://hercules.ws
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2013-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
-/// See sysinfo.h for a description of this file
-
+/**
+ * See sysinfo.h for a description of this file.
+ *
+ * Base Author: Haru @ http://herc.ws
+ */
 #define HERCULES_CORE
 
 #include "sysinfo.h"
 
+#include "common/cbasetypes.h"
+#include "common/core.h"
+#include "common/memmgr.h"
+#include "common/strlib.h"
+
 #include <stdio.h> // fopen
 #include <stdlib.h> // atoi
-
-#include "../common/cbasetypes.h"
-#include "../common/core.h"
-#include "../common/malloc.h"
-#include "../common/strlib.h"
-
 #ifdef WIN32
-#	include <string.h> // strlen
 #	include <windows.h>
 #else
 #	include <unistd.h>
@@ -42,10 +60,12 @@ struct sysinfo_private {
 struct sysinfo_interface sysinfo_s;
 struct sysinfo_private sysinfo_p;
 
+struct sysinfo_interface *sysinfo;
+
 #define VCSTYPE_UNKNOWN 0
 #define VCSTYPE_GIT 1
 #define VCSTYPE_SVN 2
-#define VCSTYPE_NONE -1
+#define VCSTYPE_NONE (-1)
 
 #ifdef WIN32
 /**
@@ -199,7 +219,9 @@ enum windows_ver_suite {
 #define SYSINFO_COMPILER "Microsoft Visual C++ 2012 (v" EXPAND_AND_QUOTE(_MSC_VER) ")"
 #elif _MSC_VER >= 1800 && _MSC_VER < 1900
 #define SYSINFO_COMPILER "Microsoft Visual C++ 2013 (v" EXPAND_AND_QUOTE(_MSC_VER) ")"
-#else // < 1300 || >= 1900
+#elif _MSC_VER >= 1900 && _MSC_VER < 2000
+#define SYSINFO_COMPILER "Microsoft Visual C++ 2015 (v" EXPAND_AND_QUOTE(_MSC_VER) ")"
+#else // < 1300 || >= 2000
 #define SYSINFO_COMPILER "Microsoft Visual C++ v" EXPAND_AND_QUOTE(_MSC_VER)
 #endif
 #else
@@ -319,12 +341,12 @@ bool sysinfo_svn_get_revision(char **out) {
 bool sysinfo_git_get_revision(char **out) {
 	// Only include Git support if we detected it, or we're on MSVC
 #if !defined(SYSINFO_VCSTYPE) || SYSINFO_VCSTYPE == VCSTYPE_GIT || SYSINFO_VCSTYPE == VCSTYPE_UNKNOWN
-	FILE *fp;
 	char ref[128], filepath[128], line[128];
 
 	strcpy(ref, "HEAD");
 
 	while (*ref) {
+		FILE *fp;
 		snprintf(filepath, sizeof(filepath), ".git/%s", ref);
 		if ((fp = fopen(filepath, "r")) != NULL) {
 			if (fgets(line, sizeof(line)-1, fp) == NULL) {
@@ -594,7 +616,7 @@ void sysinfo_osversion_retrieve(void) {
 
 	// Include service pack (if any) and build number.
 
-	if (strlen(osvi.szCSDVersion) > 0) {
+	if (osvi.szCSDVersion[0] != '\0') {
 		StrBuf->Printf(&buf, " %s", osvi.szCSDVersion);
 	}
 

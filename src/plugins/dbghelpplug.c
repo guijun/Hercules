@@ -1,16 +1,35 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 // Ported from eAthena Dev Team's version @ http://eathena-project.googlecode.com/svn/trunk/src/plugins/dbghelpplug.c
 // Currently supported dbghelp 5.1
 
+#include "common/hercules.h"
+
+#include "common/sysinfo.h"
+
+#include "common/HPMDataCheck.h"
+
 #include <stdio.h>
 #include <string.h>
-#include "../common/sysinfo.h"
-#include "../common/HPMi.h"
-
-#include "../common/HPMDataCheck.h"
 
 /**
  * Plugin basic information
@@ -44,70 +63,68 @@ HPExport struct hplugin_info pinfo = {
 #ifdef _NO_CVCONST_H
 
 typedef enum _BasicType {
-   btNoType   = 0,
-   btVoid     = 1,
-   btChar     = 2,
-   btWChar    = 3,
-   btInt      = 6,
-   btUInt     = 7,
-   btFloat    = 8,
-   btBCD      = 9,
-   btBool     = 10,
-   btLong     = 13,
-   btULong    = 14,
-   btCurrency = 25,
-   btDate     = 26,
-   btVariant  = 27,
-   btComplex  = 28,
-   btBit      = 29,
-   btBSTR     = 30,
-   btHresult  = 31
+	btNoType   = 0,
+	btVoid     = 1,
+	btChar     = 2,
+	btWChar    = 3,
+	btInt      = 6,
+	btUInt     = 7,
+	btFloat    = 8,
+	btBCD      = 9,
+	btBool     = 10,
+	btLong     = 13,
+	btULong    = 14,
+	btCurrency = 25,
+	btDate     = 26,
+	btVariant  = 27,
+	btComplex  = 28,
+	btBit      = 29,
+	btBSTR     = 30,
+	btHresult  = 31
 } BasicType;
 
 typedef enum _UdtKind
 {
-    UdtStruct,
-    UdtClass,
-    UdtUnion
+	UdtStruct,
+	UdtClass,
+	UdtUnion
 } UdtKind;
 /*
 typedef enum _SymTag {
-   SymTagNull             = 0,
-   SymTagExe              = 1,
-   SymTagCompiland        = 2,
-   SymTagCompilandDetails = 3,
-   SymTagCompilandEnv     = 4,
-   SymTagFunction         = 5,
-   SymTagBlock            = 6,
-   SymTagData             = 7,
-   SymTagAnnotation       = 8,
-   SymTagLabel            = 9,
-   SymTagPublicSymbol     = 10,
-   SymTagUDT              = 11,
-   SymTagEnum             = 12,
-   SymTagFunctionType     = 13,
-   SymTagPointerType      = 14,
-   SymTagArrayType        = 15,
-   SymTagBaseType         = 16,
-   SymTagTypedef          = 17,
-   SymTagBaseClass        = 18,
-   SymTagFriend           = 19,
-   SymTagFunctionArgType  = 20,
-   SymTagFuncDebugStart   = 21,
-   SymTagFuncDebugEnd     = 22,
-   SymTagUsingNamespace   = 23,
-   SymTagVTableShape      = 24,
-   SymTagVTable           = 25,
-   SymTagCustom           = 26,
-   SymTagThunk            = 27,
-   SymTagCustomType       = 28,
-   SymTagManagedType      = 29,
-   SymTagDimension        = 30
+	SymTagNull             = 0,
+	SymTagExe              = 1,
+	SymTagCompiland        = 2,
+	SymTagCompilandDetails = 3,
+	SymTagCompilandEnv     = 4,
+	SymTagFunction         = 5,
+	SymTagBlock            = 6,
+	SymTagData             = 7,
+	SymTagAnnotation       = 8,
+	SymTagLabel            = 9,
+	SymTagPublicSymbol     = 10,
+	SymTagUDT              = 11,
+	SymTagEnum             = 12,
+	SymTagFunctionType     = 13,
+	SymTagPointerType      = 14,
+	SymTagArrayType        = 15,
+	SymTagBaseType         = 16,
+	SymTagTypedef          = 17,
+	SymTagBaseClass        = 18,
+	SymTagFriend           = 19,
+	SymTagFunctionArgType  = 20,
+	SymTagFuncDebugStart   = 21,
+	SymTagFuncDebugEnd     = 22,
+	SymTagUsingNamespace   = 23,
+	SymTagVTableShape      = 24,
+	SymTagVTable           = 25,
+	SymTagCustom           = 26,
+	SymTagThunk            = 27,
+	SymTagCustomType       = 28,
+	SymTagManagedType      = 29,
+	SymTagDimension        = 30
 } SymTag;
 */
 #endif /* _NO_CVCONST_H */
-
-struct sysinfo_interface *sysinfo;
 
 /////////////////////////////////////////////////////////////////////
 // dbghelp function prototypes
@@ -217,8 +234,8 @@ typedef struct _InternalData {
 
 // Extended information printed in the console
 #define DBG_EXTENDED_INFORMATION \
-		"Please report the crash in the bug tracker:\n" \
-		"http://hercules.ws/board/tracker/\n"
+		"Please report the crash in our Issues tracker:\n" \
+		"https://github.com/HerculesWS/Hercules/issues\n"
 
 // Print object children?
 // WARNING: This will generate huge dump files!
@@ -429,17 +446,17 @@ Dhp__PrintProcessInfo(
 			fprintf(log_file,
 				"eip=%08x esp=%08x ebp=%08x iopl=%1x %s %s %s %s %s %s %s %s %s %s\n",
 				context->Eip, context->Esp, context->Ebp,
-				(context->EFlags >> 12) & 3,	//  IOPL level value
-				context->EFlags & 0x00100000 ? "vip" : "   ",	//  VIP (virtual interrupt pending)
-				context->EFlags & 0x00080000 ? "vif" : "   ",	//  VIF (virtual interrupt flag)
-				context->EFlags & 0x00000800 ? "ov"  : "nv",	//  VIF (virtual interrupt flag)
-				context->EFlags & 0x00000400 ? "dn"  : "up",	//  OF (overflow flag)
-				context->EFlags & 0x00000200 ? "ei"  : "di",	//  IF (interrupt enable flag)
-				context->EFlags & 0x00000080 ? "ng"  : "pl",	//  SF (sign flag)
-				context->EFlags & 0x00000040 ? "zr"  : "nz",	//  ZF (zero flag)
-				context->EFlags & 0x00000010 ? "ac"  : "na",	//  AF (aux carry flag)
-				context->EFlags & 0x00000004 ? "po"  : "pe",	//  PF (parity flag)
-				context->EFlags & 0x00000001 ? "cy"  : "nc");	//  CF (carry flag)
+				(context->EFlags >> 12) & 3,                  //  IOPL level value
+				context->EFlags & 0x00100000 ? "vip" : "   ", //  VIP (virtual interrupt pending)
+				context->EFlags & 0x00080000 ? "vif" : "   ", //  VIF (virtual interrupt flag)
+				context->EFlags & 0x00000800 ? "ov"  : "nv",  //  VIF (virtual interrupt flag)
+				context->EFlags & 0x00000400 ? "dn"  : "up",  //  OF (overflow flag)
+				context->EFlags & 0x00000200 ? "ei"  : "di",  //  IF (interrupt enable flag)
+				context->EFlags & 0x00000080 ? "ng"  : "pl",  //  SF (sign flag)
+				context->EFlags & 0x00000040 ? "zr"  : "nz",  //  ZF (zero flag)
+				context->EFlags & 0x00000010 ? "ac"  : "na",  //  AF (aux carry flag)
+				context->EFlags & 0x00000004 ? "po"  : "pe",  //  PF (parity flag)
+				context->EFlags & 0x00000001 ? "cy"  : "nc"); //  CF (carry flag)
 		}
 		if( context->ContextFlags & CONTEXT_SEGMENTS )
 		{
@@ -525,9 +542,9 @@ Dhp__PrintTypeName(
 			case btVoid: fprintf(log_file, "void"); break;
 			case btChar: fprintf(log_file, "char"); break;
 			case btWChar: fprintf(log_file, "wchar"); break;
-			case btULong: fprintf(log_file, "unsigned ");	// next
+			case btULong: fprintf(log_file, "unsigned "); // next
 			case btLong: fprintf(log_file, "long"); break;
-			case btUInt: fprintf(log_file, "unsigned ");	// next
+			case btUInt: fprintf(log_file, "unsigned "); // next
 			case btInt:
 				if( length == sizeof(char) ) fprintf(log_file, "char");
 				else if( length == sizeof(short) ) fprintf(log_file, "short");
@@ -870,7 +887,7 @@ Dhp__PrintValueCWideString(
 	}
 	__except( EXCEPTION_EXECUTE_HANDLER )
 	{
-		if( length ) Dhp__PrintValueWideChars(log_file, str, length*sizeof(WCHAR), TRUE);	// print readable part
+		if( length ) Dhp__PrintValueWideChars(log_file, str, length*sizeof(WCHAR), TRUE); // print readable part
 		fprintf(log_file, "<invalid memory>");
 		return;
 	}
@@ -901,7 +918,7 @@ Dhp__PrintValueCString(
 	}
 	__except( EXCEPTION_EXECUTE_HANDLER )
 	{
-		if( length ) Dhp__PrintValueChars(log_file, str, length*sizeof(char), TRUE);	// print readable part
+		if( length ) Dhp__PrintValueChars(log_file, str, length*sizeof(char), TRUE); // print readable part
 		fprintf(log_file, "<invalid memory>");
 		return;
 	}
@@ -954,7 +971,7 @@ Dhp__PrintDataValue(
 		ULONG i;
 		BYTE b = 0;
 		for( i = 0; i < length; ++i )
-			b += p[i];	// add to make sure it's not optimized out in release mode
+			b += p[i]; // add to make sure it's not optimized out in release mode
 
 		// Don't continue if there's no valid data
 		if( b == 0 ) {
@@ -1091,7 +1108,7 @@ Dhp__PrintDataValue(
 			DWORD i;
 
 			// count children
-			if( !SymGetTypeInfo_(hProcess, modBase, typeIndex, TI_GET_CHILDRENCOUNT, &childCount) 
+			if( !SymGetTypeInfo_(hProcess, modBase, typeIndex, TI_GET_CHILDRENCOUNT, &childCount)
 				|| !childCount ) {
 				fprintf(log_file, "<no children found>");
 				Dhp__PrintValueBytes(log_file, (BYTE*)pVariable, length);
@@ -1228,28 +1245,27 @@ Dhp__PrintDataInfo(
 	nr_of_var   = pInterData->nr_of_var;
 
 	// Determine the scope and address of the variable
-    if( pSymInfo->Flags & SYMFLAG_REGREL )
-	{
+	if( pSymInfo->Flags & SYMFLAG_REGREL ) {
 		pVariable = pStackframe->AddrFrame.Offset;
 		pVariable += (DWORD_PTR)pSymInfo->Address;
 		if( pSymInfo->Flags & SYMFLAG_PARAMETER )
-			scope = PARAM;	// parameter
+			scope = PARAM; // parameter
 		else if( pSymInfo->Flags & SYMFLAG_LOCAL )
 		{
-			scope = LOCAL;	// local
+			scope = LOCAL; // local
 #if defined(_M_IX86)
-			if( (LONG64)pSymInfo->Address  > 0) scope = PARAM;	// parameter as local (bug in DBGHELP 5.1)
+			if( (LONG64)pSymInfo->Address  > 0) scope = PARAM; // parameter as local (bug in DBGHELP 5.1)
 #endif
 		}
 	}
 	else if( pSymInfo->Flags & SYMFLAG_REGISTER )
 	{
-		scope = ( pSymInfo->Flags & SYMFLAG_PARAMETER ? PARAM : LOCAL );	// register, optimized out(?)
+		scope = ( pSymInfo->Flags & SYMFLAG_PARAMETER ? PARAM : LOCAL ); // register, optimized out(?)
 	}
 	else
 	{
 		pVariable = (DWORD_PTR)pSymInfo->Address;
-		scope = GLOBAL;	// It must be a global variable
+		scope = GLOBAL; // It must be a global variable
 	}
 
 	// check if we should to log the variable
@@ -1311,7 +1327,7 @@ Dhp__EnumSymbolsCallback(
 	PVOID           pData)
 {
 	if( pSymInfo == NULL )
-		return TRUE;	// try other symbols
+		return TRUE; // try other symbols
 
 	if( pData == NULL )
 	{
@@ -1345,7 +1361,7 @@ Dhp__PrintSourceLine(
 	assert( log_file != NULL );
 
 	// generate search paths
-	strcpy(path, filename);	// original path
+	strcpy(path, filename); // original path
 	p = strrchr(path, '\\');
 	if( p )
 	{
@@ -1355,15 +1371,15 @@ Dhp__PrintSourceLine(
 		{
 			while( strstr(p+1, "\\src\\") )
 				p = strstr(p+1, "\\src\\");
-			strcat(path, p+1);	// last src folder path
+			strcat(path, p+1); // last src folder path
 			p = strrchr(path, '\\');
 			memcpy(p, ";\0", 2);
 		}
 		filename = strrchr(filename, '\\')+1;
 	}
 	else
-		*path = '\0';	// no path
-	strcat(path, ".");	// current directoy
+		*path = '\0'; // no path
+	strcat(path, "."); // current directoy
 
 	// search for file and line
 	if( SearchPathA(path, filename, NULL, MAX_PATH, pathBuffer, NULL) )
@@ -1565,7 +1581,7 @@ typedef BOOL (WINAPI *ISDEBUGGERPRESENT)(void);
 ///
 /// @return TRUE is a debugger is present
 static BOOL
-Dhp__IsDebuggerPresent()
+Dhp__IsDebuggerPresent(void)
 {
 	HANDLE kernel32_dll;
 	ISDEBUGGERPRESENT IsDebuggerPresent_;
@@ -1590,7 +1606,7 @@ Dhp__IsDebuggerPresent()
 ///
 /// @return TRUE is sucessfull
 static BOOL
-Dhp__LoadDbghelpDll()
+Dhp__LoadDbghelpDll(void)
 {
 	dbghelp_dll = LoadLibraryA(DBGHELP_DLL);
 	if( dbghelp_dll != INVALID_HANDLE_VALUE )
@@ -1647,7 +1663,7 @@ Dhp__LoadDbghelpDll()
 
 /// Unloads the dbghelp.dll library.
 static VOID
-Dhp__UnloadDbghlpDll()
+Dhp__UnloadDbghlpDll(void)
 {
 	if( !SymCleanup_(GetCurrentProcess()) )
 		printf("Failed to cleanup symbols! Error: %u\n", GetLastError());
@@ -1668,8 +1684,8 @@ Dhp__CreateFiles(
 	char*   out_logFileName,
 	char*   out_dmpFileName)
 {
-#define LEN_TIMESTAMP 14	// "YYYYMMDDhhmmss"
-#define LEN_EXT 4	// ".rpt" or ".dmp"
+#define LEN_TIMESTAMP 14 // "YYYYMMDDhhmmss"
+#define LEN_EXT 4 // ".rpt" or ".dmp"
 	char baseFileName[MAX_PATH+1];
 	char timestamp[LEN_TIMESTAMP+1];
 	FILE* fp;
@@ -1682,7 +1698,7 @@ Dhp__CreateFiles(
 		char* pTerm = strrchr(baseFileName, '\\');
 		if( pTerm == NULL ) pTerm = baseFileName;
 		pTerm = strrchr(pTerm, '.');
-		if( pTerm ) *pTerm = '\0';	// remove extension
+		if( pTerm ) *pTerm = '\0'; // remove extension
 	}
 	else if( GetTempPathA(MAX_PATH-6-LEN_TIMESTAMP-LEN_EXT, baseFileName) )
 	{// in temp folder
@@ -1700,20 +1716,20 @@ Dhp__CreateFiles(
 	strftime(timestamp, sizeof(timestamp), "%Y%m%d%H%M%S", localtime(&now));
 #endif
 	timestamp[LEN_TIMESTAMP] = '\0';
-	
+
 	sprintf(out_logFileName, "%s%s.rpt", baseFileName, timestamp);
 	fp = fopen(out_logFileName, "w");
 	if( fp == NULL )
-		return FALSE;	// failed to create log file
+		return FALSE; // failed to create log file
 	fclose(fp);
 
 	sprintf(out_dmpFileName, "%s%s.dmp", baseFileName, timestamp);
 	fp = fopen(out_dmpFileName, "w");
 	if( fp == NULL)
-		return FALSE;	// failed to create dump file
+		return FALSE; // failed to create dump file
 	fclose(fp);
 
-	return TRUE;	// success
+	return TRUE; // success
 #undef LEN_EXT
 #undef LEN_TIMESTAMP
 }
@@ -1800,7 +1816,6 @@ static LPTOP_LEVEL_EXCEPTION_FILTER previousFilter;
  **/
 HPExport void plugin_init (void) {
 	previousFilter = SetUnhandledExceptionFilter(Dhp__UnhandledExceptionFilter);
-	sysinfo = GET_SYMBOL("sysinfo");
 }
 
 /**

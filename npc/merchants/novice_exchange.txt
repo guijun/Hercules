@@ -1,22 +1,43 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  rAthena Team
+//= Copyright (C)  eAthena Team
+//= Copyright (C)  L0ne_W0lf
+//= Copyright (C)  KarLaeda
+//= Copyright (C)  Lupus
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= Novice Goods Exchanger
-//===== By: ==================================================
-//= ???, rAthena Team
-//===== Current Version: =====================================
-//= 1.4
-//===== Description: =========================================
-//= [Official Conversion]
+//================= Description ===========================================
 //= Exchanges your Basic Monster drops for Red Potions.
-//===== Additional Comments: =================================
-//= 1.2 Rescripted to Aegis 10.standards. [L0ne_W0lf[
-//=     Made it easier to add new items to exhange list
-//=     meaning only the exchange is done in a function now.
-//= 1.3 Fixed dialog mix-up in function. [L0ne_W0lf]
-//= 1.4 Added checkweight, and input min/max values. [L0ne_W0lf]
-//============================================================
+//================= Current Version =======================================
+//= 1.4
+//=========================================================================
 
 prontera,123,102,5	script	Merchant#pron	4_M_03,{
-	if (MaxWeight - Weight < 6301 || checkweight(1201,1) == 0) {
+	if (MaxWeight - Weight < 6301 || checkweight(Knife,1) == 0) {
 		mes "[Merchant]";
 		mes "Haha!";
 		mes "What are you, superhuman?";
@@ -72,7 +93,7 @@ prontera,123,102,5	script	Merchant#pron	4_M_03,{
 }
 
 morocc,180,259,3	script	Merchant#morroc	4_M_03,{
-	if (MaxWeight - Weight < 6301 || checkweight(1201,1) == 0) {
+	if (MaxWeight - Weight < 6301 || checkweight(Knife,1) == 0) {
 		mes "[Merchant]";
 		mes "Haha!";
 		mes "What are you, superhuman?";
@@ -129,7 +150,7 @@ morocc,180,259,3	script	Merchant#morroc	4_M_03,{
 }
 
 payon,200,134,5	script	Merchant#pay	4_M_03,{
-	if (MaxWeight - Weight < 6301 || checkweight(1201,1) == 0) {
+	if (MaxWeight - Weight < 6301 || checkweight(Knife,1) == 0) {
 		mes "[Merchant]";
 		mes "Haha!";
 		mes "What are you, superhuman?";
@@ -183,7 +204,7 @@ payon,200,134,5	script	Merchant#pay	4_M_03,{
 }
 
 aldebaran,152,63,5	script	Merchant#alde	4_M_03,{
-	if (MaxWeight - Weight < 6301 || checkweight(1201,1) == 0) {
+	if (MaxWeight - Weight < 6301 || checkweight(Knife,1) == 0) {
 		mes "[Merchant]";
 		mes "Haha!";
 		mes "What are you, superhuman?";
@@ -240,7 +261,7 @@ aldebaran,152,63,5	script	Merchant#alde	4_M_03,{
 }
 
 geffen,173,88,5	script	Merchant#geff	4_M_03,{
-	if (MaxWeight - Weight < 6301 || checkweight(1201,1) == 0) {
+	if (MaxWeight - Weight < 6301 || checkweight(Knife,1) == 0) {
 		mes "[Merchant]";
 		mes "Haha!";
 		mes "What are you, superhuman?";
@@ -355,7 +376,7 @@ function	script	F_PotExchange	{
 					break;
 				}
 			}
-			set .@put_out_item,.@input * getarg(1);
+			.@put_out_item = .@input * getarg(1);
 			if (countitem(getarg(0)) < .@put_out_item) {
 				mes "[Merchant]";
 				mes "Uh oh, the number you entered doesn't seem right. You better check the number of Red Potions that you can trade for again.";
@@ -366,7 +387,7 @@ function	script	F_PotExchange	{
 			mes "Check how many Red Potions";
 			mes "I've given you, it should be good. Thanks, that was a good deal~";
 			delitem getarg(0),.@put_out_item; //Shell
-			getitem 501,.@input; //Red_Potion
+			getitem Red_Potion,.@input;
 			close;
 		}
 		mes "[Merchant]";
@@ -378,10 +399,3 @@ function	script	F_PotExchange	{
 		close;
 	}
 }
-
-//============================================================
-// Old changelog
-//============================================================
-//= 1.1 Made it as a function. U can add your own Merchs [Lupus]
-//= 1.1a Fixed item select [KarLaeda]
-//============================================================

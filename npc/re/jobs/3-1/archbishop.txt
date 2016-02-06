@@ -1,28 +1,40 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  Joseph
+//= Copyright (C)  Euphy
+//= Copyright (C)  Masao
+//= Copyright (C)  Gepard
+//= Copyright (C)  L0ne_W0lf
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= Arch Bishop Job Quest
-//===== By: ==================================================
-//= L0ne_W0lf
-//= Credits: Gepard
-//===== Current Version: =====================================
-//= 1.9
-//===== Description: =========================================
-//= [Official Conversion]
+//================= Description ===========================================
 //= Job change Quest from Priest / High Priest -> Arch Bishop.
-//===== Additional Comments: =================================
-//= 1.0 First version.
-//= 1.1 Fixed class checks for arch bishops.
-//= 1.2 Fixed Job tags typos.
-//= 1.3 Made some NPC's into duplicates and fixed some && / || checks. [Masao]
-//= 1.4 Fixed Job_Archbishop/Job_Archbishop_T typos. [Euphy]
-//= 1.5 Redone the whole Script. [Masao]
-//= 1.5a Fixed little typo in Baby Priest & Baby Arch Bishop checks. [Masao]
-//= 1.5b More small fixes. [Euphy]
-//= 1.6 Fixed bugs where players unable to continue the quest. [Joseph]
-//= 1.7 Updated script, many bugs fixed. [Euphy]
-//= 1.7a Moved warps to separate file. [Euphy]
-//= 1.8 Bug fixes and corrections. [Euphy]
-//= 1.9 Added GM management function. [Euphy]
-//============================================================
+//================= Current Version =======================================
+//= 1.9
+//=========================================================================
 
 prt_church,103,88,3	script	Praying Minister#arch	1_M_PASTOR,{
 	if (BaseJob != Job_Priest) {
@@ -52,7 +64,7 @@ prt_church,103,88,3	script	Praying Minister#arch	1_M_PASTOR,{
 		mes "I'm going to make them ministers worthy of serving Odin.";
 		close;
 	}
-	if ((BaseLevel == 99) && (JobLevel > 49)) {
+	if ((BaseLevel >= 99) && (JobLevel > 49)) {
 		if (job_arch == 0) {
 			if (SkillPoint) {
 				mes "You can't change jobs without using all your skill points. Please use all of your skill points before applying to change jobs~";
@@ -122,7 +134,7 @@ prt_church,103,88,3	script	Praying Minister#arch	1_M_PASTOR,{
 				mes "He's very old so he is hard of hearing.";
 				mes "You have to speak loud and clearly. You got it?";
 				mes "I hope that this paves the way for you to live in the light of Odin.";
-				set job_arch,1;
+				job_arch = 1;
 				setquest 2187;
 				close;
 			case 2:
@@ -308,7 +320,7 @@ umbala,139,227,3	script	Priest#arch	1_M_PASTOR,{
 		mes "After making your pilgrimage, let's have a drink together and talk about your experience.";
 		next;
 		mes "- Priest Dayan smiles again. -";
-		set job_arch,2;
+		job_arch = 2;
 		changequest 2187,2188;
 		close;
 	} else if (job_arch == 2) {
@@ -405,7 +417,7 @@ umbala,139,227,3	script	Priest#arch	1_M_PASTOR,{
 		mes "Thank you very much.";
 		mes "Feel free to visit here when you want to pray, "+(Sex?"brother.":"sister.");
 		mes "A visit from a friend always makes me happy.";
-		set job_arch,4;
+		job_arch = 4;
 		changequest 2188,2189;
 		close;
 	}
@@ -505,7 +517,7 @@ OnTouch:
 		mes "^3131FF[Priest Dayan]^000000";
 		mes "^3131FFYou're drinking the Holy Water.^000000";
 		next;
-		if (countitem(523) == 0) {
+		if (countitem(Holy_Water) == 0) {
 			mes "[" + strcharinfo(0) + "]";
 			mes "Oh no! I forgot to bring a Holy Water!";
 			close;
@@ -559,7 +571,7 @@ OnTouch:
 		mes "[" + strcharinfo(0) + "]";
 		mes "That was refreshing.";
 		mes "I guess I should go back to Priest Dayan.";
-		set job_arch,3;
+		job_arch = 3;
 		close2;
 		warp "umbala",138,219;
 		end;
@@ -707,7 +719,7 @@ hu_in01,205,204,7	script	Praying Nun#benew	1_F_PRIEST,{
 		mes "[Vinue]";
 		mes "I'll pray for your safe return.";
 		mes "I hope that Odin gives you his protection as well.";
-		set job_arch,5;
+		job_arch = 5;
 		changequest 2189,2190;
 		close;
 	} else if ((job_arch > 4) && (job_arch < 100)) {
@@ -755,7 +767,7 @@ OnInit:
 }
 
 job3_arch01,29,34,3	script	Valkyrie#arch	4_F_VALKYRIE2,{
-	if (checkweight(1201,1) == 0 || (MaxWeight - Weight) < 2000) {
+	if (checkweight(Knife,1) == 0 || (MaxWeight - Weight) < 2000) {
 		mes "- Wait a Sec !! -";
 		mes "- You are carrying too many items, -";
 		mes "- you won't be able to obtain any new items. -";
@@ -763,7 +775,7 @@ job3_arch01,29,34,3	script	Valkyrie#arch	4_F_VALKYRIE2,{
 		mes "- and come for the challenge again. -";
 		close;
 	}
-	if ((BaseLevel != 99) || (JobLevel < 50) || (BaseJob != Job_Priest)) {
+	if ((BaseLevel < 99) || (JobLevel < 50) || (BaseJob != Job_Priest)) {
 		warp "odin_tem02",282,263;
 		end;
 	}
@@ -901,11 +913,11 @@ job3_arch01,29,34,3	script	Valkyrie#arch	4_F_VALKYRIE2,{
 			mes "[Valkyrie Anguhilde]";
 			mes "When you finish preparing to go on, talk to me again.";
 			mes "It'll be a long journey...";
-			set job_arch,6;
+			job_arch = 6;
 			close;
 		} else if (job_arch == 6) {
 			if ($@archbs == 0) {
-				set $@archbs,1;
+				$@archbs = 1;
 				mes "[Valkyrie Anguhilde]";
 				mes "" + strcharinfo(0) + " Did you finish preparing for your way of asceticism?";
 				next;
@@ -913,19 +925,19 @@ job3_arch01,29,34,3	script	Valkyrie#arch	4_F_VALKYRIE2,{
 					mes "[Valkyrie Anguhilde]";
 					mes "Hmm, someone is battling the devil in the shrine right now.";
 					mes "You just wait a minute while I'm finding who it is.";
-					set $@archbs,0;
+					$@archbs = 0;
 					close;
 				}
 				mes "[Valkyrie Anguhilde]";
 				mes "Ok. Now I'm going to send you there.";
 				mes "^FF0000When you go there, you have to summon my impersonation with the scroll^000000. Don't forget.";
-				set $@archbs,0;
+				$@archbs = 0;
 				close2;
 				nude;
-				if (countitem(2798))
-					delitem 2798,countitem(2798); //Will_Of_Exhausted_Angel
+				if (countitem(Will_Of_Exhausted_Angel))
+					delitem Will_Of_Exhausted_Angel,countitem(Will_Of_Exhausted_Angel);
 				donpcevent "start#arch::OnEnable";
-				set job_arch,7;
+				job_arch = 7;
 				changequest 2190,2191;
 				warp "job3_arch02",119,49;
 				hideonnpc "Valkyrie#arch";
@@ -935,23 +947,23 @@ job3_arch01,29,34,3	script	Valkyrie#arch	4_F_VALKYRIE2,{
 			mes "I'm talking with another person now, so give me a second.";
 			close;
 		} else if (job_arch == 7) {
-			if (countitem(12381)) delitem 12381,countitem(12381); //ValkyrieA_Scroll
-			if (countitem(12382)) delitem 12382,countitem(12382); //ValkyrieB_Scroll
+			if (countitem(ValkyrieA_Scroll)) delitem ValkyrieA_Scroll,countitem(ValkyrieA_Scroll);
+			if (countitem(ValkyrieB_Scroll)) delitem ValkyrieB_Scroll,countitem(ValkyrieB_Scroll);
 			if ($@archbs == 0) {
-				set $@archbs,1;
+				$@archbs = 1;
 				mes "[Valkyrie Anguhilde]";
 				mes "Are you ok human?";
 				mes "It was not as easy as I expected.";
 				mes "Will you challenge again?";
 				next;
 				if (getmapusers("job3_arch02") > 0) {
-					set $@archbs,0;
+					$@archbs = 0;
 					mes "[Valkyrie Anguhilde]";
 					mes "Hmm, someone is battling the devil in the shrine right now.";
 					mes "You just wait a minute while I'm finding who it is.";
 					close;
 				}
-				set $@archbs,0;
+				$@archbs = 0;
 				mes "[Valkyrie Anguhilde]";
 				mes "OK. now I'm going to send you there.";
 				mes "^FF0000When you go there, you have to summon my impersonation with the scroll^000000.";
@@ -959,10 +971,10 @@ job3_arch01,29,34,3	script	Valkyrie#arch	4_F_VALKYRIE2,{
 				mes "But you have to be careful if an impersonation falls down.";
 				close2;
 				nude;
-				if (countitem(2798))
-					delitem 2798,countitem(2798); //Will_Of_Exhausted_Angel
+				if (countitem(Will_Of_Exhausted_Angel))
+					delitem Will_Of_Exhausted_Angel,countitem(Will_Of_Exhausted_Angel);
 				donpcevent "start#arch::OnEnable";
-				set job_arch,7;
+				job_arch = 7;
 				warp "job3_arch02",119,49;
 				hideonnpc "Valkyrie#arch";
 				end;
@@ -974,7 +986,7 @@ job3_arch01,29,34,3	script	Valkyrie#arch	4_F_VALKYRIE2,{
 	}
 	end;
 OnBc:
-	set $@archbs,0;
+	$@archbs = 0;
 	mapannounce "job3_arch01","Valkyrie: I think someone fell down in the shrine. I can hear the devil's unpleasant laugh.",bc_map,"0xFFCE00";
 	hideoffnpc "Valkyrie#arch";
 	end;
@@ -982,22 +994,22 @@ OnBc:
 
 job3_arch02,119,49,0	script	#arch_1_start	HIDDEN_WARP_NPC,6,6,{
 OnTouch:
-	if (countitem(12381) == 0)
-		getitem 12381,1; //ValkyrieA_Scroll
+	if (countitem(ValkyrieA_Scroll) == 0)
+		getitem ValkyrieA_Scroll,1;
 	mapannounce "job3_arch02","Whispering of an impersonation: I feel heavy! Set me free!",bc_map,"0xFFCE00";
 	disablenpc "#arch_1_start";
 	end;
 }
 
--	script	#arch_1_01_0::archbjcq	-1,{
+-	script	#arch_1_01_0::archbjcq	FAKE_NPC,{
 OnTouch:
-	if (countitem(12381)) {
-		delitem 12381,1; //ValkyrieA_Scroll
+	if (countitem(ValkyrieA_Scroll)) {
+		delitem ValkyrieA_Scroll,1;
 		// fall through
 	} else if (getmercinfo(1) == 2037) {
 		if (strnpcinfo(0) == "#arch_1_10")
 			viewpoint 1,113,327,1,0xFF9900;
-		set .@randht, rand(1,10);
+		.@randht = rand(1,10);
 		if (.@randht < 8)
 			mapannounce "job3_arch02","Whispering of an impersonation: I can feel the devil's spirits! Be careful!",bc_map,"0xFFCE00";
 		else if ((.@randht == 8) || (.@randht == 9))
@@ -1023,8 +1035,8 @@ job3_arch02,245,289,0	duplicate(archbjcq)	#arch_1_12	HIDDEN_WARP_NPC,5,5
 
 job3_arch02,203,286,0	script	#arch_1_boss	HIDDEN_WARP_NPC,5,5,{
 OnTouch:
-	if (countitem(12381)) {
-		delitem 12381,1; //ValkyrieA_Scroll
+	if (countitem(ValkyrieA_Scroll)) {
+		delitem ValkyrieA_Scroll,1;
 		// fall through
 	} else if (getmercinfo(1) == 2037) {
 		mapannounce "job3_arch02","Valkyrie's Nightmare: An incompetent illusion of Valkyrie came here with the assistance of humans. You wanna have that nightmare?",bc_map,"0xFF0000";
@@ -1036,7 +1048,7 @@ OnTouch:
 	end;
 }
 
--	script	#arch_redcell	-1,{
+-	script	#arch_redcell	FAKE_NPC,{
 OnInit:
 	setcell "job3_arch02",276,290,280,294,cell_walkable,0;
 	setcell "job3_arch02",276,290,280,294,cell_shootable,0;
@@ -1128,7 +1140,7 @@ job3_arch02,113,327,5	script	Valkyrie#arch_01	4_F_VALKYRIE2,{
 	mes "[Valkyrie Anguhilde]";
 	mes "Then I look forward a good news.";
 	close2;
-	getitem 12382,1; //ValkyrieB_Scroll
+	getitem ValkyrieB_Scroll,1;
 	viewpoint 1,244,46,1,0xFFFF99;
 	hideonnpc "Valkyrie#arch_01";
 	donpcevent "#arch_2_start::OnEnable";
@@ -1139,11 +1151,11 @@ job3_arch02,244,46,5	script	Valkyrie#arch_02	4_F_VALKYRIE2,{
 	mes "[Valkyrie Anguhilde]";
 	mes "Did you find the rest of the pieces?";
 	next;
-	if (countitem(6154) < 2) {
+	if (countitem(Broken_Horn_Pipe) < 2) {
 		mes "[Valkyrie Anguhilde]";
 		mes "Hum?";
 		mes "I can see this one beside you.";
-		getitem 6154,2; //Broken_Horn_Pipe
+		getitem Broken_Horn_Pipe,2;
 		next;
 	}
 	mes "[Valkyrie Anguhilde]";
@@ -1166,7 +1178,7 @@ job3_arch02,244,46,5	script	Valkyrie#arch_02	4_F_VALKYRIE2,{
 	mes "Take care.";
 	mes "Please, hurry up!";
 	close2;
-	getitem 2798,1; //Will_Of_Exhausted_Angel
+	getitem Will_Of_Exhausted_Angel,1;
 	hideonnpc "Valkyrie#arch_02";
 	donpcevent "#arch_3_start::OnEnable";
 	end;
@@ -1180,7 +1192,7 @@ OnTouch:
 	donpcevent "#arch_3_03::OnKill";
 	donpcevent "mob#arch_2::OnKill";
 	hideoffnpc "Valkyrie Anguhilde#end";
-	if (checkweight(1201,1) == 0 || (MaxWeight - Weight) < 2000) {
+	if (checkweight(Knife,1) == 0 || (MaxWeight - Weight) < 2000) {
 		mes "- Wait a Sec !! -";
 		mes "- You are carrying too many items, -";
 		mes "- you won't be able to obtain any new items. -";
@@ -1188,13 +1200,13 @@ OnTouch:
 		mes "- and come for the challenge again. -";
 		close;
 	}
-	if (ismounting()) {
+	if (hascashmount()) {
 		mes "You are on a riding pet,";
 		mes "so you cannot change your job.";
 		mes "Please unequip your riding pet and try again!";
 		close;
 	}
-	if (countitem(6154) < 2) {
+	if (countitem(Broken_Horn_Pipe) < 2) {
 		mes "[Valkyrie Anguhilde]";
 		mes "Did you collect all of the pieces of my horn pipe?";
 		next;
@@ -1205,9 +1217,9 @@ OnTouch:
 		mes "It can be dangerous, so let's go back.";
 		close2;
 		nude;
-		if (countitem(2798))
-			delitem 2798,(2798); //Will_Of_Exhausted_Angel
-		delitem 6154,countitem(6154); //Broken_Horn_Pipe
+		if (countitem(Will_Of_Exhausted_Angel))
+			delitem Will_Of_Exhausted_Angel,countitem(Will_Of_Exhausted_Angel);
+		delitem Broken_Horn_Pipe,countitem(Broken_Horn_Pipe);
 		mapwarp "job3_arch02","job3_arch01",29,29;
 		end;
 	}
@@ -1290,13 +1302,13 @@ OnTouch:
 	mes "Don't forget an altruistic minister's spirit like today forever.";
 	mes "I hope we see each other in Valhalla sometime.";
 	nude;
-	if (countitem(2798))
-		delitem 2798,countitem(2798); //Will_Of_Exhausted_Angel
-	delitem 6154,countitem(6154); //Broken_Horn_Pipe
-	set job_arch,100;
+	if (countitem(Will_Of_Exhausted_Angel))
+		delitem Will_Of_Exhausted_Angel,countitem(Will_Of_Exhausted_Angel);
+	delitem Broken_Horn_Pipe,countitem(Broken_Horn_Pipe);
+	job_arch = 100;
 	completequest 2191;
-	getitem 5747,1; //Mitra
-	getitem 2795,1; //Green_Apple_Ring
+	getitem Mitra,1;
+	getitem Green_Apple_Ring,1;
 	jobchange roclass(eaclass()|EAJL_THIRD);
 	close;
 OnInit:
@@ -1333,18 +1345,18 @@ OnInit:
 job3_arch02,132,323,0	script	#arch_2_01	HIDDEN_WARP_NPC,5,5,{
 	end;
 OnTouch:
-	if (countitem(12382))
+	if (countitem(ValkyrieB_Scroll))
 		mapannounce "job3_arch02","Whispering of Valkyrie: I see a new ancient scroll!",bc_map;
 	end;
 }
 
--	script	#arch_2_02_0::archbjcq2	-1,{
+-	script	#arch_2_02_0::archbjcq2	FAKE_NPC,{
 OnTouch:
-	if (countitem(12382)) {
-		delitem 12382,1; //ValkyrieB_Scroll
+	if (countitem(ValkyrieB_Scroll)) {
+		delitem ValkyrieB_Scroll,1;
 		// fall through
 	} else if (getmercinfo(1) == 2038) {
-		set .@randht, rand(1,10);
+		.@randht = rand(1,10);
 		if (.@randht < 8)
 			mapannounce "job3_arch02","Whispering of an impersonation: I can feel the devil's spirits. Can you hear? The sound of gathering in crowds.",bc_map,"0xFFCE00";
 		else if ((.@randht == 8) || (.@randht == 9))
@@ -1385,8 +1397,8 @@ OnTouch:
 
 job3_arch02,206,113,0	script	#arch_2_boss	HIDDEN_WARP_NPC,5,5,{
 OnTouch:
-	if (countitem(12382)) {
-		delitem 12382,1; //ValkyrieB_Scroll
+	if (countitem(ValkyrieB_Scroll)) {
+		delitem ValkyrieB_Scroll,1;
 		// fall through
 	} else if (getmercinfo(1) == 2038) {
 		mapannounce "job3_arch02","A shout of devil: You are so childish. I invite you a party of devil. I'll make you have a fun!",bc_map,"0xFF0000";
@@ -1635,10 +1647,10 @@ OnTouch:
 /*
 job_arch01,26,25,0	script	#archremove	HIDDEN_WARP_NPC,3,3,{
 OnTouch:
-	if (countitem(6154)) delitem 6154, countitem(6154); //Broken_Horn_Pipe
-	if (countitem(12381)) delitem 12381, countitem(12381); //ValkyrieA_Scroll
-	if (countitem(12382)) delitem 12382, countitem(12382); //ValkyrieB_Scroll
-	if (countitem(2798)) delitem 2798, countitem(2798); //Will_Of_Exhausted_Angel
+	if (countitem(Broken_Horn_Pipe)) delitem Broken_Horn_Pipe, countitem(Broken_Horn_Pipe);
+	if (countitem(ValkyrieA_Scroll)) delitem ValkyrieA_Scroll, countitem(ValkyrieA_Scroll);
+	if (countitem(ValkyrieB_Scroll)) delitem ValkyrieB_Scroll, countitem(ValkyrieB_Scroll);
+	if (countitem(Will_Of_Exhausted_Angel)) delitem Will_Of_Exhausted_Angel, countitem(Will_Of_Exhausted_Angel);
 	end;
 }
 */
@@ -1656,11 +1668,11 @@ job3_arch01,1,1,1	script	control#arch	CLEAR_NPC,{
 		next;
 		switch(select("0:1")) {
 		case 1:
-			set $@archbs,0;
+			$@archbs = 0;
 			hideoffnpc "Valkyrie#arch";
 			close;
 		case 2:
-			set $@archbs,1;
+			$@archbs = 1;
 			hideoffnpc "Valkyrie#arch";
 			close;
 		}

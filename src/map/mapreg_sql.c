@@ -1,26 +1,43 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #define HERCULES_CORE
 
 #include "mapreg.h"
 
+#include "map/map.h" // map-"mysql_handle
+#include "map/script.h"
+#include "common/cbasetypes.h"
+#include "common/db.h"
+#include "common/ers.h"
+#include "common/memmgr.h"
+#include "common/showmsg.h"
+#include "common/sql.h"
+#include "common/strlib.h"
+#include "common/timer.h"
+
 #include <stdlib.h>
 #include <string.h>
 
-#include "map.h" // map->mysql_handle
-#include "script.h"
-#include "../common/cbasetypes.h"
-#include "../common/db.h"
-#include "../common/ers.h"
-#include "../common/malloc.h"
-#include "../common/showmsg.h"
-#include "../common/sql.h"
-#include "../common/strlib.h"
-#include "../common/timer.h"
-
 struct mapreg_interface mapreg_s;
+struct mapreg_interface *mapreg;
 
 #define MAPREG_AUTOSAVE_INTERVAL (300*1000)
 
@@ -77,9 +94,9 @@ bool mapreg_setreg(int64 uid, int val) {
 			m->save = false;
 			m->is_string = false;
 
-			if(name[1] != '@' && !mapreg->skip_insert) {// write new variable to database
-				char tmp_str[32*2+1];
-				SQL->EscapeStringLen(map->mysql_handle, tmp_str, name, strnlen(name, 32));
+			if (name[1] != '@' && !mapreg->skip_insert) {// write new variable to database
+				char tmp_str[(SCRIPT_VARNAME_LENGTH+1)*2+1];
+				SQL->EscapeStringLen(map->mysql_handle, tmp_str, name, strnlen(name, SCRIPT_VARNAME_LENGTH+1));
 				if( SQL_ERROR == SQL->Query(map->mysql_handle, "INSERT INTO `%s`(`varname`,`index`,`value`) VALUES ('%s','%d','%d')", mapreg->table, tmp_str, i, val) )
 					Sql_ShowDebug(map->mysql_handle);
 			}
@@ -149,9 +166,9 @@ bool mapreg_setregstr(int64 uid, const char* str) {
 			m->is_string = true;
 
 			if(name[1] != '@' && !mapreg->skip_insert) { //put returned null, so we must insert.
-				char tmp_str[32*2+1];
+				char tmp_str[(SCRIPT_VARNAME_LENGTH+1)*2+1];
 				char tmp_str2[255*2+1];
-				SQL->EscapeStringLen(map->mysql_handle, tmp_str, name, strnlen(name, 32));
+				SQL->EscapeStringLen(map->mysql_handle, tmp_str, name, strnlen(name, SCRIPT_VARNAME_LENGTH+1));
 				SQL->EscapeStringLen(map->mysql_handle, tmp_str2, str, strnlen(str, 255));
 				if( SQL_ERROR == SQL->Query(map->mysql_handle, "INSERT INTO `%s`(`varname`,`index`,`value`) VALUES ('%s','%d','%s')", mapreg->table, tmp_str, i, tmp_str2) )
 					Sql_ShowDebug(map->mysql_handle);
@@ -174,7 +191,7 @@ void script_load_mapreg(void) {
 	   +-------------------------+
 	                                */
 	SqlStmt* stmt = SQL->StmtMalloc(map->mysql_handle);
-	char varname[32+1];
+	char varname[SCRIPT_VARNAME_LENGTH+1];
 	int index;
 	char value[255+1];
 	uint32 length;
@@ -220,13 +237,11 @@ void script_load_mapreg(void) {
  * Saves permanent variables to database.
  */
 void script_save_mapreg(void) {
-	DBIterator* iter;
-	struct mapreg_save *m = NULL;
-
-	if( mapreg->dirty ) {
-		iter = db_iterator(mapreg->regs.vars);
-		for( m = dbi_first(iter); dbi_exists(iter); m = dbi_next(iter) ) {
-			if( m->save ) {
+	if (mapreg->dirty) {
+		DBIterator *iter = db_iterator(mapreg->regs.vars);
+		struct mapreg_save *m;
+		for (m = dbi_first(iter); dbi_exists(iter); m = dbi_next(iter)) {
+			if (m->save) {
 				int num = script_getvarid(m->uid);
 				int i   = script_getvaridx(m->uid);
 				const char* name = script->get_str(num);

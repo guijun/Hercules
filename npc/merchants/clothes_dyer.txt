@@ -1,30 +1,48 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  Euphy
+//= Copyright (C)  Playtester
+//= Copyright (C)  Poki#3
+//= Copyright (C)  Nexon
+//= Copyright (C)  Lupus
+//= Copyright (C)  Usnul
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= Clothes Dyer
-//===== By: ==================================================
-//= Usnul
-//===== Current Version: =====================================
-//= 2.5
-//===== Description: =========================================
+//================= Description ===========================================
 //= Clothes dyer with standard palletes
-//===== Additional Comments: =================================
-//= Fully working
-//= 2.1 Shortened some labels to make this script loading,
-//= Added Black+White Colors desc [Lupus]
-//= 2.1a added adv classes + baby class support [Lupus]
-//= 2.2 Spell checked. [Nexon]
-//= 2.3 Fixed dis $hit! [Poki#3]
-//= 2.4 Disabled cloth dyeing since it's not implemented
-//	   on official servers and cause your client to crash
-//	   [Playtester]
-//= 2.5 Optimized. [Euphy]
-//============================================================
+//================= Current Version =======================================
+//= 2.5
+//=========================================================================
 
 prt_in,284,168,2	script	Dyer Ginedin Rephere	1_M_JOBTESTER,{
 function Dyes;
 
-	set .@EnableDyes,1;	// Disable (set to 0) if palettes cause errors [see note v2.4]
+	.@EnableDyes = 1;	// Disable (set to 0) if palettes cause errors [see note v2.4]
 
-	set .n$,"[Dyer Ginedin Rephere]";
+	.n$ = "[Dyer Ginedin Rephere]";
 	mes .n$;
 	mes "11... 12... Mmm... good. I think I'll be able to finish before tonight's party. Oh! I didn't notice you were here!";
 	while(1) {
@@ -135,11 +153,11 @@ L_End:
 function Dyes {
 	setarray .@DyeName$[0],"the default color","Orange","Violet","Red","Black","Green","Blue","White","Yellow";
 	setarray .@DyeItems[0],0,980,981,975,983,979,978,982,976;
-	set .@menu$,"- Default:";
-	for(set .@i,0; .@i<getargcount(); set .@i,.@i+2)
-		set .@menu$, .@menu$+"- "+.@DyeName$[getarg(.@i)]+":";
-	set .@menu$, .@menu$+"- ^777777Cancel^000000";
-	set .@s, select(.@menu$)-1;
+	.@menu$ = "- Default:";
+	for(.@i = 0; .@i<getargcount(); .@i += 2)
+		.@menu$ += "- "+.@DyeName$[getarg(.@i)]+":";
+	.@menu$ += "- ^777777Cancel^000000";
+	.@s = select(.@menu$)-1;
 	if (.@s == (getargcount()/2)+1) goto L_End;
 	mes .n$;
 	if (.@s == 0) {

@@ -1,47 +1,66 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #define HERCULES_CORE
 
 #include "mercenary.h"
+
+#include "map/atcommand.h"
+#include "map/battle.h"
+#include "map/chrif.h"
+#include "map/clif.h"
+#include "map/guild.h"
+#include "map/intif.h"
+#include "map/itemdb.h"
+#include "map/log.h"
+#include "map/map.h"
+#include "map/mob.h"
+#include "map/npc.h"
+#include "map/party.h"
+#include "map/pc.h"
+#include "map/pet.h"
+#include "map/script.h"
+#include "map/skill.h"
+#include "map/status.h"
+#include "map/trade.h"
+#include "map/unit.h"
+#include "common/cbasetypes.h"
+#include "common/memmgr.h"
+#include "common/mmo.h"
+#include "common/nullpo.h"
+#include "common/random.h"
+#include "common/showmsg.h"
+#include "common/socket.h"
+#include "common/strlib.h"
+#include "common/timer.h"
+#include "common/utils.h"
 
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-#include "atcommand.h"
-#include "battle.h"
-#include "chrif.h"
-#include "clif.h"
-#include "guild.h"
-#include "intif.h"
-#include "itemdb.h"
-#include "log.h"
-#include "map.h"
-#include "mob.h"
-#include "npc.h"
-#include "party.h"
-#include "pc.h"
-#include "pet.h"
-#include "script.h"
-#include "skill.h"
-#include "status.h"
-#include "trade.h"
-#include "unit.h"
-#include "../common/cbasetypes.h"
-#include "../common/malloc.h"
-#include "../common/mmo.h"
-#include "../common/nullpo.h"
-#include "../common/random.h"
-#include "../common/showmsg.h"
-#include "../common/socket.h"
-#include "../common/strlib.h"
-#include "../common/timer.h"
-#include "../common/utils.h"
-
 struct mercenary_interface mercenary_s;
+struct s_mercenary_db mercdb[MAX_MERCENARY_CLASS];
+
+struct mercenary_interface *mercenary;
 
 int merc_search_index(int class_)
 {
@@ -108,11 +127,11 @@ int mercenary_get_guild(struct mercenary_data *md)
 
 	class_ = md->db->class_;
 
-	if( class_ >= 6017 && class_ <= 6026 )
+	if (class_ >= MERID_MER_ARCHER01 && class_ <= MERID_MER_ARCHER10)
 		return ARCH_MERC_GUILD;
-	if( class_ >= 6027 && class_ <= 6036 )
+	if (class_ >= MERID_MER_LANCER01 && class_ <= MERID_MER_LANCER10)
 		return SPEAR_MERC_GUILD;
-	if( class_ >= 6037 && class_ <= 6046 )
+	if (class_ >= MERID_MER_SWORDMAN01 && class_ <= MERID_MER_SWORDMAN10)
 		return SWORD_MERC_GUILD;
 
 	return -1;
@@ -128,11 +147,11 @@ int mercenary_get_faith(struct mercenary_data *md)
 
 	class_ = md->db->class_;
 
-	if( class_ >= 6017 && class_ <= 6026 )
+	if (class_ >= MERID_MER_ARCHER01 && class_ <= MERID_MER_ARCHER10)
 		return sd->status.arch_faith;
-	if( class_ >= 6027 && class_ <= 6036 )
+	if (class_ >= MERID_MER_LANCER01 && class_ <= MERID_MER_LANCER10)
 		return sd->status.spear_faith;
-	if( class_ >= 6037 && class_ <= 6046 )
+	if (class_ >= MERID_MER_SWORDMAN01 && class_ <= MERID_MER_SWORDMAN10)
 		return sd->status.sword_faith;
 
 	return 0;
@@ -148,11 +167,11 @@ int mercenary_set_faith(struct mercenary_data *md, int value)
 
 	class_ = md->db->class_;
 
-	if( class_ >= 6017 && class_ <= 6026 )
+	if (class_ >= MERID_MER_ARCHER01 && class_ <= MERID_MER_ARCHER10)
 		faith = &sd->status.arch_faith;
-	else if( class_ >= 6027 && class_ <= 6036 )
+	else if (class_ >= MERID_MER_LANCER01 && class_ <= MERID_MER_LANCER10)
 		faith = &sd->status.spear_faith;
-	else if( class_ >= 6037 && class_ <= 6046 )
+	else if (class_ >= MERID_MER_SWORDMAN01 && class_ <= MERID_MER_SWORDMAN10)
 		faith = &sd->status.sword_faith;
 	else
 		return 0;
@@ -174,11 +193,11 @@ int mercenary_get_calls(struct mercenary_data *md)
 
 	class_ = md->db->class_;
 
-	if( class_ >= 6017 && class_ <= 6026 )
+	if (class_ >= MERID_MER_ARCHER01 && class_ <= MERID_MER_ARCHER10)
 		return sd->status.arch_calls;
-	if( class_ >= 6027 && class_ <= 6036 )
+	if (class_ >= MERID_MER_LANCER01 && class_ <= MERID_MER_LANCER10)
 		return sd->status.spear_calls;
-	if( class_ >= 6037 && class_ <= 6046 )
+	if (class_ >= MERID_MER_SWORDMAN01 && class_ <= MERID_MER_SWORDMAN10)
 		return sd->status.sword_calls;
 
 	return 0;
@@ -194,11 +213,11 @@ int mercenary_set_calls(struct mercenary_data *md, int value)
 
 	class_ = md->db->class_;
 
-	if( class_ >= 6017 && class_ <= 6026 )
+	if (class_ >= MERID_MER_ARCHER01 && class_ <= MERID_MER_ARCHER10)
 		calls = &sd->status.arch_calls;
-	else if( class_ >= 6027 && class_ <= 6036 )
+	else if (class_ >= MERID_MER_LANCER01 && class_ <= MERID_MER_LANCER10)
 		calls = &sd->status.spear_calls;
-	else if( class_ >= 6037 && class_ <= 6046 )
+	else if (class_ >= MERID_MER_SWORDMAN01 && class_ <= MERID_MER_SWORDMAN10)
 		calls = &sd->status.sword_calls;
 	else
 		return 0;
@@ -298,10 +317,11 @@ int merc_data_received(struct s_mercenary *merc, bool flag) {
 
 	db = &mercenary->db[i];
 	if( !sd->md ) {
-		sd->md = md = (struct mercenary_data*)aCalloc(1,sizeof(struct mercenary_data));
+		CREATE(md, struct mercenary_data, 1);
 		md->bl.type = BL_MER;
 		md->bl.id = npc->get_new_npc_id();
 		md->devotion_flag = 0;
+		sd->md = md;
 
 		md->master = sd;
 		md->db = db;
@@ -333,7 +353,7 @@ int merc_data_received(struct s_mercenary *merc, bool flag) {
 		mercenary->set_calls(md, 1);
 	sd->status.mer_id = merc->mercenary_id;
 
-	if( md && md->bl.prev == NULL && sd->bl.prev != NULL ) {
+	if( md->bl.prev == NULL && sd->bl.prev != NULL ) {
 		map->addblock(&md->bl);
 		clif->spawn(&md->bl);
 		clif->mercenary_info(sd);
@@ -449,7 +469,7 @@ bool read_mercenarydb_sub(char* str[], int columns, int current) {
 }
 
 int read_mercenarydb(void) {
-	memset(mercenary->db,0,sizeof(mercenary->db));
+	memset(mercenary->db, 0, sizeof(struct s_mercenary_db) * MAX_MERCENARY_CLASS);
 	sv->readdb(map->db_path, "mercenary_db.txt", ',', 26, 26, MAX_MERCENARY_CLASS, mercenary->read_db_sub);
 
 	return 0;
@@ -468,7 +488,7 @@ bool read_mercenary_skilldb_sub(char* str[], int columns, int current)
 		ShowError("read_mercenary_skilldb : Class %d not found in mercenary_db for skill entry.\n", class_);
 		return false;
 	}
-	
+
 	skill_id = atoi(str[1]);
 	if( skill_id < MC_SKILLBASE || skill_id >= MC_SKILLBASE + MAX_MERCSKILL )
 	{
@@ -498,7 +518,7 @@ void do_init_mercenary(bool minimal) {
 
 	mercenary->read_db();
 	mercenary->read_skilldb();
-	
+
 	timer->add_func_list(mercenary->contract_end_timer, "merc_contract_end_timer");
 }
 
@@ -511,25 +531,25 @@ void mercenary_defaults(void) {
 	mercenary = &mercenary_s;
 
 	/* vars */
-	memset(mercenary->db,0,sizeof(mercenary->db));
+	mercenary->db = mercdb;
+	memset(mercenary->db, 0, sizeof(struct s_mercenary_db) * MAX_MERCENARY_CLASS);
 
 	/* funcs */
-	
 	mercenary->init = do_init_mercenary;
-	
+
 	mercenary->class = merc_class;
 	mercenary->get_viewdata = merc_get_viewdata;
-	
+
 	mercenary->create = merc_create;
 	mercenary->data_received = merc_data_received;
 	mercenary->save = mercenary_save;
-	
+
 	mercenary->heal = mercenary_heal;
 	mercenary->dead = mercenary_dead;
-	
+
 	mercenary->delete = merc_delete;
 	mercenary->contract_stop = merc_contract_stop;
-	
+
 	mercenary->get_lifetime = mercenary_get_lifetime;
 	mercenary->get_guild = mercenary_get_guild;
 	mercenary->get_faith = mercenary_get_faith;
@@ -537,14 +557,14 @@ void mercenary_defaults(void) {
 	mercenary->get_calls = mercenary_get_calls;
 	mercenary->set_calls = mercenary_set_calls;
 	mercenary->kills = mercenary_kills;
-	
+
 	mercenary->checkskill = mercenary_checkskill;
 	mercenary->read_db = read_mercenarydb;
 	mercenary->read_skilldb = read_mercenary_skilldb;
-	
+
 	mercenary->killbonus = mercenary_killbonus;
 	mercenary->search_index = merc_search_index;
-	
+
 	mercenary->contract_end_timer = merc_contract_end_timer;
 	mercenary->read_db_sub = read_mercenarydb_sub;
 	mercenary->read_skill_db_sub = read_mercenary_skilldb_sub;

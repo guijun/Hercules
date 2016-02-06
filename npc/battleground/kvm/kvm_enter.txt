@@ -1,34 +1,51 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  L0ne_W0lf
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 // BattleGround System - KvM Entrance NPCs
-//===== By: ==================================================
-//= L0ne_W0lf
-//===== Current Version: =====================================
-//= 1.1
-//===== Description: =========================================
-//= [Official Conversion]
+//================= Description ===========================================
 //= Kreiger Von Midgard Battleground Entrance NPCs
 //= Original NPCs scrapped from bg_common.
-//===== Additional Comments: =================================
-//= 1.0 First Version.
-//= 1.1 Corrected some typos, and shifted messages around.
-//=     Corrected iRO style quest log entries, however it's
-//=     advisable that you not use them, as they conflict.
-//============================================================
+//================= Current Version =======================================
+//= 1.1
+//=========================================================================
 
-// KvM Officer - Guillaume
-//============================================================
+//== KvM Officer - Guillaume ===============================
 bat_room,164,178,5	script	KVM Mercenary Officer#1	4_M_KY_KNT,{
 	/*
-	set .@kvm,checkquest(6026,PLAYTIME);
-	if ((.@kvm == 0) || (.@kvm == 1)) {
+	.@kvm = questprogress(6026,PLAYTIME);
+	if (.@kvm == 1) {
 		mes "[Croix Mercenary Officer]";
 		mes "I know that you've already signed with the Croix. Go back and join their team. We will not accept traitors to fight for us.";
 		close;
 	}
 	else if (.@kvm == 2) erasequest 6026;
 	*/
-	set .@permit,checkquest(6025,PLAYTIME);
-	if ((.@permit == 0) || (.@permit == 1)) {
+	.@permit = questprogress(6025,PLAYTIME);
+	if (.@permit == 1) {
 		mes "[Guillaume Mercenary Officer]";
 		mes "It seems you have recently participated in a KVM battle. You must wait 5 minutes before signing up again.";
 		close;
@@ -47,7 +64,7 @@ bat_room,164,178,5	script	KVM Mercenary Officer#1	4_M_KY_KNT,{
 		if (BaseLevel > 79)  warp "bat_room",169,223;
 		else if (BaseLevel < 60) warp "bat_room",197,223;
 		else warp "bat_room",225,223;
-		close;
+		end;
 	case 2:
 		mes "[Guillaume Mercenary Officer]";
 		mes "We will win!";
@@ -55,8 +72,7 @@ bat_room,164,178,5	script	KVM Mercenary Officer#1	4_M_KY_KNT,{
 	}
 }
 
-// Guillaume Knight - KvM
-//============================================================
+//== Guillaume Knight - KvM ================================
 bat_room,167,178,5	script	Guillaume Knight#kvm	4_M_KY_SOLD,{
 	mes "[Guillaume Knight]";
 	mes "Hello.";
@@ -115,20 +131,19 @@ bat_room,167,178,5	script	Guillaume Knight#kvm	4_M_KY_SOLD,{
 	}
 }
 
-// KvM Officer - Croix
-//============================================================
+//== KvM Officer - Croix ===================================
 bat_room,164,121,1	script	KVM Mercenary Officer#2	4_M_CRU_KNT,{
 	/*
-	set .@kvm,checkquest(6025,PLAYTIME);
-	if ((.@kvm == 0) || (.@kvm == 1)) {
+	.@kvm = questprogress(6025,PLAYTIME);
+	if (.@kvm == 1) {
 		mes "[Croix Mercenary Officer]";
 		mes "I know that you've already signed with the Guillaume. Go back and join their team. We will not accept traitors to fight for us.";
 		close;
 	}
 	else if (.@kvm == 2) erasequest 6025;
 	*/
-	set .@permit,checkquest(6025,PLAYTIME);
-	if ((.@permit == 0) || (.@permit == 1)) {
+	.@permit = questprogress(6025,PLAYTIME);
+	if (.@permit == 1) {
 		mes "[Croix Mercenary Officer]";
 		mes "It seems you have recently participated in a KVM battle. You must wait 5 minutes before signing up again.";
 		close;
@@ -147,7 +162,7 @@ bat_room,164,121,1	script	KVM Mercenary Officer#2	4_M_CRU_KNT,{
 		if (BaseLevel > 79) warp "bat_room",169,207;
 		else if (BaseLevel < 60) warp "bat_room",197,207;
 		else warp "bat_room",225,207;
-		close;
+		end;
 	case 2:
 		mes "[Croix Mercenary Officer]";
 		mes "We will win!";
@@ -155,8 +170,7 @@ bat_room,164,121,1	script	KVM Mercenary Officer#2	4_M_CRU_KNT,{
 	}
 }
 
-// Croix Knight - KvM
-//============================================================
+//== Croix Knight - KvM ====================================
 bat_room,167,121,1	script	Croix Knight#kvm	4_M_CRU_SOLD,{
 	mes "[Croix Knight]";
 	mes "Hello.";

@@ -1,20 +1,43 @@
-//===== Hercules Script ======================================
+//================= Hercules Script =======================================
+//=       _   _                     _
+//=      | | | |                   | |
+//=      | |_| | ___ _ __ ___ _   _| | ___  ___
+//=      |  _  |/ _ \ '__/ __| | | | |/ _ \/ __|
+//=      | | | |  __/ | | (__| |_| | |  __/\__ \
+//=      \_| |_/\___|_|  \___|\__,_|_|\___||___/
+//================= License ===============================================
+//= This file is part of Hercules.
+//= http://herc.ws - http://github.com/HerculesWS/Hercules
+//=
+//= Copyright (C) 2012-2015  Hercules Dev Team
+//= Copyright (C)  L0ne_W0lf
+//= Copyright (C)  Silent
+//= Copyright (C)  Nexon
+//= Copyright (C)  Kisuka
+//= Copyright (C)  Samuray22
+//= Copyright (C)  Muad_Dib
+//=
+//= Hercules is free software: you can redistribute it and/or modify
+//= it under the terms of the GNU General Public License as published by
+//= the Free Software Foundation, either version 3 of the License, or
+//= (at your option) any later version.
+//=
+//= This program is distributed in the hope that it will be useful,
+//= but WITHOUT ANY WARRANTY; without even the implied warranty of
+//= MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//= GNU General Public License for more details.
+//=
+//= You should have received a copy of the GNU General Public License
+//= along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//=========================================================================
 //= Hair Dresser
-//===== By: ==================================================
-//= Muad_Dib, Samuray22, Kisuka
-//===== Current Version: =====================================
-//= 1.4
-//===== Description: =========================================
-//= [Official Conversion]
+//================= Description ===========================================
 //= Allows you to change your hairstyle.
-//===== Additional Comments: =================================
-//= 1.2 Rescripted to the Aegis 10.3 Standards. [Samuray22]
-//= 1.3 Updated to match AEGIS script. [Kisuka]
-//= 1.4 Added Lighthalzen Hair Dresser. [L0ne_W0lf]
-//============================================================
+//================= Current Version =======================================
+//= 1.4
+//=========================================================================
 
-// Hair Dresser Veronica
-// ============================================================
+//== Hair Dresser Veronica =================================
 alberta_in,55,142,7	script	Hair Dresser	4_F_02,{
 	mes "[Veronica]";
 	mes "Welcome to Veronica's hair salon.";
@@ -360,7 +383,7 @@ alberta_in,55,142,7	script	Hair Dresser	4_F_02,{
 			mes "your current hairstyle. Why don't you";
 			mes "try a new hair accessory rather than changing your look?";
 			close;
-		} else if((countitem(973) < 3) || (countitem(974) < 3) || (countitem(901) <100) || (countitem(1094) <100) || (countitem(1020) <100) || (countitem(1060) <100) || (countitem(7152) <100) || (Zeny < 99800)) {
+		} else if((countitem(Counteragent) < 3) || (countitem(Mixture) < 3) || (countitem(Danggie) <100) || (countitem(Short_Daenggie) <100) || (countitem(Long_Hair) <100) || (countitem(Golden_Hair) <100) || (countitem(Glossy_Hair) <100) || (Zeny < 99800)) {
 			mes "[Veronica]";
 			mes "If you wish to change your";
 			mes "hairstyle, you should meet some";
@@ -425,28 +448,28 @@ alberta_in,55,142,7	script	Hair Dresser	4_F_02,{
 					next;
 					switch(select("Red.:Yellow.:Purple.:Orange.:Green.:Blue.:White.:Dark Brown.:Cancel.")) {
 					case 1:
-						set .@pallete,8;
+						.@pallete = 8;
 						break;
 					case 2:
-						set .@pallete,1;
+						.@pallete = 1;
 						break;
 					case 3:
-						set .@pallete,2;
+						.@pallete = 2;
 						break;
 					case 4:
-						set .@pallete,3;
+						.@pallete = 3;
 						break;
 					case 5:
-						set .@pallete,4;
+						.@pallete = 4;
 						break;
 					case 6:
-						set .@pallete,5;
+						.@pallete = 5;
 						break;
 					case 7:
-						set .@pallete,6;
+						.@pallete = 6;
 						break;
 					case 8:
-						set .@pallete,7;
+						.@pallete = 7;
 						break;
 					case 9:
 						mes "[Veronica]";
@@ -471,13 +494,13 @@ alberta_in,55,142,7	script	Hair Dresser	4_F_02,{
 				mes "- *bzzzzzzz bzzzzzzz bzzzzzzz bzzzzzzz* -";
 				next;
 				Zeny -= 99800;
-				delitem 973,3;	// Counteragent
-				delitem 974,3;	// Mixture
-				delitem 901,100;	// Danggie
-				delitem 1094,100;	// Short_Daenggie
-				delitem 1020,100;	// Long_Hair
-				delitem 1060,100;	// Golden_Hair
-				delitem 7152,100;	// Glossy_Hair
+				delitem Counteragent,3;	// Counteragent
+				delitem Mixture,3;	// Mixture
+				delitem Danggie,100;	// Danggie
+				delitem Short_Daenggie,100;	// Short_Daenggie
+				delitem Long_Hair,100;	// Long_Hair
+				delitem Golden_Hair,100;	// Golden_Hair
+				delitem Glossy_Hair,100;	// Glossy_Hair
 				setlook 1,.@style;
 				setlook 6,.@pallete;
 				cutin "",255;
@@ -520,8 +543,7 @@ L_cutin:
 	return;
 }
 
-// Roving Hair Dresser
-// ============================================================
+//== Roving Hair Dresser ===================================
 alberta,33,141,7	script	Roving Hair Dresser	4_M_BARBER,{
 	mes "[Rui Vishop]";
 	mes "That Veronica...";
@@ -682,7 +704,7 @@ alberta,33,141,7	script	Roving Hair Dresser	4_M_BARBER,{
 }
 
 
-// Lighthalzen
+//== Lighthalzen ===========================================
 lhz_in02,100,143,3	script	Hair Dresser#li	2_M_DYEINGER,{
 	mes "[Prince Shammi]";
 	mes "Welcome to Prince Shammi's";
@@ -902,7 +924,7 @@ lhz_in02,100,143,3	script	Hair Dresser#li	2_M_DYEINGER,{
 			mes "come back once you do, okay?";
 			close;
 		}
-		else if ((countitem(973) < 3) || (countitem(974) < 3) || (countitem(901) < 100) || (countitem(1094) < 100) || (countitem(1020) < 100) || (countitem(1060) < 100) || (countitem(7152) < 100) || (Zeny < 99800)) {
+		else if ((countitem(Counteragent) < 3) || (countitem(Mixture) < 3) || (countitem(Danggie) < 100) || (countitem(Short_Daenggie) < 100) || (countitem(Long_Hair) < 100) || (countitem(Golden_Hair) < 100) || (countitem(Glossy_Hair) < 100) || (Zeny < 99800)) {
 			mes "[Prince Shammi]";
 			mes "If you've already decided";
 			mes "what hairstyle you'd like,";
@@ -973,7 +995,7 @@ lhz_in02,100,143,3	script	Hair Dresser#li	2_M_DYEINGER,{
 			mes "you soooooooo beautiful!";
 			close;
 		}
-		else if (getlook(VAR_HEAD) == .@input) {
+		else if (getlook(LOOK_HAIR) == .@input) {
 			mes "[Prince Shammi]";
 			mes "Oh dear me, you're not";
 			mes "going to waste money for";
@@ -995,7 +1017,7 @@ lhz_in02,100,143,3	script	Hair Dresser#li	2_M_DYEINGER,{
 			next;
 			switch(select("Yes.:No.")) {
 			case 1:
-				if (getlook(VAR_HEADPALETTE) == 0) {
+				if (getlook(LOOK_HAIR_COLOR) == 0) {
 					mes "[Prince Shammi]";
 					mes "Oh, Sweet Christmas,";
 					mes "I almost forgot! Would";
@@ -1006,28 +1028,28 @@ lhz_in02,100,143,3	script	Hair Dresser#li	2_M_DYEINGER,{
 					next;
 					switch(select("Red:Yellow:Purple:Orange:Green:Blue:White:Dark Brown")) {
 					case 1:
-						set .@headpalette,8;
+						.@headpalette = 8;
 						break;
 					case 2:
-						set .@headpalette,1;
+						.@headpalette = 1;
 						break;
 					case 3:
-						set .@headpalette,2;
+						.@headpalette = 2;
 						break;
 					case 4:
-						set .@headpalette,3;
+						.@headpalette = 3;
 						break;
 					case 5:
-						set .@headpalette,4;
+						.@headpalette = 4;
 						break;
 					case 6:
-						set .@headpalette,5;
+						.@headpalette = 5;
 						break;
 					case 7:
-						set .@headpalette,6;
+						.@headpalette = 6;
 						break;
 					case 8:
-						set .@headpalette,7;
+						.@headpalette = 7;
 						break;
 					}
 				}
@@ -1043,15 +1065,15 @@ lhz_in02,100,143,3	script	Hair Dresser#li	2_M_DYEINGER,{
 				mes "*Bzzzzzzzzzzzzzzzzzzzz*^000000";
 				next;
 				Zeny -= 99800;
-				delitem 973,3; //Counteragent
-				delitem 974,3; //Mixture
-				delitem 901,100; //Danggie
-				delitem 1094,100; //Short_Daenggie
-				delitem 1020,100; //Long_Hair
-				delitem 1060,100; //Golden_Hair
-				delitem 7152,100; //Glossy_Hair
-				setlook VAR_HEAD,.@input;
-				setlook VAR_HEADPALETTE,.@headpalette;
+				delitem Counteragent,3;
+				delitem Mixture,3;
+				delitem Danggie,100;
+				delitem Short_Daenggie,100;
+				delitem Long_Hair,100;
+				delitem Golden_Hair,100;
+				delitem Glossy_Hair,100;
+				setlook LOOK_HAIR,.@input;
+				setlook LOOK_HAIR_COLOR,.@headpalette;
 				mes "[Prince Shammi]";
 				mes "Well, we're all finished!";
 				mes "And my, oh my, you look even";
@@ -1244,14 +1266,14 @@ lhz_in02,91,155,5	script	Assistant Beautician#li	4_F_LGTGIRL,{
 				mes "Wait, I can...";
 				mes "I can fix this!";
 				next;
-				set .@style_r,rand(1,23);
-				set .@color_r,rand(1,8);
+				.@style_r = rand(1,23);
+				.@color_r = rand(1,8);
 				mes "[Assistant Beautician]";
 				mes "^333333*Pant Pant Pant*^000000";
 				next;
 				Zeny -= 250000;
-				setlook VAR_HEAD,.@style_r;
-				setlook VAR_HEADPALETTE,.@color_r;
+				setlook LOOK_HAIR,.@style_r;
+				setlook LOOK_HAIR_COLOR,.@color_r;
 				mes "[Assistant Beautician]";
 				mes "Bwahahaha! Success!";
 				if (.@input == .@style_r) {
@@ -1293,9 +1315,3 @@ lhz_in02,91,155,5	script	Assistant Beautician#li	4_F_LGTGIRL,{
 		close;
 	}
 }
-
-//===== Old Changelog: =================================
-//= 07/06/05 : Added 1st Version. [Muad_Dib]
-//= Converted to rAthena format by Dr.Evil Fixed typos [Nexon]
-//= 1.1 Removed Duplicates [Silent]
-//============================================================

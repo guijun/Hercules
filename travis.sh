@@ -1,5 +1,25 @@
 #!/bin/bash
 
+# This file is part of Hercules.
+# http://herc.ws - http://github.com/HerculesWS/Hercules
+#
+# Copyright (C) 2014-2015  Hercules Dev Team
+#
+# Hercules is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+# Base Author: Haru @ http://herc.ws
+
 MODE="$1"
 shift
 
@@ -54,11 +74,10 @@ case "$MODE" in
 		mysql $DBUSER $DBPASS $DBNAME < sql-files/logs.sql || aborterror "Unable to import logs database."
 		;;
 	build)
+		(cd tools && ./validateinterfaces.py silent) || aborterror "Interface validation error."
 		./configure $@ || aborterror "Configure error, aborting build."
 		make sql -j3 || aborterror "Build failed."
-		if [ -f src/plugins/script_mapquit.c ]; then
-			make plugin.script_mapquit -j3 || aborterror "Build failed."
-		fi
+		make plugin.script_mapquit -j3 || aborterror "Build failed."
 		;;
 	test)
 		cat >> conf/import/login_conf.txt << EOF
@@ -91,25 +110,34 @@ log_db_ip: localhost
 EOF
 		[ $? -eq 0 ] || aborterror "Unable to import configuration, aborting tests."
 		ARGS="--load-script npc/dev/test.txt "
-		if [ -f src/plugins/script_mapquit.c ]; then
-			ARGS="--load-plugin script_mapquit $ARGS --load-script npc/dev/ci_test.txt"
-		fi
+		ARGS="--load-plugin script_mapquit $ARGS --load-script npc/dev/ci_test.txt"
 		echo "Running Hercules with command line: ./map-server --run-once $ARGS"
-		./map-server --run-once $ARGS || aborterror "Test failed."
+		./map-server --run-once $ARGS 2>runlog.txt
+		export errcode=$?
+		export teststr=$(cat runlog.txt)
+		if [[ -n "${teststr}" ]]; then
+			echo "Sanitizer errors found."
+			cat runlog.txt
+			aborterror "Sanitize errors found."
+		else
+			echo "No sanitizer errors found."
+		fi
+		if [ ${errcode} -ne 0 ]; then
+			echo "server terminated with exit code ${errcode}"
+			aborterror "Test failed"
+		fi
 		;;
 	getplugins)
 		echo "Cloning plugins repository..."
-		git clone http://github.com/HerculesWS/StaffPlugins.git || aborterror "Unable to fetch plugin repository"
-		if [ -f StaffPlugins/Haru/script_mapquit/script_mapquit.c -a -f StaffPlugins/Haru/script_mapquit/examples/ci_test.txt ]; then
-			pushd src/plugins || aborterror "Unable to enter plugins directory."
-			ln -s ../../StaffPlugins/Haru/script_mapquit/script_mapquit.c ./
-			popd
-			pushd npc/dev || aborterror "Unable to enter scripts directory."
-			ln -s ../../StaffPlugins/Haru/script_mapquit/examples/ci_test.txt ./
-			popd
-		else
-			echo "Plugin not found, skipping advanced tests."
-		fi
+		# Nothing to clone right now, all relevant plugins are part of the repository.
+		#git clone http://github.com/HerculesWS/StaffPlugins.git || aborterror "Unable to fetch plugin repository"
+		#if [ -f StaffPlugins/Haru/script_mapquit/script_mapquit.c -a -f StaffPlugins/Haru/script_mapquit/examples/ci_test.txt ]; then
+		#	pushd src/plugins || aborterror "Unable to enter plugins directory."
+		#	ln -s ../../StaffPlugins/Haru/script_mapquit/script_mapquit.c ./
+		#	popd
+		#else
+		#	echo "Plugin not found, skipping advanced tests."
+		#fi
 		;;
 	*)
 		usage

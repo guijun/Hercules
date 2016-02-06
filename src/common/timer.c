@@ -1,30 +1,46 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #define HERCULES_CORE
 
 #include "timer.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
-
-#include "../common/cbasetypes.h"
-#include "../common/db.h"
-#include "../common/malloc.h"
-#include "../common/showmsg.h"
-#include "../common/utils.h"
+#include "common/cbasetypes.h"
+#include "common/db.h"
+#include "common/memmgr.h"
+#include "common/showmsg.h"
+#include "common/utils.h"
 
 #ifdef WIN32
-#	include "../common/winapi.h" // GetTickCount()
+#	include "common/winapi.h" // GetTickCount()
 #else
 #	include <sys/time.h> // struct timeval, gettimeofday()
 #	include <unistd.h>
 #endif
 
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
 struct timer_interface timer_s;
+struct timer_interface *timer;
 
 // If the server can't handle processing thousands of monsters
 // or many connected clients, please increase TIMER_MIN_INTERVAL.
@@ -59,7 +75,7 @@ time_t start_time;
 
 
 /*----------------------------
- * 	Timer debugging
+ * Timer debugging
  *----------------------------*/
 struct timer_func_list {
 	struct timer_func_list* next;
@@ -101,31 +117,31 @@ char* search_timer_func_list(TimerFunc func)
 }
 
 /*----------------------------
- * 	Get tick time
+ * Get tick time
  *----------------------------*/
 
 #if defined(ENABLE_RDTSC)
 static uint64 RDTSC_BEGINTICK = 0,   RDTSC_CLOCK = 0;
 
 static __inline uint64 rdtsc_(void) {
-	register union{
-		uint64	qw;
-		uint32 	dw[2];
+	register union {
+		uint64 qw;
+		uint32 dw[2];
 	} t;
 
 	asm volatile("rdtsc":"=a"(t.dw[0]), "=d"(t.dw[1]) );
-	
+
 	return t.qw;
 }
 
 static void rdtsc_calibrate(void){
 	uint64 t1, t2;
 	int32 i;
-	
+
 	ShowStatus("Calibrating Timer Source, please wait... ");
-	
+
 	RDTSC_CLOCK = 0;
-	
+
 	for(i = 0; i < 5; i++){
 		t1 = rdtsc_();
 		usleep(1000000); //1000 MS
@@ -133,9 +149,9 @@ static void rdtsc_calibrate(void){
 		RDTSC_CLOCK += (t2 - t1) / 1000;
 	}
 	RDTSC_CLOCK /= 5;
-	
+
 	RDTSC_BEGINTICK = rdtsc_();
-	
+
 	ShowMessage(" done. (Frequency: %u Mhz)\n", (uint32)(RDTSC_CLOCK/1000) );
 }
 
@@ -233,17 +249,21 @@ int64 timer_gettick(void) {
 //////////////////////////////////////////////////////////////////////////
 
 /*======================================
- * 	CORE : Timer Heap
+ * CORE : Timer Heap
  *--------------------------------------*/
 
 /// Adds a timer to the timer_heap
 static void push_timer_heap(int tid) {
 	BHEAP_ENSURE(timer_heap, 1, 256);
+#ifdef __clang_analyzer__ // Clang's static analyzer warns that BHEAP_ENSURE might set BHEAP_DATA(timer_heap) to NULL.
+#include "assert.h"
+	assert(BHEAP_DATA(timer_heap) != NULL);
+#endif // __clang_analyzer__
 	BHEAP_PUSH(timer_heap, tid, DIFFTICK_MINTOPCMP, swap);
 }
 
 /*==========================
- * 	Timer Management
+ * Timer Management
  *--------------------------*/
 
 /// Returns a free timer id.
@@ -260,6 +280,7 @@ static int acquire_timer(void) {
 
 	// check available space
 	if( tid >= timer_data_num )
+		// possible timer_data null pointer
 		for (tid = timer_data_num; tid < timer_data_max && timer_data[tid].type; tid++);
 	if (tid >= timer_data_num && tid >= timer_data_max)
 	{// expand timer array
@@ -281,7 +302,7 @@ static int acquire_timer(void) {
 /// Returns the timer's id.
 int timer_add(int64 tick, TimerFunc func, int id, intptr_t data) {
 	int tid;
-	
+
 	tid = acquire_timer();
 	timer_data[tid].tick     = tick;
 	timer_data[tid].func     = func;
@@ -304,7 +325,7 @@ int timer_add_interval(int64 tick, TimerFunc func, int id, intptr_t data, int in
 		          tick, func, search_timer_func_list(func), id, data, DIFF_TICK(tick, timer->gettick()));
 		return INVALID_TIMER;
 	}
-	
+
 	tid = acquire_timer();
 	timer_data[tid].tick     = tick;
 	timer_data[tid].func     = func;
@@ -347,14 +368,21 @@ int64 timer_addtick(int tid, int64 tick) {
 	return timer->settick(tid, timer_data[tid].tick+tick);
 }
 
-/// Modifies a timer's expiration time (an alternative to deleting a timer and starting a new one).
-/// Returns the new tick value, or -1 if it fails.
-int64 timer_settick(int tid, int64 tick) {
-	size_t i;
-	
+/**
+ * Modifies a timer's expiration time (an alternative to deleting a timer and starting a new one).
+ *
+ * @param tid  The timer ID.
+ * @param tick New expiration time.
+ * @return The new tick value.
+ * @retval -1 in case of failure.
+ */
+int64 timer_settick(int tid, int64 tick)
+{
+	int i;
+
 	// search timer position
 	ARR_FIND(0, BHEAP_LENGTH(timer_heap), i, BHEAP_DATA(timer_heap)[i] == tid);
-	if( i == BHEAP_LENGTH(timer_heap) ) {
+	if (i == BHEAP_LENGTH(timer_heap)) {
 		ShowError("timer_settick: no such timer %d (%p(%s))\n", tid, timer_data[tid].func, search_timer_func_list(timer_data[tid].func));
 		return -1;
 	}
@@ -372,13 +400,18 @@ int64 timer_settick(int tid, int64 tick) {
 	return tick;
 }
 
-/// Executes all expired timers.
-/// Returns the value of the smallest non-expired timer (or 1 second if there aren't any).
-int do_timer(int64 tick) {
+/**
+ * Executes all expired timers.
+ *
+ * @param tick The current tick.
+ * @return The value of the smallest non-expired timer (or 1 second if there aren't any).
+ */
+int do_timer(int64 tick)
+{
 	int64 diff = TIMER_MAX_INTERVAL; // return value
 
 	// process all timers one by one
-	while( BHEAP_LENGTH(timer_heap) ) {
+	while (BHEAP_LENGTH(timer_heap) > 0) {
 		int tid = BHEAP_PEEK(timer_heap);// top element in heap (smallest tick)
 
 		diff = DIFF_TICK(timer_data[tid].tick, tick);
@@ -444,8 +477,8 @@ void timer_final(void) {
 	struct timer_func_list *next;
 
 	for( tfl=tfl_root; tfl != NULL; tfl = next ) {
-		next = tfl->next;	// copy next pointer
-		aFree(tfl->name);	// free structures
+		next = tfl->next; // copy next pointer
+		aFree(tfl->name); // free structures
 		aFree(tfl);
 	}
 

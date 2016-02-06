@@ -1,29 +1,46 @@
-// Copyright (c) Hercules Dev Team, licensed under GNU GPL.
-// See the LICENSE file
-// Portions Copyright (c) Athena Dev Teams
-
+/**
+ * This file is part of Hercules.
+ * http://herc.ws - http://github.com/HerculesWS/Hercules
+ *
+ * Copyright (C) 2012-2015  Hercules Dev Team
+ * Copyright (C)  Athena Dev Teams
+ *
+ * Hercules is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 #define HERCULES_CORE
 
 #include "chat.h"
 
+#include "map/atcommand.h" // msg_sd(sd,)
+#include "map/battle.h" // struct battle_config
+#include "map/clif.h"
+#include "map/map.h"
+#include "map/npc.h" // npc_event_do()
+#include "map/pc.h"
+#include "map/skill.h" // ext_skill_unit_onplace()
+#include "common/cbasetypes.h"
+#include "common/memmgr.h"
+#include "common/mmo.h"
+#include "common/nullpo.h"
+#include "common/showmsg.h"
+#include "common/strlib.h"
+
 #include <stdio.h>
 #include <string.h>
 
-#include "atcommand.h" // msg_txt()
-#include "battle.h" // struct battle_config
-#include "clif.h"
-#include "map.h"
-#include "npc.h" // npc_event_do()
-#include "pc.h"
-#include "skill.h" // ext_skill_unit_onplace()
-#include "../common/cbasetypes.h"
-#include "../common/malloc.h"
-#include "../common/mmo.h"
-#include "../common/nullpo.h"
-#include "../common/showmsg.h"
-#include "../common/strlib.h"
-
 struct chat_interface chat_s;
+struct chat_interface *chat;
 
 /// Initializes a chatroom object (common functionality for both pc and npc chatrooms).
 /// Returns a chatroom object on success, or NULL on failure.
@@ -31,9 +48,12 @@ struct chat_data* chat_createchat(struct block_list* bl, const char* title, cons
 {
 	struct chat_data* cd;
 	nullpo_retr(NULL, bl);
+	nullpo_retr(NULL, title);
+	nullpo_retr(NULL, pass);
+	nullpo_retr(NULL, ev);
 
 	/* Given the overhead and the numerous instances (npc allocated or otherwise) wouldn't it be beneficial to have it use ERS? [Ind] */
-	cd = (struct chat_data *) aMalloc(sizeof(struct chat_data));
+	CREATE(cd, struct chat_data, 1);
 
 	safestrncpy(cd->title, title, sizeof(cd->title));
 	safestrncpy(cd->pass, pass, sizeof(cd->pass));
@@ -61,10 +81,10 @@ struct chat_data* chat_createchat(struct block_list* bl, const char* title, cons
 	}
 
 	map->addiddb(&cd->bl);
-	
+
 	if( bl->type != BL_NPC )
 		cd->kick_list = idb_alloc(DB_OPT_BASE);
-	
+
 	return cd;
 }
 
@@ -74,6 +94,8 @@ struct chat_data* chat_createchat(struct block_list* bl, const char* title, cons
 bool chat_createpcchat(struct map_session_data* sd, const char* title, const char* pass, int limit, bool pub) {
 	struct chat_data* cd;
 	nullpo_ret(sd);
+	nullpo_ret(title);
+	nullpo_ret(pass);
 
 	if( sd->chatID )
 		return false; //Prevent people abusing the chat system by creating multiple chats, as pointed out by End of Exam. [Skotlex]
@@ -84,16 +106,16 @@ bool chat_createpcchat(struct map_session_data* sd, const char* title, const cha
 	}
 
 	if( map->list[sd->bl.m].flag.nochat ) {
-		clif->message(sd->fd, msg_txt(281));
+		clif->message(sd->fd, msg_sd(sd,281));
 		return false; //Can't create chatrooms on this map.
 	}
 
-	if( map->getcell(sd->bl.m,sd->bl.x,sd->bl.y,CELL_CHKNOCHAT) ) {
-		clif->message (sd->fd, msg_txt(865)); // "Can't create chat rooms in this area."
+	if (map->getcell(sd->bl.m, &sd->bl, sd->bl.x, sd->bl.y, CELL_CHKNOCHAT) ) {
+		clif->message (sd->fd, msg_sd(sd,865)); // "Can't create chat rooms in this area."
 		return false;
 	}
 
-	pc_stop_walking(sd,1);
+	pc_stop_walking(sd, STOPWALKING_FLAG_FIXPOS);
 
 	cd = chat->create(&sd->bl, title, pass, limit, pub, 0, "", 0, 1, MAX_LEVEL);
 	if( cd ) {
@@ -101,7 +123,7 @@ bool chat_createpcchat(struct map_session_data* sd, const char* title, const cha
 		cd->usersd[0] = sd;
 		pc_setchatid(sd,cd->bl.id);
 		pc_stop_attack(sd);
-		clif->createchat(sd,0);
+		clif->createchat(sd,0); // 0 = success
 		clif->dispchat(cd,0);
 		return true;
 	}
@@ -117,7 +139,8 @@ bool chat_joinchat(struct map_session_data* sd, int chatid, const char* pass) {
 	struct chat_data* cd;
 
 	nullpo_ret(sd);
-	cd = (struct chat_data*)map->id2bl(chatid);
+	nullpo_ret(pass);
+	cd = map->id2cd(chatid);
 
 	if( cd == NULL || cd->bl.type != BL_CHAT || cd->bl.m != sd->bl.m || sd->state.vending || sd->state.buyingstore || sd->chatID || ((cd->owner->type == BL_NPC) ? cd->users+1 : cd->users) >= cd->limit )
 	{
@@ -150,26 +173,26 @@ bool chat_joinchat(struct map_session_data* sd, int chatid, const char* pass) {
 		return false;
 	}
 
-	pc_stop_walking(sd,1);
+	pc_stop_walking(sd, STOPWALKING_FLAG_FIXPOS);
 	cd->usersd[cd->users] = sd;
 	cd->users++;
 
 	pc_setchatid(sd,cd->bl.id);
 
-    clif->joinchatok(sd, cd); //To the person who newly joined the list of all
-    clif->addchat(cd, sd); //Reports To the person who already in the chat
-    clif->dispchat(cd, 0); //Reported number of changes to the people around
+	clif->joinchatok(sd, cd); //To the person who newly joined the list of all
+	clif->addchat(cd, sd); //Reports To the person who already in the chat
+	clif->dispchat(cd, 0); //Reported number of changes to the people around
 
-    chat->trigger_event(cd); //Event
+	chat->trigger_event(cd); //Event
 
-    return true;
+	return true;
 }
 
 
 /*==========================================
  * Leave a chatroom
  * Return
- *	0: User not found in chatroom/Missing data
+ *  0: User not found in chatroom/Missing data
  *  1: Success
  *  2: Chat room deleted (chat room empty)
  *  3: Owner changed (Owner left and a new one as assigned)
@@ -181,15 +204,15 @@ int chat_leavechat(struct map_session_data* sd, bool kicked) {
 
 	nullpo_retr(0, sd);
 
-	cd = (struct chat_data*)map->id2bl(sd->chatID);
+	cd = map->id2cd(sd->chatID);
 	if( cd == NULL ) {
 		pc_setchatid(sd, 0);
 		return 0;
 	}
 
 	ARR_FIND( 0, cd->users, i, cd->usersd[i] == sd );
-	if ( i == cd->users )
-	{	// Not found in the chatroom?
+	if (i == cd->users) {
+		// Not found in the chatroom?
 		pc_setchatid(sd, 0);
 		return 0;
 	}
@@ -213,7 +236,7 @@ int chat_leavechat(struct map_session_data* sd, bool kicked) {
 		map->deliddb(&cd->bl);
 		map->delblock(&cd->bl);
 		map->freeblock(&cd->bl);
-		
+
 		su = map->find_skill_unit_oncell(&sd->bl, sd->bl.x, sd->bl.y, AL_WARP, NULL, 0);
 		group = (su != NULL) ? su->group : NULL;
 		if (group != NULL)
@@ -224,14 +247,14 @@ int chat_leavechat(struct map_session_data* sd, bool kicked) {
 
 	if( leavechar == 0 && cd->owner->type == BL_PC ) {
 		// Set and announce new owner
-		cd->owner = (struct block_list*) cd->usersd[0];
+		cd->owner = &cd->usersd[0]->bl;
 		clif->changechatowner(cd, cd->usersd[0]);
 		clif->clearchat(cd, 0);
 
 		//Adjust Chat location after owner has been changed.
 		map->delblock( &cd->bl );
-		cd->bl.x=cd->usersd[0]->bl.x;
-		cd->bl.y=cd->usersd[0]->bl.y;
+		cd->bl.x = cd->owner->x;
+		cd->bl.y = cd->owner->y;
 		map->addblock( &cd->bl );
 
 		clif->dispchat(cd,0);
@@ -254,9 +277,10 @@ bool chat_changechatowner(struct map_session_data* sd, const char* nextownername
 	int i;
 
 	nullpo_ret(sd);
+	nullpo_ret(nextownername);
 
-	cd = (struct chat_data*)map->id2bl(sd->chatID);
-	if( cd == NULL || (struct block_list*) sd != cd->owner )
+	cd = map->id2cd(sd->chatID);
+	if (cd == NULL || &sd->bl != cd->owner)
 		return false;
 
 	ARR_FIND( 1, cd->users, i, strncmp(cd->usersd[i]->status.name, nextownername, NAME_LENGTH) == 0 );
@@ -267,7 +291,7 @@ bool chat_changechatowner(struct map_session_data* sd, const char* nextownername
 	clif->clearchat(cd,0);
 
 	// set new owner
-	cd->owner = (struct block_list*) cd->usersd[i];
+	cd->owner = &cd->usersd[i]->bl;
 	clif->changechatowner(cd,cd->usersd[i]);
 
 	// swap the old and new owners' positions
@@ -297,9 +321,11 @@ bool chat_changechatstatus(struct map_session_data* sd, const char* title, const
 	struct chat_data* cd;
 
 	nullpo_ret(sd);
+	nullpo_ret(title);
+	nullpo_ret(pass);
 
-	cd = (struct chat_data*)map->id2bl(sd->chatID);
-	if( cd==NULL || (struct block_list *)sd != cd->owner )
+	cd = map->id2cd(sd->chatID);
+	if (cd == NULL || &sd->bl != cd->owner)
 		return false;
 
 	safestrncpy(cd->title, title, CHATROOM_TITLE_SIZE);
@@ -324,10 +350,11 @@ bool chat_kickchat(struct map_session_data* sd, const char* kickusername) {
 	int i;
 
 	nullpo_ret(sd);
+	nullpo_ret(kickusername);
 
-	cd = (struct chat_data *)map->id2bl(sd->chatID);
-	
-	if( cd==NULL || (struct block_list *)sd != cd->owner )
+	cd = map->id2cd(sd->chatID);
+
+	if (cd == NULL || &sd->bl != cd->owner)
 		return false;
 
 	ARR_FIND( 0, cd->users, i, strncmp(cd->usersd[i]->status.name, kickusername, NAME_LENGTH) == 0 );
@@ -336,10 +363,10 @@ bool chat_kickchat(struct map_session_data* sd, const char* kickusername) {
 
 	if (pc_has_permission(cd->usersd[i], PC_PERM_NO_CHAT_KICK))
 		return false; //gm kick protection [Valaris]
-	
+
 	idb_iput(cd->kick_list,cd->usersd[i]->status.char_id,1);
 
-	chat->leave(cd->usersd[i],1);
+	chat->leave(cd->usersd[i], true);
 	return true;
 }
 
@@ -382,17 +409,17 @@ bool chat_deletenpcchat(struct npc_data* nd) {
 	struct chat_data *cd;
 	nullpo_ret(nd);
 
-	cd = (struct chat_data*)map->id2bl(nd->chat_id);
-	if( cd == NULL )
+	cd = map->id2cd(nd->chat_id);
+	if (cd == NULL)
 		return false;
-	
+
 	chat->npc_kick_all(cd);
 	clif->clearchat(cd, 0);
 	map->deliddb(&cd->bl);
 	map->delblock(&cd->bl);
 	map->freeblock(&cd->bl);
 	nd->chat_id = 0;
-	
+
 	return true;
 }
 
@@ -440,7 +467,7 @@ bool chat_npckickall(struct chat_data* cd)
 	nullpo_ret(cd);
 
 	while( cd->users > 0 )
-		chat->leave(cd->usersd[cd->users-1],0);
+		chat->leave(cd->usersd[cd->users-1], false);
 
 	return true;
 }
@@ -452,7 +479,7 @@ bool chat_npckickall(struct chat_data* cd)
 *-------------------------------------*/
 void chat_defaults(void) {
 	chat = &chat_s;
-	
+
 	/* funcs */
 	chat->create_pc_chat = chat_createpcchat;
 	chat->join = chat_joinchat;
